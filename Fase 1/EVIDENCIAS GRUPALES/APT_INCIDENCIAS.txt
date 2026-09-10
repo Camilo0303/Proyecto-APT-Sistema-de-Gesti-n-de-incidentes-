@@ -1,0 +1,792 @@
+CREATE DATABASE sistema_incidencias;
+USE sistema_incidencias;
+
+-- =====================================================
+-- TABLA: roles
+-- =====================================================
+-- Esta tabla almacena los distintos tipos de usuarios
+-- que podrán utilizar el sistema.
+-- Cada rol tendrá un identificador único (id_rol)
+-- que posteriormente se relacionará con la tabla usuarios.
+-- =====================================================
+
+CREATE TABLE roles (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    descripcion VARCHAR(150)
+);
+
+-- =====================================================
+-- DATOS INICIALES: roles
+-- =====================================================
+-- Se registran los tipos de usuarios autorizados
+-- para acceder al sistema.
+-- Los usuarios autorizados serán:
+-- 1. Profesor
+-- 2. Técnico
+-- 3. Administrador
+-- =====================================================
+
+INSERT INTO roles (nombre, descripcion)
+VALUES
+('Profesor', 'Docente autorizado para utilizar el sistema'),
+('Tecnico', 'Personal técnico encargado de gestionar incidencias'),
+('Administrador', 'Usuario encargado de administrar el sistema');
+
+-- =====================================================
+-- TABLA: usuarios
+-- =====================================================
+-- Esta tabla almacena los usuarios autorizados para
+-- acceder al Sistema de Gestión de Incidencias.
+-- Cada usuario tendrá:
+-- - Identificador único.
+-- - Nombre y apellido.
+-- - Correo electrónico único.
+-- - Contraseña.
+-- - Rol asignado.
+-- - Estado activo o inactivo.
+--
+-- Un rol puede estar asociado a muchos usuarios,
+-- pero cada usuario tendrá un único rol.
+-- =====================================================
+
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    -- El correo será utilizado para identificar
+    -- al usuario durante el inicio de sesión.
+    correo VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    -- Identifica el rol que posee el usuario.
+    id_rol INT NOT NULL,
+    -- Permite habilitar o deshabilitar usuarios
+    -- sin necesidad de eliminarlos de la base de datos.
+    activo BOOLEAN DEFAULT TRUE,
+    -- Clave foránea que relaciona cada usuario
+    -- con un registro existente en la tabla roles.
+    CONSTRAINT fk_usuario_rol
+        FOREIGN KEY (id_rol)
+        REFERENCES roles(id_rol)
+);
+
+-- =====================================================
+-- TABLA: salas
+-- =====================================================
+-- Esta tabla almacena las distintas salas o ubicaciones
+-- físicas del establecimiento donde pueden ocurrir
+-- incidencias.
+--
+-- Cada sala tendrá:
+-- - Un identificador único.
+-- - Nombre de la sala.
+-- - Piso.
+-- - Edificio.
+-- - Código QR asociado.
+-- - Estado activo/inactivo.
+--
+-- El código QR permitirá identificar rápidamente
+-- una ubicación dentro del sistema.
+-- =====================================================
+
+CREATE TABLE salas (
+    id_sala INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    piso INT,
+    edificio VARCHAR(100),
+    -- Código único asociado al QR de la sala.
+    codigo_qr VARCHAR(255) UNIQUE,
+    -- Permite dejar una sala fuera de uso
+    -- sin eliminarla de la base de datos.
+    activa BOOLEAN DEFAULT TRUE
+);
+
+-- =====================================================
+-- TABLA: equipos
+-- =====================================================
+-- Esta tabla almacena los equipos asociados a una sala
+-- o ubicación específica.
+-- Cada equipo podrá estar relacionado con una sala.
+
+-- Una sala puede tener varios equipos,
+-- pero cada equipo estará asociado a una sala.
+-- =====================================================
+
+CREATE TABLE equipos (
+    id_equipo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    tipo VARCHAR(100),
+    marca VARCHAR(100),
+    modelo VARCHAR(100),
+    numero_serie VARCHAR(100),
+    estado VARCHAR(50),
+    -- Identifica la sala donde se encuentra el equipo.
+    id_sala INT,
+    -- Clave foránea que relaciona el equipo
+    -- con la tabla salas.
+    CONSTRAINT fk_equipo_sala
+        FOREIGN KEY (id_sala)
+        REFERENCES salas(id_sala)
+);
+
+-- =====================================================
+-- TABLA: categorias
+-- =====================================================
+-- Esta tabla almacena las distintas categorías
+-- que pueden tener las incidencias registradas
+-- Esto permitirá clasificar las incidencias y
+-- posteriormente generar estadísticas y reportes.
+-- =====================================================
+
+CREATE TABLE categorias (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(200)
+);
+
+-- =====================================================
+-- TABLA: prioridades
+-- =====================================================
+-- Esta tabla almacena los niveles de prioridad
+-- de las incidencias
+-- El campo nivel permitirá ordenar las prioridades
+-- de menor a mayor importancia.
+-- =====================================================
+
+CREATE TABLE prioridades (
+    id_prioridad INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    nivel INT NOT NULL
+);
+
+-- =====================================================
+-- TABLA: estados_incidencia
+-- =====================================================
+-- Esta tabla almacena los distintos estados
+-- por los que puede pasar una incidencia.
+-- Esto permitirá realizar seguimiento
+-- =====================================================
+
+CREATE TABLE estados_incidencia (
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    descripcion VARCHAR(150)
+);
+
+
+-- =====================================================
+-- TABLA: incidencias
+-- =====================================================
+-- Esta tabla almacena cada problema o falla reportada
+-- dentro del establecimiento.
+--
+-- Una incidencia podrá registrar:
+-- - Título y descripción del problema.
+-- - Usuario que realiza el reporte.
+-- - Sala donde ocurrió.
+-- - Equipo involucrado, si corresponde.
+-- - Categoría.
+-- - Prioridad.
+-- - Estado actual.
+-- - Usuario responsable de atenderla.
+-- - Fecha de creación.
+-- - Fecha de solución.
+-- - Descripción de la solución aplicada.
+-- El campo id_responsable también se relaciona con
+-- la tabla usuarios, ya que el responsable será
+-- normalmente un técnico o administrador autorizado.
+-- =====================================================
+
+CREATE TABLE incidencias (
+    id_incidencia INT AUTO_INCREMENT PRIMARY KEY,
+    -- Título breve de la incidencia.
+    titulo VARCHAR(150) NOT NULL,
+    -- Descripción detallada del problema reportado.
+    descripcion TEXT NOT NULL,
+    -- Fecha y hora en que se registra la incidencia.
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Usuario que realiza el reporte.
+    id_usuario_reporta INT NOT NULL,
+    -- Sala o ubicación donde ocurrió el problema.
+    id_sala INT NOT NULL,
+    -- Equipo involucrado.
+    -- Puede ser NULL si la incidencia no corresponde
+    -- a un equipo específico.
+    id_equipo INT NULL,
+    -- Clasificación de la incidencia.
+    id_categoria INT NOT NULL,
+    -- Nivel de prioridad.
+    id_prioridad INT NOT NULL,
+    -- Estado actual de la incidencia.
+    id_estado INT NOT NULL,
+    -- Usuario encargado de gestionar la incidencia.
+    -- Puede ser NULL mientras aún no haya sido asignada.
+    id_responsable INT NULL,
+    -- Fecha en que se considera solucionada.
+    fecha_solucion DATETIME NULL,
+    -- Descripción de la solución aplicada.
+    solucion TEXT NULL,
+    -- Relación con el usuario que reporta.
+    CONSTRAINT fk_incidencia_usuario_reporta
+        FOREIGN KEY (id_usuario_reporta)
+        REFERENCES usuarios(id_usuario),
+    -- Relación con la sala.
+    CONSTRAINT fk_incidencia_sala
+        FOREIGN KEY (id_sala)
+        REFERENCES salas(id_sala),
+    -- Relación con el equipo.
+    CONSTRAINT fk_incidencia_equipo
+        FOREIGN KEY (id_equipo)
+        REFERENCES equipos(id_equipo),
+    -- Relación con la categoría.
+    CONSTRAINT fk_incidencia_categoria
+        FOREIGN KEY (id_categoria)
+        REFERENCES categorias(id_categoria),
+    -- Relación con la prioridad.
+    CONSTRAINT fk_incidencia_prioridad
+        FOREIGN KEY (id_prioridad)
+        REFERENCES prioridades(id_prioridad),
+    -- Relación con el estado.
+    CONSTRAINT fk_incidencia_estado
+        FOREIGN KEY (id_estado)
+        REFERENCES estados_incidencia(id_estado),
+    -- Relación con el usuario responsable.
+    CONSTRAINT fk_incidencia_responsable
+        FOREIGN KEY (id_responsable)
+        REFERENCES usuarios(id_usuario)
+);
+
+-- =====================================================
+-- TABLA: historial_incidencias
+-- =====================================================
+-- Esta tabla permite mantener la trazabilidad de cada
+-- incidencia registrada en el sistema.
+--
+-- Cada vez que una incidencia cambie de estado,
+-- se podrá registrar:
+-- - La incidencia modificada.
+-- - El estado anterior.
+-- - El nuevo estado.
+-- - Un comentario sobre el cambio realizado.
+-- - El usuario que realizó la modificación.
+-- - La fecha y hora del cambio.
+--
+-- De esta forma no solamente conocemos el estado actual
+-- de una incidencia, sino también todo su historial.
+-- =====================================================
+
+CREATE TABLE historial_incidencias (
+    id_historial INT AUTO_INCREMENT PRIMARY KEY,
+    -- Incidencia a la que pertenece este registro.
+    id_incidencia INT NOT NULL,
+    -- Estado que tenía la incidencia antes del cambio.
+    -- Puede ser NULL cuando se registra por primera vez.
+    id_estado_anterior INT NULL,
+    -- Nuevo estado asignado a la incidencia.
+    id_estado_nuevo INT NOT NULL,
+    -- Explicación o comentario asociado al cambio.
+    comentario VARCHAR(255),
+    -- Usuario que realizó la modificación.
+    id_usuario INT NOT NULL,
+    -- Fecha y hora del cambio.
+    fecha_cambio DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Relación con la incidencia.
+    CONSTRAINT fk_historial_incidencia
+        FOREIGN KEY (id_incidencia)
+        REFERENCES incidencias(id_incidencia),
+    -- Relación con el estado anterior.
+    CONSTRAINT fk_historial_estado_anterior
+        FOREIGN KEY (id_estado_anterior)
+        REFERENCES estados_incidencia(id_estado),
+    -- Relación con el nuevo estado.
+    CONSTRAINT fk_historial_estado_nuevo
+        FOREIGN KEY (id_estado_nuevo)
+        REFERENCES estados_incidencia(id_estado),
+    -- Relación con el usuario que realizó el cambio.
+    CONSTRAINT fk_historial_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario)
+);
+
+
+-- =====================================================
+-- TABLA: alertas
+-- =====================================================
+-- Esta tabla almacena las alertas internas generadas
+-- mediante el botón de pánico del sistema.
+--
+-- El objetivo es permitir que un usuario autorizado
+-- pueda solicitar atención rápida ante una situación
+-- que requiera asistencia dentro del establecimiento.
+--
+-- Cada alerta permitirá registrar:
+-- - Usuario que genera la alerta.
+-- - Sala o ubicación donde se genera.
+-- - Descripción de la situación.
+-- - Fecha y hora de generación.
+-- - Estado actual de la alerta.
+-- - Usuario que atendió la alerta.
+-- - Fecha y hora de atención.
+
+-- La tabla usuarios participa dos veces:
+-- 1. Usuario que genera la alerta.
+-- 2. Usuario autorizado que atiende la alerta.
+-- =====================================================
+
+CREATE TABLE alertas (
+    id_alerta INT AUTO_INCREMENT PRIMARY KEY,
+    -- Usuario que genera la alerta.
+    id_usuario INT NOT NULL,
+    -- Sala o ubicación donde ocurre la situación.
+    id_sala INT NOT NULL,
+    -- Información adicional sobre la alerta.
+    descripcion VARCHAR(255),
+    -- Fecha y hora de generación.
+    fecha_alerta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Estado actual de la alerta.
+    -- Ejemplos: Pendiente, En atención, Atendida.
+    estado VARCHAR(50) DEFAULT 'Pendiente',
+    -- Usuario autorizado que atiende la alerta.
+    -- Puede permanecer NULL mientras nadie la atienda.
+    atendida_por INT NULL,
+    -- Fecha y hora en que se atiende la alerta.
+    fecha_atencion DATETIME NULL,
+    -- Relación con el usuario que genera la alerta.
+    CONSTRAINT fk_alerta_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario),
+    -- Relación con la sala donde se genera.
+    CONSTRAINT fk_alerta_sala
+        FOREIGN KEY (id_sala)
+        REFERENCES salas(id_sala),
+    -- Relación con el usuario que atiende la alerta.
+    CONSTRAINT fk_alerta_atendida_por
+        FOREIGN KEY (atendida_por)
+        REFERENCES usuarios(id_usuario)
+);
+
+
+-- =====================================================
+-- DATOS FICTICIOS: usuarios
+-- =====================================================
+-- Se registran usuarios ficticios para realizar
+-- pruebas sobre el funcionamiento de la base de datos.
+-- En la implementación real las contraseñas no deben
+-- almacenarse como texto plano. El backend deberá
+-- almacenarlas utilizando un algoritmo de hash seguro.
+-- =====================================================
+
+INSERT INTO usuarios
+(nombre, apellido, correo, password, id_rol)
+VALUES
+
+-- Profesores
+('Carolina', 'Martinez',
+ 'carolina.martinez@colegio.cl', 'Demo123', 1),
+
+('Andres', 'Gonzalez',
+ 'andres.gonzalez@colegio.cl', 'Demo123', 1),
+
+('Daniela', 'Soto',
+ 'daniela.soto@colegio.cl', 'Demo123', 1),
+
+('Felipe', 'Vargas',
+ 'felipe.vargas@colegio.cl', 'Demo123', 1),
+
+('Camila', 'Munoz',
+ 'camila.munoz@colegio.cl', 'Demo123', 1),
+
+-- Técnicos
+('Carlos', 'Perez',
+ 'carlos.perez@colegio.cl', 'Demo123', 2),
+
+('Matias', 'Contreras',
+ 'matias.contreras@colegio.cl', 'Demo123', 2),
+
+('Fernanda', 'Rojas',
+ 'fernanda.rojas@colegio.cl', 'Demo123', 2),
+
+-- Administrador
+('Administrador', 'Sistema',
+ 'admin@colegio.cl', 'AdminDemo123', 3);
+
+-- =====================================================
+-- CONSULTA DE VERIFICACIÓN: usuarios y roles
+-- =====================================================
+-- Esta consulta permite comprobar que los usuarios
+-- fueron insertados correctamente y que la relación
+-- entre usuarios y roles está funcionando.
+-- =====================================================
+
+SELECT
+    u.id_usuario,
+    u.nombre,
+    u.apellido,
+    u.correo,
+    r.nombre AS rol,
+    u.activo
+FROM usuarios u
+INNER JOIN roles r
+    ON u.id_rol = r.id_rol
+ORDER BY u.id_usuario;
+
+
+-- =====================================================
+-- DATOS FICTICIOS: salas
+-- =====================================================
+-- Se registran distintas salas y ubicaciones del
+-- establecimiento para realizar pruebas del sistema.
+--
+-- Cada sala posee:
+-- - Nombre.
+-- - Piso.
+-- - Edificio.
+-- - Código QR único.
+--
+-- El código QR permitirá identificar rápidamente
+-- la ubicación desde el sistema.
+-- =====================================================
+
+INSERT INTO salas
+(nombre, piso, edificio, codigo_qr)
+VALUES
+
+('Laboratorio 301', 3, 'Edificio A', 'QR-LAB-301'),
+
+('Laboratorio 302', 3, 'Edificio A', 'QR-LAB-302'),
+
+('Sala 204', 2, 'Edificio B', 'QR-SALA-204'),
+
+('Biblioteca', 1, 'Edificio Central', 'QR-BIBLIOTECA'),
+
+('Auditorio', 1, 'Edificio Central', 'QR-AUDITORIO'),
+
+('Sala de Profesores', 2, 'Edificio Central', 'QR-PROFESORES');
+
+-- =====================================================
+-- CONSULTA DE VERIFICACIÓN: salas
+-- =====================================================
+-- Permite comprobar que las ubicaciones fueron
+-- insertadas correctamente en la base de datos.
+-- =====================================================
+
+SELECT *
+FROM salas
+ORDER BY id_sala;
+
+-- =====================================================
+-- DATOS FICTICIOS: equipos
+-- =====================================================
+-- Se registran equipos tecnológicos asociados a
+-- distintas salas del establecimiento.
+--
+-- Esto permitirá posteriormente identificar qué equipo
+-- está involucrado en una incidencia.
+-- =====================================================
+
+INSERT INTO equipos
+(nombre, tipo, marca, modelo, numero_serie, estado, id_sala)
+VALUES
+
+-- Laboratorio 301
+('PC-301-01', 'Computador', 'Dell', 'OptiPlex 7090',
+ 'SN-PC301-001', 'Operativo', 1),
+
+('PC-301-02', 'Computador', 'Dell', 'OptiPlex 7090',
+ 'SN-PC301-002', 'Operativo', 1),
+
+('Proyector-301', 'Proyector', 'Epson', 'PowerLite X49',
+ 'SN-PROY301-001', 'Operativo', 1),
+
+-- Laboratorio 302
+('PC-302-01', 'Computador', 'HP', 'ProDesk 400',
+ 'SN-PC302-001', 'Operativo', 2),
+
+('PC-302-02', 'Computador', 'HP', 'ProDesk 400',
+ 'SN-PC302-002', 'Operativo', 2),
+
+-- Sala 204
+('Proyector-204', 'Proyector', 'Epson', 'PowerLite E20',
+ 'SN-PROY204-001', 'Operativo', 3),
+
+-- Biblioteca
+('Router-Biblioteca', 'Red', 'Cisco', 'RV340',
+ 'SN-ROUTER-BIB-01', 'Operativo', 4),
+
+('PC-Biblioteca-01', 'Computador', 'Lenovo', 'ThinkCentre',
+ 'SN-PCBIB-001', 'Operativo', 4),
+
+-- Auditorio
+('Proyector-Auditorio', 'Proyector', 'Epson', 'EB-L520U',
+ 'SN-PROYAUD-001', 'Operativo', 5),
+
+('Consola-Audio-Auditorio', 'Audio', 'Soundcraft', 'Ui24R',
+ 'SN-AUDIOAUD-001', 'Operativo', 5);
+
+ -- =====================================================
+-- CONSULTA DE VERIFICACIÓN: equipos y salas
+-- =====================================================
+-- Esta consulta comprueba que cada equipo se encuentre
+-- correctamente asociado a una sala.
+-- =====================================================
+
+SELECT
+    e.id_equipo,
+    e.nombre AS equipo,
+    e.tipo,
+    e.marca,
+    e.modelo,
+    e.estado,
+    s.nombre AS sala,
+    s.edificio
+FROM equipos e
+INNER JOIN salas s
+    ON e.id_sala = s.id_sala
+ORDER BY e.id_equipo;
+
+
+-- =====================================================
+-- DATOS FICTICIOS: categorias
+-- =====================================================
+-- Se registran las categorías que permitirán clasificar
+-- las incidencias según el tipo de problema reportado.
+--
+-- Estas categorías facilitarán posteriormente:
+-- - La búsqueda y filtrado de incidencias.
+-- - La generación de estadísticas.
+-- - La creación de indicadores en Power BI.
+-- =====================================================
+
+INSERT INTO categorias (nombre, descripcion)
+VALUES
+('Computador', 'Problemas relacionados con computadores'),
+('Proyector', 'Problemas relacionados con proyectores'),
+('Internet', 'Problemas de conectividad o acceso a internet'),
+('Infraestructura', 'Problemas relacionados con infraestructura física'),
+('Electricidad', 'Problemas eléctricos o de alimentación'),
+('Mobiliario', 'Problemas relacionados con mesas, sillas u otros muebles'),
+('Audio', 'Problemas relacionados con equipos de audio');
+
+-- =====================================================
+-- DATOS FICTICIOS: prioridades
+-- =====================================================
+-- Se definen los niveles de prioridad que permitirán
+-- indicar la importancia de cada incidencia.
+--
+-- El campo "nivel" permite ordenar las prioridades:
+--
+-- 1 = Baja
+-- 2 = Media
+-- 3 = Alta
+-- 4 = Crítica
+-- =====================================================
+
+INSERT INTO prioridades (nombre, nivel)
+VALUES
+('Baja', 1),
+('Media', 2),
+('Alta', 3),
+('Critica', 4);
+
+-- =====================================================
+-- DATOS FICTICIOS: estados_incidencia
+-- =====================================================
+-- Se registran los estados por los que puede pasar
+-- una incidencia durante su ciclo de atención.
+--
+-- Estos estados permiten conocer la situación actual
+-- de cada incidencia y mantener su trazabilidad.
+-- =====================================================
+
+INSERT INTO estados_incidencia (nombre, descripcion)
+VALUES
+('Pendiente', 'Incidencia registrada y pendiente de revision'),
+('Asignada', 'Incidencia asignada a un responsable'),
+('En proceso', 'Incidencia actualmente siendo atendida'),
+('Solucionada', 'El problema reportado fue solucionado'),
+('Cerrada', 'Incidencia finalizada y cerrada');
+
+
+
+SELECT * FROM categorias;
+
+SELECT * FROM prioridades;
+
+SELECT * FROM estados_incidencia;
+
+
+-- =====================================================
+-- DATOS FICTICIOS: incidencias
+-- =====================================================
+-- Se registran incidencias ficticias para comprobar
+-- el funcionamiento de las relaciones entre:
+--
+-- - Usuarios
+-- - Salas
+-- - Equipos
+-- - Categorías
+-- - Prioridades
+-- - Estados
+-- - Responsables
+--
+-- Los profesores pueden reportar incidencias.
+-- Los técnicos pueden ser asignados como responsables.
+--
+-- Algunos campos pueden quedar NULL:
+--
+-- id_equipo:
+-- Puede ser NULL cuando el problema no corresponde
+-- directamente a un equipo.
+--
+-- id_responsable:
+-- Puede ser NULL cuando la incidencia todavía
+-- no ha sido asignada.
+--
+-- fecha_solucion y solucion:
+-- Permanecen NULL mientras la incidencia
+-- todavía no haya sido solucionada.
+-- =====================================================
+
+INSERT INTO incidencias
+(
+    titulo,
+    descripcion,
+    id_usuario_reporta,
+    id_sala,
+    id_equipo,
+    id_categoria,
+    id_prioridad,
+    id_estado,
+    id_responsable,
+    fecha_solucion,
+    solucion
+)
+VALUES
+
+-- Incidencia 1
+-- Profesor reporta un computador que no enciende.
+-- Se encuentra asignada y en proceso por un técnico.
+(
+    'Computador no enciende',
+    'El computador no responde al presionar el boton de encendido.',
+    1, 1, 1, 1, 3, 3, 6,
+    NULL,
+    NULL
+),
+
+-- Incidencia 2
+-- Problema con el proyector del Laboratorio 301.
+(
+    'Proyector sin imagen',
+    'El proyector enciende pero no muestra imagen desde el computador.',
+    2, 1, 3, 2, 2, 2, 7,
+    NULL,
+    NULL
+),
+
+-- Incidencia 3
+-- Problema de conectividad en Biblioteca.
+-- Todavía no tiene técnico asignado.
+(
+    'Internet intermitente',
+    'La conexion a internet se desconecta constantemente.',
+    3, 4, 7, 3, 3, 1, NULL,
+    NULL,
+    NULL
+),
+
+-- Incidencia 4
+-- Problema de mobiliario.
+-- No existe un equipo tecnológico asociado.
+(
+    'Silla en mal estado',
+    'Una silla presenta una pata suelta y requiere revision.',
+    4, 3, NULL, 6, 1, 1, NULL,
+    NULL,
+    NULL
+),
+
+-- Incidencia 5
+-- Problema eléctrico de alta importancia.
+(
+    'Enchufes sin energia',
+    'Los enchufes del sector derecho del laboratorio no tienen energia.',
+    5, 2, NULL, 5, 4, 3, 8,
+    NULL,
+    NULL
+),
+
+-- Incidencia 6
+-- Computador con problemas de rendimiento.
+(
+    'Computador con bajo rendimiento',
+    'El computador demora varios minutos en iniciar y ejecutar aplicaciones.',
+    1, 2, 4, 1, 2, 2, 6,
+    NULL,
+    NULL
+),
+
+-- Incidencia 7
+-- Falla de audio en el auditorio.
+(
+    'Sistema de audio sin sonido',
+    'La consola se encuentra encendida pero no entrega sonido.',
+    2, 5, 10, 7, 3, 3, 7,
+    NULL,
+    NULL
+),
+
+-- Incidencia 8
+-- Proyector del auditorio con falla.
+(
+    'Proyector se apaga',
+    'El proyector se apaga despues de algunos minutos de funcionamiento.',
+    3, 5, 9, 2, 3, 2, 8,
+    NULL,
+    NULL
+),
+
+-- Incidencia 9
+-- Problema de infraestructura sin equipo asociado.
+(
+    'Filtracion de agua',
+    'Se detecta una filtracion de agua cercana a una ventana.',
+    4, 3, NULL, 4, 4, 1, NULL,
+    NULL,
+    NULL
+),
+
+-- Incidencia 10
+-- Incidencia ya solucionada para disponer de datos
+-- de distintos estados en las pruebas.
+(
+    'PC sin conexion a internet',
+    'El computador no lograba conectarse a la red.',
+    5, 4, 8, 3, 2, 4, 6,
+    NOW(),
+    'Se configuro nuevamente el adaptador de red y se verifico la conexion.'
+);
+
+-- =====================================================
+-- CONSULTA DE VERIFICACIÓN: incidencias
+-- =====================================================
+-- Permite comprobar que las incidencias ficticias
+-- fueron registradas correctamente.
+--
+-- En esta consulta todavía veremos principalmente
+-- identificadores de las tablas relacionadas.
+-- =====================================================
+
+SELECT *
+FROM incidencias
+ORDER BY id_incidencia;
+
+-- =====================================================
+-- LIMPIEZA DE DATOS: incidencias
+-- =====================================================
+-- DELETE FROM historial_incidencias; --
+-- DELETE FROM  incidencias; --
+-- ALTER TABLE incidencias AUTO_INCREMENT = 1; --
+
+
+
