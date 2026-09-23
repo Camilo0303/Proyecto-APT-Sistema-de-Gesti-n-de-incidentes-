@@ -1,138 +1,264 @@
-import './Home.css'
+import { useNavigate } from "react-router-dom";
+import "./Home.css";
+
 
 function Home() {
 
-  return (
-    <main className="home">
 
-      <header className="top">
+  const navigate = useNavigate();
+
+
+
+  return (
+
+
+    <main className="home-container">
+
+
+
+      <header className="header">
+
 
         <div className="logo">
           🏫
         </div>
 
+
+
         <div>
+
           <h1>
             Sistema de Incidencias
           </h1>
 
+
           <p>
             Gestión de infraestructura escolar
           </p>
+
+
         </div>
+
+
+
+        <span className="status">
+          Sistema activo
+        </span>
+
+
 
       </header>
 
 
+
+
+
       <section className="welcome">
+
 
         <h2>
           Hola 👋
         </h2>
 
+
         <p>
           ¿Qué necesitas realizar?
         </p>
 
+
+
       </section>
 
 
-      <section className="menu">
 
 
-        <button className="card qr">
 
-          <span>
+      <section className="menu-grid">
+
+
+
+
+
+        {/* ESCANEAR QR */}
+
+        <div
+          className="menu-card qr"
+          onClick={() => navigate("/escanear")}
+        >
+
+
+          <div className="icon">
             📷
-          </span>
+          </div>
+
+
 
           <div>
+
             <h3>
               Escanear QR
             </h3>
 
+
             <p>
               Identifica automáticamente la sala
             </p>
+
+
           </div>
 
-        </button>
+
+
+        </div>
 
 
 
-        <button className="card history">
 
-          <span>
+
+
+        {/* HISTORIAL */}
+
+
+        <div
+          className="menu-card history"
+          onClick={() => alert("Módulo historial próximamente")}
+        >
+
+
+          <div className="icon">
             📋
-          </span>
+          </div>
+
+
 
           <div>
+
             <h3>
               Historial
             </h3>
 
+
             <p>
               Revisa tus reportes enviados
             </p>
+
+
           </div>
 
-        </button>
+
+        </div>
 
 
 
-        <button className="card panic">
 
-          <span>
+
+
+
+
+        {/* BOTON PANICO */}
+
+
+        <div
+          className="menu-card panic"
+          onClick={() => alert("Alerta de emergencia activada")}
+        >
+
+
+          <div className="icon">
             🚨
-          </span>
+          </div>
+
+
 
           <div>
+
             <h3>
               Botón de pánico
             </h3>
 
+
             <p>
               Generar alerta de emergencia
             </p>
+
+
           </div>
 
-        </button>
+
+
+        </div>
 
 
 
-        <button className="card login">
 
-          <span>
+
+
+
+
+        {/* LOGIN */}
+
+
+        <div
+          className="menu-card login"
+          onClick={() => navigate("/login")}
+        >
+
+
+          <div className="icon">
             🔐
-          </span>
+          </div>
+
+
+
 
           <div>
+
             <h3>
               Iniciar sesión
             </h3>
 
+
             <p>
               Acceso para profesores y encargados
             </p>
+
+
           </div>
 
-        </button>
+
+
+
+        </div>
+
+
+
 
 
       </section>
+
+
+
+
 
 
 
       <footer>
 
-        📍 Ubicación no detectada
+        Sistema de Gestión de Incidencias · Proyecto APT
 
       </footer>
 
 
+
+
     </main>
-  )
+
+
+  );
+
+
 }
 
 
-export default Home
+
+export default Home;

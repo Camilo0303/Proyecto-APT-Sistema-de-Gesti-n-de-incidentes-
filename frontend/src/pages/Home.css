@@ -1,207 +1,188 @@
-.home {
-
-  min-height:100vh;
-  background:#f4f7fb;
-  padding:30px;
-
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f3f6fb;
 }
 
 
-.top {
+.home-container {
+  min-height: 100vh;
+  padding: 40px;
+}
 
-  display:flex;
-  align-items:center;
-  gap:15px;
 
-  background:white;
-  padding:20px;
-  border-radius:20px;
+/* HEADER */
 
+.header {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
 }
 
 
 .logo {
+  font-size: 45px;
+}
 
-  width:55px;
-  height:55px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.header h1 {
+  margin: 0;
+  color: #16213e;
+}
 
-  background:#0066cc;
 
-  border-radius:16px;
-
-  font-size:28px;
-
+.header p {
+  color: #777;
 }
 
 
 
-.top h1 {
-
-  margin:0;
-
-  font-size:22px;
-
+.status {
+  background: #d9fbe5;
+  color:#16803c;
+  padding:10px 20px;
+  border-radius:20px;
 }
 
 
-.top p {
 
-  margin:4px 0;
-
-  color:#777;
-
-}
-
-
+/* BIENVENIDA */
 
 .welcome {
-
-  margin-top:35px;
-
+  margin-top:40px;
 }
 
 
 .welcome h2 {
-
-  font-size:32px;
-
-  margin-bottom:5px;
-
+  font-size:40px;
+  color:#16213e;
 }
+
 
 
 .welcome p {
-
   color:#666;
+  font-size:18px;
+}
+
+
+
+/* TARJETAS */
+
+.menu-grid {
+
+margin-top:40px;
+
+display:grid;
+
+grid-template-columns: repeat(2,1fr);
+
+gap:25px;
 
 }
 
 
 
-.menu {
+.menu-card {
 
-  margin-top:30px;
+background:white;
 
-  display:grid;
+border-radius:25px;
 
-  grid-template-columns:repeat(2,1fr);
+padding:30px;
 
-  gap:20px;
+display:flex;
 
-}
+align-items:center;
 
+gap:25px;
 
+cursor:pointer;
 
-.card {
+box-shadow:0 10px 25px rgba(0,0,0,.08);
 
-  background:white;
-
-  border:none;
-
-  border-radius:22px;
-
-  padding:25px;
-
-  display:flex;
-
-  gap:20px;
-
-  align-items:center;
-
-  text-align:left;
-
-  cursor:pointer;
-
-  box-shadow:0 8px 25px rgba(0,0,0,.08);
-
-  transition:.2s;
-
-}
-
-
-.card:hover {
-
-  transform:translateY(-5px);
+transition:.3s;
 
 }
 
 
 
-.card span {
+.menu-card:hover{
 
-  font-size:40px;
-
-}
-
-
-
-.card h3 {
-
-  margin:0 0 8px;
-
-  font-size:20px;
+transform:translateY(-5px);
 
 }
 
 
 
-.card p {
+.icon {
 
-  margin:0;
-
-  color:#777;
+font-size:45px;
 
 }
 
 
 
-.panic {
+.menu-card h3{
 
-  border-left:6px solid #e63946;
+margin:0;
 
-}
-
-
-
-.qr {
-
-  border-left:6px solid #0066cc;
+font-size:24px;
 
 }
 
 
 
-.login {
+.menu-card p{
 
-  border-left:6px solid #18a558;
-
-}
-
-
-
-footer {
-
-  margin-top:40px;
-
-  color:#777;
-
-  text-align:center;
+color:#777;
 
 }
 
 
 
-@media(max-width:700px){
+/* COLORES */
 
-.menu{
+.qr{
 
-grid-template-columns:1fr;
+border-left:8px solid #1976d2;
 
 }
 
+
+.history{
+
+border-left:8px solid #ff9800;
+
+}
+
+
+.panic{
+
+border-left:8px solid #e53935;
+
+}
+
+
+.login{
+
+border-left:8px solid #00a86b;
+
+}
+
+
+
+
+footer{
+
+margin-top:50px;
+
+text-align:center;
+
+color:#777;
 
 }
