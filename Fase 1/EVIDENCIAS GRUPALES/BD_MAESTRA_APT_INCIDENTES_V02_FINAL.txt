@@ -1,0 +1,1877 @@
+/*
+============================================================
+
+ PROYECTO APT 2026
+ SISTEMA DE GESTIÓN DE INCIDENCIAS
+
+ BD_MAESTRA_APT_INCIDENTES_V2
+
+ Descripción:
+
+ Sistema web para:
+ - Registrar incidencias.
+ - Gestionar equipos.
+ - Realizar seguimiento.
+ - Generar alertas mediante botón de pánico.
+ - Identificar ubicaciones mediante códigos QR.
+ - Mantener historial de acciones.
+
+ Motor:
+ MySQL 8+
+
+ Equipo:
+ Ingeniería en Informática
+
+============================================================
+*/
+
+
+-- =========================================================
+-- ELIMINAR BD ANTERIOR
+-- SOLO UTILIZAR EN INSTALACIÓN DESDE CERO
+-- =========================================================
+
+
+DROP DATABASE IF EXISTS sistema_incidencias;
+
+
+
+-- =========================================================
+-- CREAR BASE DE DATOS
+-- =========================================================
+
+
+CREATE DATABASE sistema_incidencias
+
+CHARACTER SET utf8mb4
+
+COLLATE utf8mb4_unicode_ci;
+
+
+
+USE sistema_incidencias;
+
+
+
+-- =========================================================
+-- TABLA:
+-- ROLES
+--
+-- Define los perfiles autorizados dentro del sistema.
+--
+-- Ejemplo:
+-- Administrador
+-- Profesor
+-- Técnico
+-- Inspector
+-- Auxiliar
+-- =========================================================
+
+
+CREATE TABLE roles
+(
+
+id_rol INT AUTO_INCREMENT PRIMARY KEY,
+
+nombre VARCHAR(50) NOT NULL UNIQUE,
+
+descripcion VARCHAR(255)
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- ESTADOS DE INCIDENCIA
+--
+-- Controla el ciclo de vida de una incidencia.
+--
+-- Flujo:
+--
+-- Pendiente
+--     ↓
+-- Asignada
+--     ↓
+-- En proceso
+--     ↓
+-- Resuelta
+--     ↓
+-- Cerrada
+--
+-- =========================================================
+
+
+CREATE TABLE estados_incidencia
+(
+
+id_estado INT AUTO_INCREMENT PRIMARY KEY,
+
+nombre VARCHAR(50) NOT NULL UNIQUE,
+
+descripcion VARCHAR(255)
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- PRIORIDADES
+--
+-- Define la importancia de una incidencia.
+-- =========================================================
+
+
+CREATE TABLE prioridades
+(
+
+id_prioridad INT AUTO_INCREMENT PRIMARY KEY,
+
+nombre VARCHAR(50) NOT NULL UNIQUE,
+
+descripcion VARCHAR(255)
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- CATEGORÍAS
+--
+-- Clasifica el tipo de problema.
+-- =========================================================
+
+
+CREATE TABLE categorias
+(
+
+id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+
+nombre VARCHAR(100) NOT NULL UNIQUE,
+
+descripcion VARCHAR(255)
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- ESTADOS DE ALERTA
+--
+-- Flujo botón de pánico:
+-- =========================================================
+
+
+CREATE TABLE estados_alerta
+(
+
+id_estado_alerta INT AUTO_INCREMENT PRIMARY KEY,
+
+nombre VARCHAR(50) NOT NULL UNIQUE,
+
+descripcion VARCHAR(255)
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- TIPOS DE EMERGENCIA
+--
+-- Opciones rápidas del botón de pánico.
+--
+-- La descripción será opcional desde frontend.
+-- =========================================================
+
+
+CREATE TABLE tipos_emergencia
+(
+
+id_tipo_emergencia INT AUTO_INCREMENT PRIMARY KEY,
+
+nombre VARCHAR(100) NOT NULL UNIQUE,
+
+descripcion VARCHAR(255)
+
+);
+
+
+
+-- =========================================================
+-- CARGA DE DATOS INICIALES
+-- =========================================================
+
+
+
+-- ROLES
+
+INSERT INTO roles
+(
+nombre,
+descripcion
+)
+
+VALUES
+
+('Administrador',
+'Usuario con acceso completo al sistema'),
+
+('Profesor',
+'Usuario autorizado para generar incidencias y alertas'),
+
+('Técnico',
+'Usuario encargado de resolver incidencias'),
+
+('Inspector',
+'Usuario de supervisión'),
+
+('Auxiliar',
+'Usuario de apoyo');
+
+
+
+-- ESTADOS INCIDENCIA
+
+INSERT INTO estados_incidencia
+(
+nombre,
+descripcion
+)
+
+VALUES
+
+('Pendiente',
+'Incidencia creada esperando atención'),
+
+('Asignada',
+'Cuenta con responsable asignado'),
+
+('En proceso',
+'Incidencia siendo trabajada'),
+
+('Resuelta',
+'Problema solucionado'),
+
+('Cerrada',
+'Incidencia finalizada');
+
+
+
+-- PRIORIDADES
+
+INSERT INTO prioridades
+(
+nombre,
+descripcion
+)
+
+VALUES
+
+('Baja',
+'No afecta el funcionamiento'),
+
+('Media',
+'Afecta parcialmente'),
+
+('Alta',
+'Afecta una operación importante'),
+
+('Crítica',
+'Interrumpe completamente el servicio');
+
+
+
+-- CATEGORÍAS
+
+INSERT INTO categorias
+(
+nombre,
+descripcion
+)
+
+VALUES
+
+('Hardware',
+'Problemas físicos de equipos'),
+
+('Software',
+'Problemas de aplicaciones'),
+
+('Red',
+'Problemas de conectividad'),
+
+('Infraestructura',
+'Problemas del establecimiento'),
+
+('Otro',
+'Otra clasificación');
+
+
+-- ESTADOS ALERTA
+
+INSERT INTO estados_alerta
+(
+nombre,
+descripcion
+)
+
+VALUES
+
+('Pendiente',
+'Alerta generada esperando atención'),
+
+('En atención',
+'Personal autorizado atendiendo'),
+
+('Atendida',
+'Emergencia finalizada');
+
+
+
+-- TIPOS EMERGENCIA
+
+INSERT INTO tipos_emergencia
+(
+nombre,
+descripcion
+)
+
+VALUES
+
+('Emergencia de salud',
+'Situaciones médicas'),
+
+('Accidente',
+'Caídas, golpes o lesiones'),
+
+('Seguridad',
+'Situaciones de riesgo'),
+
+('Evacuación',
+'Necesidad de evacuar'),
+
+('Otra emergencia',
+'Otra situación crítica');
+
+
+
+-- =========================================================
+-- VALIDACIÓN
+-- =========================================================
+
+SELECT * FROM roles;
+
+SELECT * FROM estados_incidencia;
+
+SELECT * FROM prioridades;
+
+SELECT * FROM categorias;
+
+SELECT * FROM estados_alerta;
+
+SELECT * FROM tipos_emergencia;
+
+/*
+============================================================
+
+ PARTE 2/6
+
+ TABLAS:
+ - Usuarios
+ - Correos autorizados
+ - Edificios
+ - Pisos
+ - Salas con código QR
+
+============================================================
+*/
+
+
+USE sistema_incidencias;
+
+
+
+-- =========================================================
+-- TABLA:
+-- USUARIOS
+--
+-- Personas que utilizan el sistema.
+--
+-- Los alumnos NO tienen acceso.
+--
+-- Roles permitidos:
+-- Administrador
+-- Profesor
+-- Técnico
+-- Inspector
+-- Auxiliar
+--
+-- =========================================================
+
+
+CREATE TABLE usuarios
+(
+id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(100) NOT NULL,
+apellido VARCHAR(100) NOT NULL,
+correo VARCHAR(150) NOT NULL UNIQUE,
+password VARCHAR(255) NOT NULL,
+id_rol INT NOT NULL,
+activo BOOLEAN DEFAULT TRUE,
+fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- CORREOS AUTORIZADOS
+--
+-- Controla quién puede registrarse.
+--
+-- Ejemplo:
+--
+-- profesor@colegio.cl
+-- tecnico@colegio.cl
+--
+-- Permite agregar o quitar permisos sin modificar
+-- la estructura del sistema.
+--
+-- =========================================================
+
+
+CREATE TABLE correos_autorizados
+(
+id_autorizacion INT AUTO_INCREMENT PRIMARY KEY,
+correo VARCHAR(150) NOT NULL UNIQUE,
+id_rol INT NOT NULL,
+activo BOOLEAN DEFAULT TRUE,
+fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- EDIFICIOS
+--
+-- Contiene las estructuras físicas del establecimiento.
+--
+-- =========================================================
+
+
+CREATE TABLE edificios
+(
+id_edificio INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(100) NOT NULL UNIQUE,
+descripcion VARCHAR(255)
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- PISOS
+--
+-- Cada piso pertenece a un edificio.
+--
+-- =========================================================
+
+
+CREATE TABLE pisos
+(
+id_piso INT AUTO_INCREMENT PRIMARY KEY,
+numero_piso INT NOT NULL,
+nombre VARCHAR(100),
+id_edificio INT NOT NULL
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- SALAS
+--
+-- Cada sala pertenece a un piso.
+--
+-- El código QR identifica la ubicación.
+--
+-- Ejemplo:
+--
+-- QR-SALA-205
+--
+-- Al escanear:
+-- Sistema obtiene id_sala
+--
+-- =========================================================
+
+
+CREATE TABLE salas
+(
+id_sala INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(100) NOT NULL,
+codigo_sala VARCHAR(50),
+codigo_qr VARCHAR(150) NOT NULL UNIQUE,
+id_piso INT NOT NULL,
+activo BOOLEAN DEFAULT TRUE
+);
+
+
+
+-- =========================================================
+-- DATOS DEMOSTRACIÓN
+--
+-- Estos datos posteriormente serán reemplazados
+-- por los datos reales enviados por el establecimiento.
+--
+-- =========================================================
+
+
+
+-- USUARIO ADMINISTRADOR DE PRUEBA - CAMBIAR POR DATOS REALES
+
+INSERT INTO usuarios
+(
+nombre,
+apellido,
+correo,
+password,
+id_rol
+)
+
+VALUES
+
+(
+'Administrador',
+'Sistema',
+'admin@colegio.cl',
+'Admin123',
+1
+);
+
+
+
+-- CORREOS AUTORIZADOS - CAMBIAR POR DATOS REALES
+
+INSERT INTO correos_autorizados
+(
+correo,
+id_rol
+)
+VALUES
+(
+'admin@colegio.cl',
+1
+),
+(
+'profesor@colegio.cl',
+2
+),
+(
+'tecnico@colegio.cl',
+3
+);
+
+
+
+-- EDIFICIOS DE PRUEBA - CAMBIAR POR DATOS REALES
+
+INSERT INTO edificios
+(
+nombre,
+descripcion
+)
+VALUES
+(
+'Edificio Principal',
+'Infraestructura principal'
+),
+(
+'Edificio Tecnología',
+'Sector laboratorios'
+);
+
+
+
+-- PISOS - CAMBIAR POR DATOS REALES
+
+INSERT INTO pisos
+(
+numero_piso,
+nombre,
+id_edificio
+)
+VALUES
+(
+1,
+'Primer Piso',
+1
+),
+(
+2,
+'Segundo Piso',
+1
+),
+(
+1,
+'Primer Piso',
+2
+);
+
+
+
+-- SALAS CON QR - CAMBIAR POR DATOS REALES
+
+INSERT INTO salas
+(
+nombre,
+codigo_sala,
+codigo_qr,
+id_piso
+)
+
+VALUES
+
+
+(
+'Sala 101',
+'101',
+'QR-SALA-101',
+1
+),
+
+
+(
+'Sala 202',
+'202',
+'QR-SALA-202',
+2
+),
+
+
+(
+'Laboratorio Computación',
+'LAB-01',
+'QR-LAB-01',
+3
+);
+
+
+
+-- =========================================================
+-- VALIDACIÓN
+-- =========================================================
+
+
+SELECT * FROM usuarios;
+
+
+SELECT * FROM correos_autorizados;
+
+
+SELECT * FROM edificios;
+
+
+SELECT * FROM pisos;
+
+
+SELECT * FROM salas;
+
+
+/*
+============================================================
+
+ PARTE 3/6
+
+ TABLAS:
+ - Equipos
+ - Incidencias
+ - Historial Incidencias
+ - Alertas
+ - Historial Alertas
+
+============================================================
+*/
+
+
+USE sistema_incidencias;
+
+
+
+-- =========================================================
+-- TABLA:
+-- EQUIPOS
+--
+-- Inventario tecnológico del establecimiento.
+--
+-- Cada equipo pertenece a una sala.
+--
+-- Ejemplo:
+--
+-- PC-001
+-- Sala 205
+--
+-- =========================================================
+
+
+CREATE TABLE equipos
+(
+
+id_equipo INT AUTO_INCREMENT PRIMARY KEY,
+
+
+codigo_inventario VARCHAR(100) UNIQUE,
+
+
+nombre VARCHAR(150) NOT NULL,
+
+
+marca VARCHAR(100),
+
+
+modelo VARCHAR(100),
+
+
+descripcion VARCHAR(255),
+
+
+id_sala INT NOT NULL,
+
+
+estado VARCHAR(50) DEFAULT 'Activo',
+
+
+fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- INCIDENCIAS
+--
+-- Registro de problemas reportados.
+--
+-- Puede estar asociado a:
+-- - Equipo
+-- - Sala
+--
+-- =========================================================
+
+
+CREATE TABLE incidencias
+(
+
+id_incidencia INT AUTO_INCREMENT PRIMARY KEY,
+
+
+titulo VARCHAR(150) NOT NULL,
+
+
+descripcion TEXT,
+
+
+id_usuario_creador INT NOT NULL,
+
+
+id_equipo INT NULL,
+
+
+id_sala INT NOT NULL,
+
+
+id_categoria INT NOT NULL,
+
+
+id_prioridad INT NOT NULL,
+
+
+id_estado INT NOT NULL,
+
+
+id_responsable INT NULL,
+
+
+fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+fecha_cierre DATETIME NULL
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- HISTORIAL INCIDENCIAS
+--
+-- Guarda todas las acciones realizadas.
+--
+-- Ejemplo:
+--
+-- CREACION
+-- ASIGNACION
+-- CAMBIO_ESTADO
+-- CIERRE
+--
+-- =========================================================
+
+
+CREATE TABLE historial_incidencias
+(
+
+id_historial INT AUTO_INCREMENT PRIMARY KEY,
+
+
+id_incidencia INT NOT NULL,
+
+
+tipo_movimiento VARCHAR(50) NOT NULL,
+
+
+id_estado_anterior INT NULL,
+
+
+id_estado_nuevo INT NULL,
+
+
+id_usuario INT NOT NULL,
+
+
+id_responsable_asignado INT NULL,
+
+
+comentario VARCHAR(255),
+
+
+fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- ALERTAS BOTÓN DE PÁNICO
+--
+-- Emergencias rápidas.
+--
+-- La descripción es opcional.
+--
+-- El usuario solo selecciona:
+--
+-- Sala
+-- Tipo emergencia
+--
+-- =========================================================
+
+
+CREATE TABLE alertas
+(
+
+id_alerta INT AUTO_INCREMENT PRIMARY KEY,
+
+
+id_usuario INT NOT NULL,
+
+
+id_sala INT NOT NULL,
+
+
+id_tipo_emergencia INT NOT NULL,
+
+
+id_estado_alerta INT DEFAULT 1,
+
+
+descripcion VARCHAR(255) NULL,
+
+
+fecha_alerta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+atendida_por INT NULL,
+
+
+fecha_atencion DATETIME NULL
+
+);
+
+
+
+-- =========================================================
+-- TABLA:
+-- HISTORIAL ALERTAS
+--
+-- Trazabilidad del botón de pánico.
+--
+-- =========================================================
+
+
+CREATE TABLE historial_alertas
+(
+
+id_historial_alerta INT AUTO_INCREMENT PRIMARY KEY,
+
+
+id_alerta INT NOT NULL,
+
+
+id_estado_anterior INT NULL,
+
+
+id_estado_nuevo INT NOT NULL,
+
+
+id_usuario INT NOT NULL,
+
+
+comentario VARCHAR(255),
+
+
+fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+
+/*
+============================================================
+
+ PARTE 4/6
+
+ RELACIONES DE BASE DE DATOS
+
+ Integridad referencial mediante FOREIGN KEY.
+
+============================================================
+*/
+
+
+USE sistema_incidencias;
+
+
+
+-- =====================================================
+-- USUARIOS → ROLES
+-- =====================================================
+
+
+ALTER TABLE usuarios
+
+ADD CONSTRAINT fk_usuario_rol
+
+FOREIGN KEY(id_rol)
+
+REFERENCES roles(id_rol);
+
+
+
+-- =====================================================
+-- CORREOS AUTORIZADOS → ROLES
+-- =====================================================
+
+
+ALTER TABLE correos_autorizados
+
+ADD CONSTRAINT fk_correo_autorizado_rol
+
+FOREIGN KEY(id_rol)
+
+REFERENCES roles(id_rol);
+
+
+
+-- =====================================================
+-- PISOS → EDIFICIOS
+-- =====================================================
+
+
+ALTER TABLE pisos
+
+ADD CONSTRAINT fk_piso_edificio
+
+FOREIGN KEY(id_edificio)
+
+REFERENCES edificios(id_edificio);
+
+
+
+-- =====================================================
+-- SALAS → PISOS
+-- =====================================================
+
+
+ALTER TABLE salas
+
+ADD CONSTRAINT fk_sala_piso
+
+FOREIGN KEY(id_piso)
+
+REFERENCES pisos(id_piso);
+
+
+
+-- =====================================================
+-- EQUIPOS → SALAS
+-- =====================================================
+
+
+ALTER TABLE equipos
+
+ADD CONSTRAINT fk_equipo_sala
+
+FOREIGN KEY(id_sala)
+
+REFERENCES salas(id_sala);
+
+
+
+-- =====================================================
+-- INCIDENCIAS → USUARIO CREADOR
+-- =====================================================
+
+
+ALTER TABLE incidencias
+
+ADD CONSTRAINT fk_incidencia_creador
+
+FOREIGN KEY(id_usuario_creador)
+
+REFERENCES usuarios(id_usuario);
+
+
+
+-- =====================================================
+-- INCIDENCIAS → EQUIPO
+-- Puede ser NULL porque no todas las incidencias
+-- corresponden a un equipo.
+-- =====================================================
+
+
+ALTER TABLE incidencias
+
+ADD CONSTRAINT fk_incidencia_equipo
+
+FOREIGN KEY(id_equipo)
+
+REFERENCES equipos(id_equipo);
+
+
+
+-- =====================================================
+-- INCIDENCIAS → SALA
+-- =====================================================
+
+
+ALTER TABLE incidencias
+
+ADD CONSTRAINT fk_incidencia_sala
+
+FOREIGN KEY(id_sala)
+
+REFERENCES salas(id_sala);
+
+
+
+-- =====================================================
+-- INCIDENCIAS → CATEGORIA
+-- =====================================================
+
+
+ALTER TABLE incidencias
+
+ADD CONSTRAINT fk_incidencia_categoria
+
+FOREIGN KEY(id_categoria)
+
+REFERENCES categorias(id_categoria);
+
+
+
+-- =====================================================
+-- INCIDENCIAS → PRIORIDAD
+-- =====================================================
+
+
+ALTER TABLE incidencias
+
+ADD CONSTRAINT fk_incidencia_prioridad
+
+FOREIGN KEY(id_prioridad)
+
+REFERENCES prioridades(id_prioridad);
+
+
+
+-- =====================================================
+-- INCIDENCIAS → ESTADO
+-- =====================================================
+
+
+ALTER TABLE incidencias
+
+ADD CONSTRAINT fk_incidencia_estado
+
+FOREIGN KEY(id_estado)
+
+REFERENCES estados_incidencia(id_estado);
+
+
+
+-- =====================================================
+-- INCIDENCIAS → RESPONSABLE
+-- Técnico encargado
+-- =====================================================
+
+
+ALTER TABLE incidencias
+
+ADD CONSTRAINT fk_incidencia_responsable
+
+FOREIGN KEY(id_responsable)
+
+REFERENCES usuarios(id_usuario);
+
+
+
+-- =====================================================
+-- HISTORIAL INCIDENCIAS
+-- =====================================================
+
+
+ALTER TABLE historial_incidencias
+
+ADD CONSTRAINT fk_historial_inc
+
+FOREIGN KEY(id_incidencia)
+
+REFERENCES incidencias(id_incidencia);
+
+
+
+ALTER TABLE historial_incidencias
+
+ADD CONSTRAINT fk_historial_usuario
+
+FOREIGN KEY(id_usuario)
+
+REFERENCES usuarios(id_usuario);
+
+
+
+ALTER TABLE historial_incidencias
+
+ADD CONSTRAINT fk_historial_responsable
+
+FOREIGN KEY(id_responsable_asignado)
+
+REFERENCES usuarios(id_usuario);
+
+
+
+-- =====================================================
+-- ALERTAS BOTÓN DE PÁNICO
+-- =====================================================
+
+
+ALTER TABLE alertas
+
+ADD CONSTRAINT fk_alerta_usuario
+
+FOREIGN KEY(id_usuario)
+
+REFERENCES usuarios(id_usuario);
+
+
+
+ALTER TABLE alertas
+
+ADD CONSTRAINT fk_alerta_sala
+
+FOREIGN KEY(id_sala)
+
+REFERENCES salas(id_sala);
+
+
+
+ALTER TABLE alertas
+
+ADD CONSTRAINT fk_alerta_tipo
+
+FOREIGN KEY(id_tipo_emergencia)
+
+REFERENCES tipos_emergencia(id_tipo_emergencia);
+
+
+
+ALTER TABLE alertas
+
+ADD CONSTRAINT fk_alerta_estado
+
+FOREIGN KEY(id_estado_alerta)
+
+REFERENCES estados_alerta(id_estado_alerta);
+
+
+
+ALTER TABLE alertas
+
+ADD CONSTRAINT fk_alerta_atendido
+
+FOREIGN KEY(atendida_por)
+
+REFERENCES usuarios(id_usuario);
+
+
+
+-- =====================================================
+-- HISTORIAL ALERTAS
+-- =====================================================
+
+
+ALTER TABLE historial_alertas
+
+ADD CONSTRAINT fk_historial_alerta
+
+FOREIGN KEY(id_alerta)
+
+REFERENCES alertas(id_alerta);
+
+
+
+ALTER TABLE historial_alertas
+
+ADD CONSTRAINT fk_historial_alerta_usuario
+
+FOREIGN KEY(id_usuario)
+
+REFERENCES usuarios(id_usuario);
+
+
+/*
+============================================================
+ TRIGGER:
+ CREACIÓN AUTOMÁTICA HISTORIAL INCIDENCIAS
+
+ Cada nueva incidencia genera automáticamente
+ un registro de historial.
+============================================================
+*/
+
+
+DROP TRIGGER IF EXISTS trg_crear_historial_incidencia;
+
+
+DELIMITER $$
+
+
+CREATE TRIGGER trg_crear_historial_incidencia
+
+AFTER INSERT ON incidencias
+
+FOR EACH ROW
+
+BEGIN
+
+
+INSERT INTO historial_incidencias
+(
+id_incidencia,
+tipo_movimiento,
+id_estado_nuevo,
+id_usuario,
+comentario
+)
+
+VALUES
+
+(
+NEW.id_incidencia,
+'CREACION',
+NEW.id_estado,
+NEW.id_usuario_creador,
+'Incidencia creada en el sistema'
+);
+
+
+END$$
+
+
+DELIMITER ;
+
+/*
+============================================================
+ TRIGGER:
+ CREACIÓN HISTORIAL ALERTAS
+
+ Registra automáticamente una emergencia nueva.
+============================================================
+*/
+
+
+DROP TRIGGER IF EXISTS trg_crear_historial_alerta;
+
+
+DELIMITER $$
+
+
+CREATE TRIGGER trg_crear_historial_alerta
+
+AFTER INSERT ON alertas
+
+FOR EACH ROW
+
+BEGIN
+
+
+INSERT INTO historial_alertas
+(
+id_alerta,
+id_estado_nuevo,
+id_usuario,
+comentario
+)
+
+VALUES
+
+(
+NEW.id_alerta,
+NEW.id_estado_alerta,
+NEW.id_usuario,
+'Alerta de emergencia generada'
+);
+
+
+END$$
+
+
+DELIMITER ;
+
+/*
+============================================================
+ PROCEDIMIENTO:
+ GENERAR ALERTA EMERGENCIA
+
+ Crea una alerta desde botón de pánico.
+============================================================
+*/
+
+
+DROP PROCEDURE IF EXISTS generar_alerta_emergencia;
+
+
+DELIMITER $$
+
+
+CREATE PROCEDURE generar_alerta_emergencia
+
+(
+IN p_usuario INT,
+
+IN p_sala INT,
+
+IN p_tipo_emergencia INT,
+
+IN p_descripcion VARCHAR(255)
+
+)
+
+BEGIN
+
+
+INSERT INTO alertas
+(
+id_usuario,
+id_sala,
+id_tipo_emergencia,
+id_estado_alerta,
+descripcion
+)
+
+VALUES
+
+(
+p_usuario,
+p_sala,
+p_tipo_emergencia,
+1,
+p_descripcion
+);
+
+
+
+SELECT LAST_INSERT_ID()
+AS id_alerta_generada;
+
+
+END$$
+
+
+DELIMITER ;
+
+/*
+============================================================
+ PROCEDIMIENTO:
+ ASIGNAR RESPONSABLE
+
+ Asigna técnico y deja registro.
+============================================================
+*/
+
+
+DROP PROCEDURE IF EXISTS asignar_responsable;
+
+
+DELIMITER $$
+
+
+CREATE PROCEDURE asignar_responsable
+
+(
+IN p_incidencia INT,
+
+IN p_tecnico INT,
+
+IN p_usuario_accion INT,
+
+IN p_comentario VARCHAR(255)
+
+)
+
+BEGIN
+
+
+
+UPDATE incidencias
+
+SET
+
+id_responsable = p_tecnico
+
+WHERE id_incidencia = p_incidencia;
+
+
+
+INSERT INTO historial_incidencias
+(
+id_incidencia,
+tipo_movimiento,
+id_usuario,
+id_responsable_asignado,
+comentario
+)
+
+VALUES
+
+(
+p_incidencia,
+'ASIGNACION',
+p_usuario_accion,
+p_tecnico,
+p_comentario
+);
+
+
+END$$
+
+
+DELIMITER ;
+DROP PROCEDURE IF EXISTS cambiar_estado_incidencia;
+
+
+DELIMITER $$
+
+
+CREATE PROCEDURE cambiar_estado_incidencia
+
+(
+IN p_incidencia INT,
+
+IN p_estado_nuevo INT,
+
+IN p_usuario INT,
+
+IN p_comentario VARCHAR(255)
+
+)
+
+
+BEGIN
+
+
+DECLARE estado_anterior INT;
+
+
+
+SELECT id_estado
+
+INTO estado_anterior
+
+FROM incidencias
+
+WHERE id_incidencia=p_incidencia;
+
+
+
+UPDATE incidencias
+
+SET id_estado=p_estado_nuevo
+
+WHERE id_incidencia=p_incidencia;
+
+
+
+INSERT INTO historial_incidencias
+(
+id_incidencia,
+tipo_movimiento,
+id_estado_anterior,
+id_estado_nuevo,
+id_usuario,
+comentario
+)
+
+VALUES
+
+(
+p_incidencia,
+'CAMBIO_ESTADO',
+estado_anterior,
+p_estado_nuevo,
+p_usuario,
+p_comentario
+);
+
+
+END$$
+
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS cambiar_estado_alerta;
+
+
+DELIMITER $$
+
+
+CREATE PROCEDURE cambiar_estado_alerta
+
+(
+IN p_alerta INT,
+
+IN p_estado_nuevo INT,
+
+IN p_usuario INT,
+
+IN p_comentario VARCHAR(255)
+
+)
+
+BEGIN
+
+
+DECLARE estado_anterior INT;
+
+
+
+SELECT id_estado_alerta
+
+INTO estado_anterior
+
+FROM alertas
+
+WHERE id_alerta=p_alerta;
+
+
+
+UPDATE alertas
+
+SET
+
+id_estado_alerta=p_estado_nuevo,
+
+
+atendida_por=p_usuario,
+
+
+fecha_atencion =
+CASE
+
+WHEN p_estado_nuevo = 3
+
+THEN NOW()
+
+ELSE fecha_atencion
+
+END
+
+
+WHERE id_alerta=p_alerta;
+
+
+
+INSERT INTO historial_alertas
+(
+id_alerta,
+id_estado_anterior,
+id_estado_nuevo,
+id_usuario,
+comentario
+)
+
+VALUES
+
+(
+p_alerta,
+estado_anterior,
+p_estado_nuevo,
+p_usuario,
+p_comentario
+);
+
+
+
+END$$
+
+
+DELIMITER ;
+
+/*
+============================================================
+ PARTE 6/6
+
+ DATOS DE PRUEBA
+
+ Estos datos son solamente demostrativos.
+ Posteriormente serán reemplazados por información
+ real del establecimiento.
+
+============================================================
+*/
+
+
+USE sistema_incidencias;
+
+
+
+-- =====================================================
+-- USUARIOS DE PRUEBA
+-- =====================================================
+
+
+INSERT INTO usuarios
+(
+nombre,
+apellido,
+correo,
+password,
+id_rol
+)
+
+VALUES
+
+(
+'Kevin',
+'Administrador',
+'kevin.admin@colegio.cl',
+'123456',
+1
+),
+
+(
+'Carolina',
+'Martinez',
+'carolina.profesor@colegio.cl',
+'123456',
+2
+),
+
+(
+'Carlos',
+'Perez',
+'carlos.tecnico@colegio.cl',
+'123456',
+3
+);
+
+
+
+-- =====================================================
+-- EDIFICIOS
+-- =====================================================
+
+INSERT IGNORE INTO edificios
+(
+nombre,
+descripcion
+)
+VALUES
+
+(
+'Edificio Principal',
+'Edificio administrativo y salas'
+),
+
+(
+'Edificio Tecnología',
+'Laboratorios computación'
+);
+
+
+
+-- =====================================================
+-- PISOS
+-- =====================================================
+
+
+INSERT IGNORE INTO pisos
+(
+numero_piso,
+nombre,
+id_edificio
+)
+
+VALUES
+
+(
+1,
+'Primer Piso',
+1
+),
+
+(
+2,
+'Segundo Piso',
+1
+),
+
+(
+1,
+'Primer Piso',
+2
+);
+
+
+-- =====================================================
+-- SALAS CON QR
+-- =====================================================
+
+
+INSERT IGNORE INTO salas
+(
+nombre,
+codigo_sala,
+codigo_qr,
+id_piso
+)
+
+VALUES
+
+(
+'Sala 101',
+'101',
+'QR-SALA-101',
+1
+),
+
+(
+'Sala 202',
+'202',
+'QR-SALA-202',
+2
+),
+
+(
+'Laboratorio Computación',
+'LAB01',
+'QR-LAB-01',
+3
+);
+
+
+-- =====================================================
+-- EQUIPOS
+-- =====================================================
+
+
+INSERT INTO equipos
+(
+codigo_inventario,
+nombre,
+marca,
+modelo,
+id_sala
+)
+
+VALUES
+
+
+(
+'PC-001',
+'Computador docente',
+'Dell',
+'Optiplex',
+3
+),
+
+
+(
+'PROY-001',
+'Proyector sala',
+'Epson',
+'X200',
+1
+);
+
+
+
+-- =====================================================
+-- CREAR INCIDENCIA DE PRUEBA
+-- =====================================================
+
+
+INSERT INTO incidencias
+(
+titulo,
+descripcion,
+id_usuario_creador,
+id_equipo,
+id_sala,
+id_categoria,
+id_prioridad,
+id_estado
+)
+
+VALUES
+
+(
+'Equipo no enciende',
+'Computador no inicia correctamente',
+2,
+1,
+3,
+1,
+3,
+1
+);
+
+
+
+-- =====================================================
+-- CREAR ALERTA BOTÓN DE PÁNICO
+-- =====================================================
+
+
+CALL generar_alerta_emergencia
+
+(
+2,
+1,
+1,
+NULL
+);
+
