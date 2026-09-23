@@ -1,0 +1,207 @@
+.home {
+
+  min-height:100vh;
+  background:#f4f7fb;
+  padding:30px;
+
+}
+
+
+.top {
+
+  display:flex;
+  align-items:center;
+  gap:15px;
+
+  background:white;
+  padding:20px;
+  border-radius:20px;
+
+}
+
+
+.logo {
+
+  width:55px;
+  height:55px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#0066cc;
+
+  border-radius:16px;
+
+  font-size:28px;
+
+}
+
+
+
+.top h1 {
+
+  margin:0;
+
+  font-size:22px;
+
+}
+
+
+.top p {
+
+  margin:4px 0;
+
+  color:#777;
+
+}
+
+
+
+.welcome {
+
+  margin-top:35px;
+
+}
+
+
+.welcome h2 {
+
+  font-size:32px;
+
+  margin-bottom:5px;
+
+}
+
+
+.welcome p {
+
+  color:#666;
+
+}
+
+
+
+.menu {
+
+  margin-top:30px;
+
+  display:grid;
+
+  grid-template-columns:repeat(2,1fr);
+
+  gap:20px;
+
+}
+
+
+
+.card {
+
+  background:white;
+
+  border:none;
+
+  border-radius:22px;
+
+  padding:25px;
+
+  display:flex;
+
+  gap:20px;
+
+  align-items:center;
+
+  text-align:left;
+
+  cursor:pointer;
+
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+  transition:.2s;
+
+}
+
+
+.card:hover {
+
+  transform:translateY(-5px);
+
+}
+
+
+
+.card span {
+
+  font-size:40px;
+
+}
+
+
+
+.card h3 {
+
+  margin:0 0 8px;
+
+  font-size:20px;
+
+}
+
+
+
+.card p {
+
+  margin:0;
+
+  color:#777;
+
+}
+
+
+
+.panic {
+
+  border-left:6px solid #e63946;
+
+}
+
+
+
+.qr {
+
+  border-left:6px solid #0066cc;
+
+}
+
+
+
+.login {
+
+  border-left:6px solid #18a558;
+
+}
+
+
+
+footer {
+
+  margin-top:40px;
+
+  color:#777;
+
+  text-align:center;
+
+}
+
+
+
+@media(max-width:700px){
+
+.menu{
+
+grid-template-columns:1fr;
+
+}
+
+
+}
