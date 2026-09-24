@@ -1,166 +1,42 @@
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+﻿import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { iniciarSesion } from '../data/sesion';
+import './Login.css';
 
-import {usuarios} from "../data/usuarios";
-import {iniciarSesion} from "../data/sesion";
+function Login() {
+  const navigate = useNavigate();
+  const [correo, setCorreo] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
-import "./Login.css";
+  async function ingresar(event) {
+    event.preventDefault();
+    if (enviando) return;
+    setEnviando(true);
+    setError('');
+    try {
+      await iniciarSesion({ correo, password });
+      setPassword('');
+      navigate('/', { replace: true });
+    } catch (err) { setError(err.message); }
+    finally { setEnviando(false); }
+  }
 
-
-function Login(){
-
-
-const navigate = useNavigate();
-
-
-const [correo,setCorreo]=useState("");
-
-const [password,setPassword]=useState("");
-
-
-
-
-function ingresar(){
-
-
-
-const usuario = usuarios.find(
-
-(u)=>
-
-u.correo===correo &&
-u.password===password
-
-);
-
-
-
-if(!usuario){
-
-
-alert(
-"Correo o contraseña incorrectos"
-);
-
-
-return;
-
-
+  return <div className="login-page"><div className="login-card">
+    <div className="login-logo">🏫</div>
+    <h1>Sistema de Incidencias</h1>
+    <p>Acceso personal autorizado</p>
+    <form onSubmit={ingresar}>
+      <label htmlFor="correo">Correo institucional</label>
+      <input id="correo" type="email" autoComplete="username" required maxLength={150} value={correo} onChange={e => setCorreo(e.target.value)} />
+      <label htmlFor="password">Contraseña</label>
+      <input id="password" type="password" autoComplete="current-password" required maxLength={128} value={password} onChange={e => setPassword(e.target.value)} />
+      {error && <p className="auth-error" role="alert">{error}</p>}
+      <button disabled={enviando} type="submit">{enviando ? 'Ingresando...' : 'Ingresar'}</button>
+    </form>
+    <p>¿No tienes cuenta?</p>
+    <button disabled={enviando} onClick={() => navigate('/registro')}>Crear cuenta</button>
+  </div></div>;
 }
-
-
-
-iniciarSesion(usuario);
-
-
-navigate("/");
-
-
-
-}
-
-
-
-
-return(
-
-
-<div className="login-page">
-
-
-<div className="login-card">
-
-
-
-<div className="login-logo">
-
-🏫
-
-</div>
-
-
-
-
-<h1>
-Sistema de Incidencias
-</h1>
-
-
-
-<p>
-Acceso personal autorizado
-</p>
-
-
-
-
-<input
-
-placeholder="Correo institucional"
-
-onChange={(e)=>setCorreo(e.target.value)}
-
-/>
-
-
-
-
-<input
-
-type="password"
-
-placeholder="Contraseña"
-
-onChange={(e)=>setPassword(e.target.value)}
-
-/>
-
-
-
-
-
-<button
-
-onClick={ingresar}
-
->
-
-Ingresar
-
-</button>
-
-
-
-
-<p>
-¿No tienes cuenta?
-</p>
-
-
-
-<button
-
-onClick={()=>navigate("/registro")}
-
->
-
-Crear registro
-
-</button>
-
-
-
-
-</div>
-
-
-</div>
-
-
-)
-
-
-}
-
-
 export default Login;

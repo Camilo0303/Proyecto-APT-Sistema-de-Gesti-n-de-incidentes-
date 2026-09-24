@@ -1,0 +1,20 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs",
+    "check": "node --check server.cjs && node --check auth.cjs && node --check passwords.cjs",
+    "test": "node --test auth.test.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "mysql2": "^3.24.4"
+  }
+}

@@ -376,3 +376,27 @@ padding:25px;
 
 border-radius:25px
 }
+
+/* Dashboard conectado a MySQL */
+.content { min-width: 0; }
+.stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.dashboard-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 24px; }
+.dashboard-toolbar p { color: #64748b; }
+.dashboard-refresh { border: none; border-radius: 12px; padding: 12px 18px; background: #2563eb; color: white; cursor: pointer; }
+.dashboard-refresh:disabled { opacity: 0.6; cursor: wait; }
+.dashboard-error { padding: 16px; margin-top: 16px; border-radius: 12px; background: #fee2e2; color: #991b1b; }
+.dashboard-panel { margin-top: 28px; padding: 24px; background: white; border-radius: 24px; }
+.dashboard-panel h2 { margin-top: 0; color: #0f172a; }
+.dashboard-table-wrapper { overflow-x: auto; }
+.dashboard-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.dashboard-table th, .dashboard-table td { padding: 14px 12px; border-bottom: 1px solid #e2e8f0; }
+.dashboard-table th { background: #f8fafc; color: #475569; white-space: nowrap; }
+.dashboard-table td { color: #0f172a; }
+.dashboard-table tbody tr:hover { background: #f8fafc; }
+.dashboard-panel .empty-box { padding: 36px 16px; text-align: center; color: #64748b; }
+@media (max-width: 800px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: auto; }
+  .content { padding: 16px; }
+  .topbar, .welcome-card, .dashboard-toolbar { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
