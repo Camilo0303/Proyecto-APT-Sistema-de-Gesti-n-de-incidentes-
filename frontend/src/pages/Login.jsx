@@ -1,70 +1,63 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
+
+import {usuarios} from "../data/usuarios";
+import {iniciarSesion} from "../data/sesion";
+
 import "./Login.css";
 
 
 function Login(){
 
-  const navigate = useNavigate();
+
+const navigate = useNavigate();
 
 
-  const [correo,setCorreo] = useState("");
+const [correo,setCorreo]=useState("");
 
-  const [password,setPassword] = useState("");
-
-
-
-  const iniciarSesion = () => {
-
-
-    const usuarioGuardado = localStorage.getItem("usuario");
-
-
-    if(!usuarioGuardado){
-
-      alert("No existe ningún usuario registrado");
-
-      return;
-
-    }
+const [password,setPassword]=useState("");
 
 
 
-    const usuario = JSON.parse(usuarioGuardado);
+
+function ingresar(){
 
 
 
-    if(
-      usuario.correo === correo
-    ){
+const usuario = usuarios.find(
 
-      alert(
-        "Bienvenido " + usuario.nombre +
-        "\nRol: " + usuario.rol
-      );
+(u)=>
 
+u.correo===correo &&
+u.password===password
 
-      localStorage.setItem(
-        "sesion",
-        JSON.stringify(usuario)
-      );
+);
 
 
-      navigate("/");
+
+if(!usuario){
 
 
-    }else{
+alert(
+"Correo o contraseña incorrectos"
+);
 
 
-      alert(
-        "Correo incorrecto"
-      );
+return;
 
 
-    }
+}
 
 
-  };
+
+iniciarSesion(usuario);
+
+
+navigate("/");
+
+
+
+}
 
 
 
@@ -72,85 +65,64 @@ function Login(){
 return(
 
 
-<main className="login-page">
+<div className="login-page">
 
 
 <div className="login-card">
 
 
-<div className="login-icon">
 
-🔐
+<div className="login-logo">
+
+🏫
 
 </div>
 
 
 
+
 <h1>
-
-Iniciar sesión
-
+Sistema de Incidencias
 </h1>
 
 
+
 <p>
-
-Acceso al Sistema de Incidencias
-
+Acceso personal autorizado
 </p>
 
 
 
 
-<label>
-
-Correo institucional
-
-</label>
-
-
 <input
 
-type="email"
+placeholder="Correo institucional"
 
-placeholder="correo@colegio.cl"
-
-value={correo}
-
-onChange={
-(e)=>setCorreo(e.target.value)
-}
+onChange={(e)=>setCorreo(e.target.value)}
 
 />
 
 
-
-
-<label>
-
-Contraseña
-
-</label>
 
 
 <input
 
 type="password"
 
-placeholder="********"
+placeholder="Contraseña"
 
-value={password}
-
-onChange={
-(e)=>setPassword(e.target.value)
-}
+onChange={(e)=>setPassword(e.target.value)}
 
 />
 
 
 
+
+
 <button
-onClick={iniciarSesion}
+
+onClick={ingresar}
+
 >
 
 Ingresar
@@ -159,23 +131,30 @@ Ingresar
 
 
 
-<p
+
+<p>
+¿No tienes cuenta?
+</p>
+
+
+
+<button
+
 onClick={()=>navigate("/registro")}
-style={{
-cursor:"pointer"
-}}
+
 >
 
-¿No tienes cuenta? Registrar
+Crear registro
 
-</p>
+</button>
+
 
 
 
 </div>
 
 
-</main>
+</div>
 
 
 )

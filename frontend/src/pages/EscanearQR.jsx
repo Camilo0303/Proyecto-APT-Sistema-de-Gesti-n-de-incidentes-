@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import "./Home.css";
+import "./EscanearQR.css";
 
 
 function EscanearQR() {
@@ -70,57 +70,61 @@ function EscanearQR() {
   return (
 
 
-    <main className="home-container">
+    <main className="qr-page">
 
 
-      <header className="header">
+      <section className="qr-header">
 
 
-        <div>
-
-          <h1>
-            Escanear código QR 📷
-          </h1>
-
-
-          <p>
-            Identificación automática de sala
-          </p>
-
-
-        </div>
-
-
-      </header>
-
-
-
-
-
-
-      <section className="welcome">
-
-
-        <h2>
-          Escanea el código de la sala
-        </h2>
+        <h1>
+          📷 Escanear código QR
+        </h1>
 
 
         <p>
-          Apunta la cámara al QR instalado en el aula.
+          Identificación automática de sala
         </p>
 
 
+      </section>
 
+
+
+
+
+      <section className="qr-container">
 
 
         {
           !sala &&
 
-          <div id="reader"></div>
+          <>
+
+
+          <h2>
+            Escanea el código de la sala
+          </h2>
+
+
+          <p>
+            Apunta la cámara al código QR instalado en el aula.
+          </p>
+
+
+
+          <div className="scanner-box">
+
+
+            <div id="reader"></div>
+
+
+          </div>
+
+
+
+          </>
 
         }
-
 
 
 
@@ -129,38 +133,43 @@ function EscanearQR() {
         {
           sala &&
 
-          <div className="menu-card qr">
+
+          <div className="qr-success">
 
 
-            <div className="icon">
+            <div className="success-icon">
               ✅
             </div>
 
 
-
-            <div>
-
-              <h3>
-                Sala identificada
-              </h3>
+            <h2>
+              Sala identificada correctamente
+            </h2>
 
 
-              <p>
-                Código:
-                <b> {sala}</b>
-              </p>
+            <p>
+              Código detectado:
+            </p>
 
 
-            </div>
+            <strong>
+              {sala}
+            </strong>
 
+
+            <button
+              className="continue-button"
+            >
+
+              Reportar incidencia
+
+            </button>
 
 
           </div>
 
 
         }
-
-
 
 
 
@@ -175,6 +184,7 @@ function EscanearQR() {
 
 
 }
+
 
 
 export default EscanearQR;

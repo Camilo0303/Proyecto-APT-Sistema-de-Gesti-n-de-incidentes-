@@ -1,264 +1,425 @@
-import { useNavigate } from "react-router-dom";
 import "./Home.css";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { obtenerUsuario, cerrarSesion } from "../data/sesion";
 
 
-function Home() {
+function Home(){
 
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
+const usuario = obtenerUsuario();
 
+const [menu,setMenu] = useState(false);
 
-  return (
 
 
-    <main className="home-container">
+function irAReportar(){
 
+if(usuario){
 
+navigate("/reportar");
 
-      <header className="header">
+}
+else{
 
+navigate("/login");
 
-        <div className="logo">
-          🏫
-        </div>
+}
 
+}
 
 
-        <div>
 
-          <h1>
-            Sistema de Incidencias
-          </h1>
+return(
 
 
-          <p>
-            Gestión de infraestructura escolar
-          </p>
+<div className="layout">
 
 
-        </div>
+<aside className="sidebar">
 
 
+<div className="brand">
 
-        <span className="status">
-          Sistema activo
-        </span>
+<div className="brand-logo">
+🏫
+</div>
 
 
+<div>
 
-      </header>
+<h2>
+SIGI
+</h2>
 
+<p>
+Gestión incidencias
+</p>
 
 
+</div>
 
+</div>
 
-      <section className="welcome">
 
 
-        <h2>
-          Hola 👋
-        </h2>
+<nav>
 
 
-        <p>
-          ¿Qué necesitas realizar?
-        </p>
+<button className="active">
 
+🏠 Dashboard
 
+</button>
 
-      </section>
 
+<button onClick={()=>navigate("/escanear")}>
 
+📷 Escanear QR
 
+</button>
 
 
-      <section className="menu-grid">
 
+<button onClick={irAReportar}>
 
+➕ Reportar incidencia
 
+</button>
 
 
-        {/* ESCANEAR QR */}
 
-        <div
-          className="menu-card qr"
-          onClick={() => navigate("/escanear")}
-        >
+<button onClick={()=>navigate("/historial")}>
 
+📋 Mis reportes
 
-          <div className="icon">
-            📷
-          </div>
+</button>
 
 
 
-          <div>
+<button onClick={()=>navigate("/panico")}>
 
-            <h3>
-              Escanear QR
-            </h3>
+🚨 Botón de pánico
 
+</button>
 
-            <p>
-              Identifica automáticamente la sala
-            </p>
 
 
-          </div>
+</nav>
 
 
+</aside>
 
-        </div>
 
 
 
 
 
 
-        {/* HISTORIAL */}
+<main className="content">
 
 
-        <div
-          className="menu-card history"
-          onClick={() => alert("Módulo historial próximamente")}
-        >
 
+<header className="topbar">
 
-          <div className="icon">
-            📋
-          </div>
 
+<div>
 
+<h1>
+Sistema de Gestión de Incidencias
+</h1>
 
-          <div>
 
-            <h3>
-              Historial
-            </h3>
+<p>
+Control de infraestructura y equipamiento
+</p>
 
+</div>
 
-            <p>
-              Revisa tus reportes enviados
-            </p>
 
 
-          </div>
 
 
-        </div>
 
+<div className="profile">
 
 
 
+{
+usuario ?
 
 
+<>
 
 
-        {/* BOTON PANICO */}
+<button onClick={()=>setMenu(!menu)}>
 
+👤 {usuario.nombre} ▼
 
-        <div
-          className="menu-card panic"
-          onClick={() => alert("Alerta de emergencia activada")}
-        >
+</button>
 
 
-          <div className="icon">
-            🚨
-          </div>
 
+{
 
+menu &&
 
-          <div>
+<div className="dropdown">
 
-            <h3>
-              Botón de pánico
-            </h3>
 
+<p>
+<strong>
+Rol:
+</strong>
 
-            <p>
-              Generar alerta de emergencia
-            </p>
+<br/>
 
+{usuario.rol}
 
-          </div>
+</p>
 
 
+<p>
+<strong>
+Área:
+</strong>
 
-        </div>
+<br/>
 
+{usuario.area}
 
+</p>
 
 
 
+<button
 
+onClick={()=>{
 
+cerrarSesion();
 
-        {/* LOGIN */}
+navigate("/");
 
+}}
 
-        <div
-          className="menu-card login"
-          onClick={() => navigate("/login")}
-        >
+>
 
+Cerrar sesión
 
-          <div className="icon">
-            🔐
-          </div>
+</button>
 
 
 
+</div>
 
-          <div>
+}
 
-            <h3>
-              Iniciar sesión
-            </h3>
 
+</>
 
-            <p>
-              Acceso para profesores y encargados
-            </p>
 
 
-          </div>
 
+:
 
 
+<button
 
-        </div>
+className="login-button"
 
+onClick={()=>navigate("/login")}
 
+>
 
+🔐 Iniciar sesión
 
-
-      </section>
-
-
-
-
-
-
-
-      <footer>
-
-        Sistema de Gestión de Incidencias · Proyecto APT
-
-      </footer>
-
-
-
-
-    </main>
-
-
-  );
+</button>
 
 
 }
 
+
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+<section className="welcome-card">
+
+
+<div>
+
+<h2>
+Bienvenido al sistema 👋
+</h2>
+
+
+<p>
+Reporta problemas del establecimiento de forma rápida y segura.
+</p>
+
+
+</div>
+
+
+
+
+<button onClick={irAReportar}>
+
++ Nueva incidencia
+
+</button>
+
+
+
+</section>
+
+
+
+
+
+
+
+<section className="stats">
+
+
+<div className="stat blue">
+
+<span>
+📋
+</span>
+
+<h2>
+0
+</h2>
+
+<p>
+Total incidencias
+</p>
+
+</div>
+
+
+
+
+<div className="stat yellow">
+
+<span>
+⏳
+</span>
+
+<h2>
+0
+</h2>
+
+<p>
+Pendientes
+</p>
+
+</div>
+
+
+
+
+
+<div className="stat purple">
+
+<span>
+⚙️
+</span>
+
+<h2>
+0
+</h2>
+
+<p>
+En proceso
+</p>
+
+</div>
+
+
+
+
+
+<div className="stat green">
+
+<span>
+✅
+</span>
+
+<h2>
+0
+</h2>
+
+<p>
+Resueltas
+</p>
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+<section className="panel">
+
+
+<h2>
+Últimos reportes
+</h2>
+
+
+<div className="empty-box">
+
+
+📂
+
+
+<h3>
+No existen incidencias registradas
+</h3>
+
+
+<p>
+Los reportes aparecerán cuando sean creados.
+</p>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+</main>
+
+
+</div>
+
+
+)
+
+
+}
 
 
 export default Home;
