@@ -33,8 +33,8 @@ function Registro() {
       <label htmlFor="correo">Correo institucional</label>
       <input id="correo" name="correo" type="email" autoComplete="username" required maxLength={150} value={datos.correo} onChange={cambiar} />
       <label htmlFor="password">Contraseña</label>
-      <input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} maxLength={128} aria-describedby="password-help" value={datos.password} onChange={cambiar} />
-      <p id="password-help">Entre 8 y 128 caracteres.</p>
+      <input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} maxLength={16} aria-describedby="password-help" value={datos.password} onChange={cambiar} />
+      <p id="password-help">Entre 8 y 16 caracteres.</p>
       {error && <p className="auth-error" role="alert">{error}</p>}
       <button disabled={enviando} type="submit">{enviando ? 'Registrando...' : 'Registrarse'}</button>
     </form>

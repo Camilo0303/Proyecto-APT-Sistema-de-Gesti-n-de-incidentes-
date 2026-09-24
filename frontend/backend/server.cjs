@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.join(__dirname, '.env'), quiet: true });
 const express = require('express');
 const mysql = require('mysql2/promise');
 const { createAuth } = require('./auth.cjs');
+const { createIncidencias } = require('./incidencias.cjs');
 const app = express();
 const port = Number(process.env.PORT || 3001);
 app.disable('x-powered-by');
@@ -20,6 +21,10 @@ const pool = mysql.createPool({
 app.use(express.json({ limit: '16kb' }));
 const auth = createAuth(pool);
 app.use('/api/auth', auth.router);
+app.use(
+  '/api/incidencias',
+  createIncidencias(pool, auth.requireAuth)
+);
 
 app.get('/api/dashboard', auth.requireAuth, async (_req, res) => {
   res.set('Cache-Control', 'no-store');
