@@ -1,46 +1,47 @@
 .cetecom-container {
-    padding: 30px;
+  padding: 30px;
 }
 
 .cetecom-container h1 {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
-.cards {
-    display: flex;
-    gap: 20px;
-    margin: 25px 0;
+.cetecom-container .cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 25px 0;
 }
 
-.card {
-    background: #f5f5f5;
-    padding: 20px;
-    border-radius: 12px;
-    width: 180px;
+.cetecom-container .card {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 12px;
+  width: 180px;
 }
 
-.card h3 {
-    margin: 0;
+.cetecom-container .card h3 {
+  margin: 0;
 }
 
-.card span {
-    font-size: 35px;
-    font-weight: bold;
+.cetecom-container .card span {
+  font-size: 35px;
+  font-weight: bold;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+.cetecom-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-table th {
-    background: #222;
-    color: white;
+.cetecom-container table th {
+  background: #222;
+  color: white;
 }
 
-table th,
-table td {
-    padding: 12px;
-    border: 1px solid #ddd;
+.cetecom-container table th,
+.cetecom-container table td {
+  padding: 12px;
+  border: 1px solid #ddd;
 }
