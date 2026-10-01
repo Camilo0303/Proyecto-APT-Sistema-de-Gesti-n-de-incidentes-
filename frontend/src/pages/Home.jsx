@@ -265,7 +265,7 @@ function Home() {
         ) : (
           <>
             <div className="dashboard-toolbar">
-              <p>Resumen general del establecimiento</p>
+              <p>Resumen de mis incidencias</p>
 
               <button
                 className="dashboard-refresh"
