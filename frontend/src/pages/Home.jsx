@@ -1,382 +1,397 @@
 ﻿import './Home.css';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import {
   obtenerUsuario,
   cerrarSesion,
   olvidarSesion,
 } from '../data/sesion';
 
-const tarjetas = [
-  ['total', 'Total incidencias', '📋', 'blue'],
-  ['pendientes', 'Pendientes', '⏳', 'yellow'],
-  ['asignadas', 'Asignadas', '👤', 'blue'],
-  ['en_proceso', 'En proceso', '⚙️', 'purple'],
-  ['resueltas', 'Resueltas', '✅', 'green'],
-  ['cerradas', 'Cerradas', '📁', 'green'],
+const indicadores = [
+  ['total', 'Total de reportes', 'azul'],
+  ['pendientes', 'Pendientes', 'ambar'],
+  ['asignadas', 'Asignadas', 'azul'],
+  ['en_proceso', 'En proceso', 'violeta'],
+  ['resueltas', 'Resueltas', 'verde'],
+  ['cerradas', 'Cerradas', 'gris'],
 ];
 
-function Home() {
-  const navigate = useNavigate();
+function colorEstado(estado) {
+  switch (estado) {
+    case 'Pendiente':
+      return 'ambar';
+    case 'Asignada':
+      return 'azul';
+    case 'En proceso':
+      return 'violeta';
+    case 'Resuelta':
+      return 'verde';
+    default:
+      return 'gris';
+  }
+}
 
+export default function Home() {
   const [usuario, setUsuario] = useState(() => obtenerUsuario());
-  const [menu, setMenu] = useState(false);
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [cerrando, setCerrando] = useState(false);
   const [error, setError] = useState('');
+  const [errorSesion, setErrorSesion] = useState('');
   const [recarga, setRecarga] = useState(0);
 
   useEffect(() => {
     if (!usuario) return;
 
+    let activo = true;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
-    let activo = true;
 
-    async function cargarDashboard() {
+    async function cargar() {
       setCargando(true);
       setError('');
+      setDatos(null);
 
       try {
         const respuesta = await fetch('/api/dashboard', {
           credentials: 'same-origin',
-          signal: controller.signal,
           cache: 'no-store',
+          signal: controller.signal,
         });
 
         if (respuesta.status === 401) {
           if (activo) {
             olvidarSesion();
             setUsuario(null);
-            setDatos(null);
-            setMenu(false);
           }
-
           return;
         }
 
         if (!respuesta.ok) {
-          throw new Error('No se pudo consultar el dashboard.');
+          throw new Error('No se pudieron consultar las incidencias.');
         }
 
         const resultado = await respuesta.json();
 
-        if (activo) {
-          setDatos(resultado);
+        if (
+          !resultado.resumen ||
+          !Array.isArray(resultado.ultimosReportes)
+        ) {
+          throw new Error('La respuesta del servidor no es válida.');
         }
+
+        if (activo) setDatos(resultado);
       } catch (err) {
         if (activo) {
           setError(
             err.name === 'AbortError'
-              ? 'El servidor tardó demasiado. Intenta actualizar los datos.'
-              : 'No se pudieron obtener los datos. Revisa que el backend y MySQL estén encendidos.'
+              ? 'La consulta tardó demasiado. Presiona Actualizar para intentar nuevamente.'
+              : 'No se pudieron cargar tus reportes. Comprueba que el backend y MySQL estén funcionando.'
           );
         }
       } finally {
         clearTimeout(timeout);
-
-        if (activo) {
-          setCargando(false);
-        }
+        if (activo) setCargando(false);
       }
     }
 
-    cargarDashboard();
+    cargar();
 
     return () => {
       activo = false;
       clearTimeout(timeout);
       controller.abort();
     };
-  }, [recarga, usuario]);
-
-  function irAReportar() {
-    navigate(usuario ? '/reportar' : '/login');
-  }
+  }, [usuario, recarga]);
 
   async function salir() {
     if (cerrando) return;
 
     setCerrando(true);
-    setError('');
+    setErrorSesion('');
 
     try {
       await cerrarSesion();
-
-      // Recarga el inicio después de cerrar la sesión.
       window.location.replace('/');
     } catch (err) {
-      setError(
+      setErrorSesion(
         err.message || 'No se pudo cerrar sesión. Intenta nuevamente.'
       );
       setCerrando(false);
     }
   }
 
-  return (
-    <div className="layout">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-logo">🏫</div>
+  if (!usuario) {
+    return <Navigate to="/login" replace />;
+  }
 
+  const nombreCompleto = [usuario.nombre, usuario.apellido]
+    .filter(Boolean)
+    .join(' ');
+
+  const inicial = (usuario.nombre || 'P').charAt(0).toUpperCase();
+
+  return (
+    <div className="profesor-dashboard" lang="es" translate="no">
+      <a className="pd-saltar" href="#pd-contenido">
+        Saltar al contenido
+      </a>
+
+      <aside className="pd-sidebar">
+        <Link to="/profesor" className="pd-marca">
+          <span className="pd-logo" aria-hidden="true">S</span>
+          <span>
+            <strong>SIGI</strong>
+            <small>Gestión de incidencias</small>
+          </span>
+        </Link>
+
+        <p className="pd-menu-titulo">ESPACIO DEL PROFESOR</p>
+
+        <nav className="pd-nav" aria-label="Menú del profesor">
+          <Link to="/profesor" className="pd-nav-activo" aria-current="page">
+            <span aria-hidden="true">⌂</span>
+            Mi panel
+          </Link>
+
+          <Link to="/reportar">
+            <span aria-hidden="true">＋</span>
+            Reportar incidencia
+          </Link>
+
+          <Link to="/escanear">
+            <span aria-hidden="true">▦</span>
+            Escanear QR
+          </Link>
+
+          <Link to="/historial">
+            <span aria-hidden="true">☷</span>
+            Mis reportes
+          </Link>
+
+          <Link to="/panico">
+            <span aria-hidden="true">!</span>
+            Emergencia
+            <small>Demo</small>
+          </Link>
+        </nav>
+
+        <div className="pd-sidebar-pie">
+          <span className="pd-avatar" aria-hidden="true">{inicial}</span>
           <div>
-            <h2>SIGI</h2>
-            <p>Gestión incidencias</p>
+            <strong>{nombreCompleto}</strong>
+            <small>{usuario.rol || 'Profesor'}</small>
           </div>
         </div>
-
-        <nav>
-          <button
-            className="active"
-            onClick={() => navigate('/')}
-          >
-            🏠 Dashboard
-          </button>
-
-          <button onClick={() => navigate('/escanear')}>
-            📷 Escanear QR
-          </button>
-
-          <button onClick={irAReportar}>
-            ➕ Reportar incidencia
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(usuario ? '/historial' : '/login')
-            }
-          >
-            📋 Mis reportes
-          </button>
-
-          <button
-            onClick={() =>
-              navigate(usuario ? '/panico' : '/login')
-            }
-          >
-            🚨 Botón de pánico
-          </button>
-        </nav>
       </aside>
 
-      <main className="content">
-        <header className="topbar">
+      <main className="pd-main" id="pd-contenido">
+        <header className="pd-cabecera">
           <div>
-            <h1>Sistema de Gestión de Incidencias</h1>
-            <p>Control de infraestructura y equipamiento</p>
+            <p className="pd-etiqueta">MI ESPACIO</p>
+            <h1>Panel del profesor</h1>
+            <p>Reporta un problema y sigue su avance desde aquí.</p>
           </div>
 
-          <div className="profile">
-            {usuario ? (
-              <>
-                <button
-                  onClick={() => setMenu(!menu)}
-                  aria-expanded={menu}
-                  disabled={cerrando}
-                >
-                  👤 {usuario.nombre} ▼
-                </button>
-
-                {menu && (
-                  <div className="dropdown">
-                    <p>
-                      <strong>Rol:</strong>
-                      <br />
-                      {usuario.rol}
-                    </p>
-
-                    <button
-                      onClick={salir}
-                      disabled={cerrando}
-                    >
-                      {cerrando
-                        ? 'Cerrando sesión...'
-                        : 'Cerrar sesión'}
-                    </button>
-                  </div>
-                )}
-              </>
-            ) : (
-              <button
-                className="login-button"
-                onClick={() => navigate('/login')}
-              >
-                🔐 Iniciar sesión
-              </button>
-            )}
-          </div>
+          <button
+            type="button"
+            className="pd-boton pd-boton-secundario"
+            onClick={salir}
+            disabled={cerrando}
+          >
+            {cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}
+          </button>
         </header>
 
-        <section className="welcome-card">
-          <div>
-            <h2>
-              {usuario
-                ? `Bienvenido, ${usuario.nombre} 👋`
-                : 'Bienvenido al sistema 👋'}
-            </h2>
+        {errorSesion && (
+          <div className="pd-error" role="alert">{errorSesion}</div>
+        )}
 
+        <section className="pd-bienvenida">
+          <div>
+            <span className="pd-bienvenida-etiqueta">JUNTOS CUIDAMOS EL ESTABLECIMIENTO</span>
+            <h2>Hola, {usuario.nombre}</h2>
             <p>
-              Reporta problemas del establecimiento de forma
-              rápida y segura.
+              ¿Encontraste un problema en una sala o equipo?
+              Registra una incidencia para que pueda ser atendida.
             </p>
           </div>
 
-          <button onClick={irAReportar}>
-            + Nueva incidencia
-          </button>
+          <Link to="/reportar" className="pd-boton pd-boton-blanco">
+            <span aria-hidden="true">＋</span>
+            Nueva incidencia
+          </Link>
         </section>
 
-        {error && (
-          <div className="dashboard-error" role="alert">
-            {error}
+        <section className="pd-accesos" aria-label="Accesos rápidos">
+          <Link to="/reportar" className="pd-acceso">
+            <span className="pd-acceso-icono pd-azul" aria-hidden="true">＋</span>
+            <div>
+              <h2>Reportar un problema</h2>
+              <p>Describe lo ocurrido e indica su ubicación.</p>
+            </div>
+            <span className="pd-flecha" aria-hidden="true">→</span>
+          </Link>
+
+          <Link to="/escanear" className="pd-acceso">
+            <span className="pd-acceso-icono pd-violeta" aria-hidden="true">▦</span>
+            <div>
+              <h2>Escanear código QR</h2>
+              <p>Abre la cámara para leer un código.</p>
+            </div>
+            <span className="pd-flecha" aria-hidden="true">→</span>
+          </Link>
+
+          <Link to="/historial" className="pd-acceso">
+            <span className="pd-acceso-icono pd-verde" aria-hidden="true">☷</span>
+            <div>
+              <h2>Consultar mis reportes</h2>
+              <p>Revisa el estado de tus incidencias.</p>
+            </div>
+            <span className="pd-flecha" aria-hidden="true">→</span>
+          </Link>
+        </section>
+
+        <section className="pd-resumen" aria-labelledby="pd-resumen-titulo">
+          <div className="pd-seccion-cabecera">
+            <div>
+              <h2 id="pd-resumen-titulo">Mis incidencias</h2>
+              <p>Resumen de los reportes que has registrado.</p>
+            </div>
+
+            <button
+              type="button"
+              className="pd-boton pd-boton-secundario"
+              disabled={cargando}
+              onClick={() => setRecarga(valor => valor + 1)}
+            >
+              {cargando ? 'Cargando…' : 'Actualizar'}
+            </button>
           </div>
-        )}
 
-        {!usuario ? (
-          <section className="panel dashboard-panel">
-            <div className="empty-box">
-              <span>🏫</span>
+          {error && (
+            <div className="pd-error" role="alert">{error}</div>
+          )}
 
-              <h2>Sistema de Gestión de Incidencias</h2>
+          {cargando && (
+            <p className="pd-cargando" role="status">
+              Consultando tus incidencias…
+            </p>
+          )}
 
-              <p>
-                Inicia sesión para consultar tus reportes
-                y registrar nuevas incidencias.
-              </p>
+          <div className="pd-estadisticas" aria-busy={cargando}>
+            {indicadores.map(([campo, texto, color]) => (
+              <article className="pd-estadistica" key={campo}>
+                <span className={`pd-punto pd-${color}`} aria-hidden="true" />
+                <p>{texto}</p>
+                <strong>
+                  {datos ? datos.resumen[campo] ?? 0 : '—'}
+                </strong>
+              </article>
+            ))}
+          </div>
+        </section>
 
-              <button
-                className="dashboard-refresh"
-                onClick={() => navigate('/login')}
-              >
-                Iniciar sesión
-              </button>
-
-              <p>¿Todavía no tienes una cuenta?</p>
-
-              <button
-                className="dashboard-refresh"
-                onClick={() => navigate('/registro')}
-              >
-                Registrarse
-              </button>
+        <section className="pd-reportes" aria-labelledby="pd-reportes-titulo">
+          <div className="pd-seccion-cabecera pd-reportes-cabecera">
+            <div>
+              <h2 id="pd-reportes-titulo">Últimos reportes</h2>
+              <p>Consulta el avance y el responsable de cada incidencia.</p>
             </div>
-          </section>
-        ) : (
-          <>
-            <div className="dashboard-toolbar">
-              <p>Resumen de mis incidencias</p>
+            <Link to="/historial" className="pd-enlace">Ver mis reportes →</Link>
+          </div>
 
-              <button
-                className="dashboard-refresh"
-                disabled={cargando || cerrando}
-                onClick={() =>
-                  setRecarga(valor => valor + 1)
-                }
-              >
-                {cargando
-                  ? 'Cargando...'
-                  : 'Actualizar datos'}
-              </button>
+          {cargando ? (
+            <div className="pd-vacio">Cargando reportes…</div>
+          ) : !datos ? (
+            <div className="pd-vacio">
+              <h3>No pudimos consultar tus reportes</h3>
+              <p>Presiona Actualizar para volver a intentarlo.</p>
             </div>
-
-            {cargando ? (
-              <p role="status">
-                Consultando incidencias...
-              </p>
-            ) : (
-              !error &&
-              datos && (
-                <>
-                  <section className="stats">
-                    {tarjetas.map(
-                      ([campo, texto, icono, color]) => (
-                        <div
-                          className={`stat ${color}`}
-                          key={campo}
+          ) : datos.ultimosReportes.length === 0 ? (
+            <div className="pd-vacio">
+              <span className="pd-vacio-icono" aria-hidden="true">☷</span>
+              <h3>Todavía no tienes incidencias</h3>
+              <p>Cuando registres un problema, podrás seguir su avance aquí.</p>
+              <Link to="/reportar" className="pd-boton pd-boton-primario">
+                Crear mi primer reporte
+              </Link>
+            </div>
+          ) : (
+            <div
+              className="pd-tabla-contenedor"
+              tabIndex={0}
+              role="region"
+              aria-label="Últimas incidencias; desplaza horizontalmente para ver todas las columnas"
+            >
+              <table className="pd-tabla">
+                <thead>
+                  <tr>
+                    <th scope="col">Incidencia</th>
+                    <th scope="col">Ubicación</th>
+                    <th scope="col">Prioridad</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Responsable</th>
+                    <th scope="col">Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {datos.ultimosReportes.map(reporte => (
+                    <tr key={reporte.id_incidencia}>
+                      <td>
+                        <span className="pd-codigo">
+                          INC-{String(reporte.id_incidencia).padStart(4, '0')}
+                        </span>
+                        <strong className="pd-titulo-reporte">{reporte.titulo}</strong>
+                        <small className="pd-categoria">{reporte.categoria || 'Sin categoría'}</small>
+                      </td>
+                      <td>{reporte.sala || 'Sin ubicación'}</td>
+                      <td>
+                        <span
+                          className={`pd-insignia ${
+                            reporte.prioridad === 'Alta'
+                              ? 'pd-rojo'
+                              : reporte.prioridad === 'Media'
+                                ? 'pd-ambar'
+                                : 'pd-gris'
+                          }`}
                         >
-                          <span>{icono}</span>
-                          <h2>{datos.resumen[campo]}</h2>
-                          <p>{texto}</p>
-                        </div>
-                      )
-                    )}
-                  </section>
+                          {reporte.prioridad || 'Sin prioridad'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`pd-insignia pd-${colorEstado(reporte.estado)}`}>
+                          {reporte.estado || 'Sin estado'}
+                        </span>
+                      </td>
+                      <td>{reporte.responsable || 'Sin asignar'}</td>
+                      <td className="pd-fecha">{reporte.fecha || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
 
-                  <section className="panel dashboard-panel">
-                    <h2>Últimos reportes</h2>
+        <section className="pd-emergencia" aria-labelledby="pd-emergencia-titulo">
+          <span className="pd-emergencia-icono" aria-hidden="true">!</span>
+          <div>
+            <h2 id="pd-emergencia-titulo">Botón de emergencia</h2>
+            <p>
+              En preparación: todavía no envía alertas a enfermería.
+              Ante una emergencia real, utiliza el protocolo del establecimiento.
+            </p>
+          </div>
+          <Link to="/panico" className="pd-boton pd-boton-emergencia">
+            Ver demostración
+          </Link>
+        </section>
 
-                    {datos.ultimosReportes.length === 0 ? (
-                      <div className="empty-box">
-                        <span>📂</span>
-                        <h3>
-                          No existen incidencias registradas
-                        </h3>
-                        <p>
-                          Los reportes aparecerán cuando
-                          sean creados.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="dashboard-table-wrapper">
-                        <table className="dashboard-table">
-                          <thead>
-                            <tr>
-                              {[
-                                'Código',
-                                'Título',
-                                'Sala',
-                                'Categoría',
-                                'Prioridad',
-                                'Estado',
-                                'Responsable',
-                                'Fecha',
-                              ].map(titulo => (
-                                <th
-                                  scope="col"
-                                  key={titulo}
-                                >
-                                  {titulo}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {datos.ultimosReportes.map(
-                              reporte => (
-                                <tr
-                                  key={reporte.id_incidencia}
-                                >
-                                  <td>
-                                    INC-
-                                    {String(
-                                      reporte.id_incidencia
-                                    ).padStart(4, '0')}
-                                  </td>
-                                  <td>{reporte.titulo}</td>
-                                  <td>{reporte.sala}</td>
-                                  <td>{reporte.categoria}</td>
-                                  <td>{reporte.prioridad}</td>
-                                  <td>{reporte.estado}</td>
-                                  <td>{reporte.responsable}</td>
-                                  <td>{reporte.fecha}</td>
-                                </tr>
-                              )
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </section>
-                </>
-              )
-            )}
-          </>
-        )}
+        <footer className="pd-pie">
+          SIGI · Sistema de Gestión de Incidencias
+        </footer>
       </main>
     </div>
   );
 }
-
-export default Home;

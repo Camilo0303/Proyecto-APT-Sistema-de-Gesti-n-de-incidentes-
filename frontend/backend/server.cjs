@@ -11,6 +11,8 @@ const mysql = require('mysql2/promise');
 const { createAuth } = require('./auth.cjs');
 const { createIncidencias } = require('./incidencias.cjs');
 const { permitirRoles } = require('./permisos.cjs');
+const { createAdministracion } = require('./administracion.cjs');
+const { createCorreos } = require('./correos.cjs');
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
@@ -32,6 +34,14 @@ const pool = mysql.createPool({
 const auth = createAuth(pool);
 
 app.use('/api/auth', auth.router);
+app.use(
+  '/api/admin/correos',
+  createCorreos(pool, auth.requireAuth)
+);
+app.use(
+  '/api/admin',
+  createAdministracion(pool, auth.requireAuth)
+);
 
 // Registro y consulta de reportes propios.
 // Las funciones de gestión de Cetecom se agregarán después.

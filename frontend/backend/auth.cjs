@@ -43,8 +43,6 @@ function validEmail(email) {
 }
 
 function esCorreoProfesor(correo) {
-  // Acepta @profesor.cl, @profesor.duoc.cl, etc.
-  // Rechaza @gmail.com y @profesor falso sin un dominio válido.
   return /^[^\s@]+@profesor(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/i.test(
     correo
   );
@@ -79,15 +77,11 @@ function createAuth(pool) {
     const ahora = Date.now();
 
     for (const [key, session] of sessions) {
-      if (session.expires <= ahora) {
-        sessions.delete(key);
-      }
+      if (session.expires <= ahora) sessions.delete(key);
     }
 
     for (const [key, attempt] of attempts) {
-      if (attempt.expires <= ahora) {
-        attempts.delete(key);
-      }
+      if (attempt.expires <= ahora) attempts.delete(key);
     }
   }, 60000);
 
@@ -190,7 +184,7 @@ function createAuth(pool) {
     next();
   });
 
-  // REGISTRO AUTOMÁTICO DE PROFESORES
+  // REGISTRO
   router.post('/registro', async (req, res, next) => {
     const { nombre, apellido, password } = req.body || {};
     const correo = cleanEmail(req.body?.correo);
@@ -202,26 +196,16 @@ function createAuth(pool) {
         value.trim().length <= 100
     );
 
-    const passwordValida =
-      typeof password === 'string' &&
-      password.length >= 8 &&
-      password.length <= 16;
-
     if (
       !nombresValidos ||
       !validEmail(correo) ||
-      !passwordValida
+      typeof password !== 'string' ||
+      password.length < 8 ||
+      password.length > 16
     ) {
       return res.status(400).json({
         mensaje:
-          'Completa nombre, apellido, correo válido y contraseña de 8 a 128 caracteres.',
-      });
-    }
-
-    if (!esCorreoProfesor(correo)) {
-      return res.status(403).json({
-        mensaje:
-          'Debes usar un correo de profesor, como nombre@profesor.cl o nombre@profesor.duoc.cl.',
+          'Completa nombre, apellido, correo válido y contraseña de 8 a 16 caracteres.',
       });
     }
 
@@ -235,24 +219,83 @@ function createAuth(pool) {
       await connection.beginTransaction();
       transaccionActiva = true;
 
-      // Asigna siempre el rol Profesor desde la base de datos.
-      const [roles] = await connection.execute(
-        'SELECT id_rol FROM roles WHERE nombre = ?',
-        ['Profesor']
+      const [autorizaciones] = await connection.execute(
+        `SELECT c.id_rol, c.activo, r.nombre AS rol
+         FROM correos_autorizados c
+         JOIN roles r ON r.id_rol = c.id_rol
+         WHERE c.correo = ?
+         FOR UPDATE`,
+        [correo]
       );
 
-      if (!roles.length) {
+      const [existentes] = await connection.execute(
+        `SELECT id_usuario
+         FROM usuarios
+         WHERE correo = ?
+         FOR UPDATE`,
+        [correo]
+      );
+
+      if (existentes.length) {
         await connection.rollback();
         transaccionActiva = false;
 
-        return res.status(500).json({
+        return res.status(409).json({
           mensaje:
-            'No existe el rol Profesor en la base de datos. Contacta al administrador.',
+            'Este correo ya tiene una cuenta. Inicia sesión.',
         });
       }
 
-      // Guarda directamente en usuarios.
-      // No consulta la tabla correos_autorizados.
+      let idRol;
+      const autorizacion = autorizaciones[0];
+
+      if (autorizacion) {
+        const rolesPermitidos = [
+          'Profesor',
+          'Técnico',
+          'Enfermería',
+          'Administrador',
+        ];
+
+        if (
+          Number(autorizacion.activo) !== 1 ||
+          !rolesPermitidos.includes(autorizacion.rol)
+        ) {
+          await connection.rollback();
+          transaccionActiva = false;
+
+          return res.status(403).json({
+            mensaje:
+              'Tu correo no está habilitado para registrarse. Contacta al administrador.',
+          });
+        }
+
+        // La autorización define el rol.
+        idRol = autorizacion.id_rol;
+      } else {
+        // Sin autorización, solo se permite registro de profesores.
+        if (!esCorreoProfesor(correo)) {
+          await connection.rollback();
+          transaccionActiva = false;
+
+          return res.status(403).json({
+            mensaje:
+              'Usa un correo de profesor o solicita que el administrador autorice tu correo.',
+          });
+        }
+
+        const [roles] = await connection.execute(
+          'SELECT id_rol FROM roles WHERE nombre = ?',
+          ['Profesor']
+        );
+
+        if (!roles.length) {
+          throw new Error('No existe el rol Profesor.');
+        }
+
+        idRol = roles[0].id_rol;
+      }
+
       const [result] = await connection.execute(
         `INSERT INTO usuarios
           (nombre, apellido, correo, password, id_rol, activo)
@@ -262,7 +305,7 @@ function createAuth(pool) {
           apellido.trim(),
           correo,
           hash,
-          roles[0].id_rol,
+          idRol,
         ]
       );
 
@@ -293,6 +336,16 @@ function createAuth(pool) {
         return res.status(409).json({
           mensaje:
             'Este correo ya tiene una cuenta. Inicia sesión.',
+        });
+      }
+
+      if (
+        error.code === 'ER_LOCK_DEADLOCK' ||
+        error.code === 'ER_LOCK_WAIT_TIMEOUT'
+      ) {
+        return res.status(409).json({
+          mensaje:
+            'Hubo otra operación al mismo tiempo. Intenta registrarte nuevamente.',
         });
       }
 
@@ -339,8 +392,7 @@ function createAuth(pool) {
         });
       }
 
-      // Convierte las contraseñas antiguas del SQL inicial
-      // a un hash después de un inicio de sesión correcto.
+      // Actualiza las contraseñas antiguas al formato seguro.
       if (!account.password.startsWith(PREFIX)) {
         const hash = await hashPassword(password);
 
@@ -366,7 +418,7 @@ function createAuth(pool) {
 
       newSession(req, res, account.id_usuario);
 
-      return res.json({
+      res.json({
         usuario: publicUser(users[0]),
       });
     } catch (error) {

@@ -23,6 +23,7 @@ import Historial from './pages/Historial';
 import EscanearQR from './pages/EscanearQR';
 import Panico from './pages/Panico';
 import Cetecom from './pages/Cetecom';
+import Administrador from './pages/Administrador';
 
 import './pages/Login.css';
 
@@ -53,7 +54,9 @@ function BotonSalir() {
       await cerrarSesion();
       window.location.replace('/login');
     } catch (err) {
-      setError(err.message);
+      setError(
+        err.message || 'No se pudo cerrar sesión.'
+      );
       setCerrando(false);
     }
   }
@@ -62,15 +65,19 @@ function BotonSalir() {
     <div>
       {error && <p role="alert">{error}</p>}
 
-      <button onClick={salir} disabled={cerrando}>
+      <button
+        type="button"
+        onClick={salir}
+        disabled={cerrando}
+      >
         {cerrando ? 'Cerrando sesión...' : 'Cerrar sesión'}
       </button>
     </div>
   );
 }
 
-// Comprueba en el servidor el rol antes de mostrar
-// una ruta protegida, incluso al cambiar de página.
+// Comprueba la sesión en el servidor antes de mostrar
+// cada página protegida.
 function RutaProtegida({ rol, children }) {
   const [estado, setEstado] = useState({
     cargando: true,
@@ -97,7 +104,9 @@ function RutaProtegida({ rol, children }) {
         if (activo) {
           setEstado({
             cargando: false,
-            error: err.message,
+            error:
+              err.message ||
+              'No se pudo comprobar la sesión.',
             usuario: null,
           });
         }
@@ -123,9 +132,11 @@ function RutaProtegida({ rol, children }) {
       <div className="login-page">
         <div className="login-card">
           <h1>No se pudo comprobar la sesión</h1>
+
           <p role="alert">{estado.error}</p>
 
           <button
+            type="button"
             onClick={() => {
               setEstado({
                 cargando: true,
@@ -161,13 +172,20 @@ function RutaProtegida({ rol, children }) {
 function RutaPublica({ children }) {
   const usuario = obtenerUsuario();
 
-  return usuario
-    ? <Navigate to={destinoUsuario(usuario)} replace />
-    : children;
+  if (usuario) {
+    return (
+      <Navigate
+        to={destinoUsuario(usuario)}
+        replace
+      />
+    );
+  }
+
+  return children;
 }
 
-// Pantallas de entrada de esta fase.
-// Todavía no incluyen gestión administrativa ni alertas.
+// Pantalla temporal de Enfermería.
+// La recepción de alertas se implementará después.
 function PanelInicial({ titulo, descripcion }) {
   const usuario = obtenerUsuario();
 
@@ -197,7 +215,10 @@ function SinAcceso() {
 
   if (destinoUsuario(usuario) !== '/sin-acceso') {
     return (
-      <Navigate to={destinoUsuario(usuario)} replace />
+      <Navigate
+        to={destinoUsuario(usuario)}
+        replace
+      />
     );
   }
 
@@ -205,10 +226,12 @@ function SinAcceso() {
     <div className="login-page">
       <div className="login-card">
         <h1>Acceso pendiente</h1>
+
         <p>
           Tu rol todavía no tiene un panel habilitado.
           Contacta al administrador.
         </p>
+
         <BotonSalir />
       </div>
     </div>
@@ -220,7 +243,10 @@ function RutasAplicacion() {
 
   function proteger(rol, contenido) {
     return (
-      <RutaProtegida key={location.pathname} rol={rol}>
+      <RutaProtegida
+        key={location.pathname}
+        rol={rol}
+      >
         {contenido}
       </RutaProtegida>
     );
@@ -258,22 +284,34 @@ function RutasAplicacion() {
 
       <Route
         path="/profesor"
-        element={proteger('Profesor', <Home />)}
+        element={proteger(
+          'Profesor',
+          <Home />
+        )}
       />
 
       <Route
         path="/reportar"
-        element={proteger('Profesor', <Reportar />)}
+        element={proteger(
+          'Profesor',
+          <Reportar />
+        )}
       />
 
       <Route
         path="/historial"
-        element={proteger('Profesor', <Historial />)}
+        element={proteger(
+          'Profesor',
+          <Historial />
+        )}
       />
 
       <Route
         path="/escanear"
-        element={proteger('Profesor', <EscanearQR />)}
+        element={proteger(
+          'Profesor',
+          <EscanearQR />
+        )}
       />
 
       <Route
@@ -291,10 +329,12 @@ function RutasAplicacion() {
             >
               El botón de emergencia todavía es una
               demostración: no envía alertas a Enfermería.
-              Lo conectaremos en la fase de emergencias.
               {' '}
-              <Link to="/profesor">Volver al inicio</Link>
+              <Link to="/profesor">
+                Volver al inicio
+              </Link>
             </div>
+
             <Panico />
           </div>
         )}
@@ -309,7 +349,9 @@ function RutasAplicacion() {
               <p>
                 Sesión de {obtenerUsuario()?.nombre}
               </p>
+
               <BotonSalir />
+
               <p>
                 Vista de demostración: los contadores y
                 reportes todavía son datos de ejemplo.
@@ -325,13 +367,7 @@ function RutasAplicacion() {
         path="/administrador"
         element={proteger(
           'Administrador',
-          <PanelInicial
-            titulo="Administración"
-            descripcion={
-              'Acceso de administrador habilitado. ' +
-              'La gestión de usuarios y correos se agregará en la siguiente fase.'
-            }
-          />
+          <Administrador />
         )}
       />
 
@@ -349,7 +385,10 @@ function RutasAplicacion() {
         )}
       />
 
-      <Route path="/sin-acceso" element={<SinAcceso />} />
+      <Route
+        path="/sin-acceso"
+        element={<SinAcceso />}
+      />
 
       <Route
         path="*"
@@ -359,7 +398,7 @@ function RutasAplicacion() {
   );
 }
 
-function App() {
+export default function App() {
   const [listo, setListo] = useState(false);
   const [error, setError] = useState('');
   const [intento, setIntento] = useState(0);
@@ -372,7 +411,12 @@ function App() {
         if (activo) setListo(true);
       })
       .catch(err => {
-        if (activo) setError(err.message);
+        if (activo) {
+          setError(
+            err.message ||
+            'No se pudo conectar con el servidor.'
+          );
+        }
       });
 
     return () => {
@@ -391,6 +435,7 @@ function App() {
               <p role="alert">{error}</p>
 
               <button
+                type="button"
                 onClick={() => {
                   setError('');
                   setIntento(valor => valor + 1);
@@ -400,7 +445,9 @@ function App() {
               </button>
             </>
           ) : (
-            <p role="status">Comprobando sesión...</p>
+            <p role="status">
+              Comprobando sesión...
+            </p>
           )}
         </div>
       </div>
@@ -413,5 +460,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;
