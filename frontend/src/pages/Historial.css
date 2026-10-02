@@ -1,71 +1,335 @@
-.historial-container{
-
-min-height:80vh;
-
-background:#f5f7fb;
-
-padding:40px;
-
+body:has(.historial-container) {
+  margin: 0;
 }
 
-
-
-.historial-container h1{
-
-color:#172554;
-
-font-size:36px;
-
+.historial-container,
+.historial-container * {
+  box-sizing: border-box;
 }
 
+/* Fondo y distribución general */
 
-
-.historial-container p{
-
-color:#64748b;
-
+.historial-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 40px max(24px, calc((100% - 1000px) / 2));
+  background: #f3f6fb;
+  color: #172b49;
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.6;
 }
 
-
-
-.empty-report{
-
-
-background:white;
-
-border-radius:25px;
-
-padding:60px;
-
-margin-top:40px;
-
-text-align:center;
-
-box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-
+.historial-container > h1 {
+  margin: 0 0 8px;
+  color: #172b49;
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.8px;
 }
 
-
-
-.empty-report:first-letter{
-
-font-size:40px;
-
+.historial-container > p {
+  margin: 0 0 22px;
+  color: #697b93;
+  font-size: 14px;
 }
 
-
-
-.empty-report h2{
-
-color:#1e293b;
-
+.historial-container p {
+  overflow-wrap: anywhere;
 }
 
+/* Acciones superiores */
 
+.historial-container > div {
+  min-width: 0;
+  flex-wrap: wrap;
+}
 
-.empty-report p{
+.historial-container button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: 46px;
+  margin: 0;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: #2863da;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgb(40 99 218 / 12%);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
 
-font-size:17px;
+.historial-container button:hover {
+  background: #1e50b8;
+}
 
+.historial-container button:focus-visible {
+  outline: 3px solid #93b7f5;
+  outline-offset: 3px;
+}
+
+.historial-container button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.historial-container > div > button + button {
+  border-color: #d6e1ef;
+  background: white;
+  color: #344d70;
+  box-shadow: none;
+}
+
+.historial-container > div > button + button:hover {
+  border-color: #a9c0e4;
+  background: #edf3ff;
+}
+
+/* Tarjetas de incidencias.
+   !important reemplaza únicamente la presentación
+   que actualmente viene escrita dentro de Historial.jsx. */
+
+.historial-container > article {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 0 20px !important;
+  padding: 26px 28px !important;
+  border: 1px solid #e0e7f1 !important;
+  border-left: 4px solid #3974df !important;
+  border-radius: 16px !important;
+  background: white !important;
+  color: #253b58 !important;
+  box-shadow: 0 5px 20px rgb(23 43 73 / 4%);
+  overflow-wrap: anywhere;
+}
+
+.historial-container article h2 {
+  margin: 0 0 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #edf1f7;
+  color: #19365c;
+  font-size: clamp(18px, 3vw, 22px);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.35px;
+  overflow-wrap: anywhere;
+}
+
+/* Estado y prioridad */
+
+.historial-container article h2 + p {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #e3ebf8;
+  border-radius: 9px;
+  background: #f3f7fe;
+  color: #385579;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.historial-container article h2 + p strong {
+  display: inline;
+  min-width: 0;
+  margin: 0;
+  color: #27496f;
+}
+
+/* Información del reporte */
+
+.historial-container article p {
+  margin: 0;
+  padding: 9px 0;
+  color: #5c6f88;
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.historial-container article p strong {
+  display: inline-block;
+  min-width: 115px;
+  margin-right: 8px;
+  color: #344b69;
+  font-size: 13px;
+  font-weight: 650;
+  vertical-align: top;
+}
+
+/* La descripción es el párrafo que no contiene
+   una etiqueta en negrita. Conserva los saltos de línea. */
+
+.historial-container article p:not(:has(strong)) {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #e8edf4;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475d78;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+/* Mensajes de éxito, carga y error */
+
+.historial-container > p[role="status"] {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px solid #d5e3f4;
+  border-radius: 10px;
+  background: #edf5ff;
+  font-size: 14px;
+}
+
+.historial-container [role="alert"] {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid #f0cece;
+  border-radius: 10px;
+  background: #fff1f1;
+  color: #993434;
+  font-size: 14px;
+}
+
+/* Cuando todavía no existen reportes */
+
+.historial-container .empty-report {
+  margin-top: 28px;
+  padding: 48px 28px;
+  border: 1px dashed #cbd9ed;
+  border-radius: 18px;
+  background: white;
+  text-align: center;
+}
+
+.historial-container .empty-report::before {
+  content: "☷";
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 18px;
+  border-radius: 16px;
+  background: #edf3ff;
+  color: #3974df;
+  font-size: 32px;
+}
+
+.historial-container .empty-report h2 {
+  margin: 0 0 10px;
+  color: #274363;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.historial-container .empty-report p {
+  margin: 0;
+  color: #708198;
+  font-size: 14px;
+}
+
+/* Celulares */
+
+@media (max-width: 600px) {
+  .historial-container {
+    padding: 26px 16px;
+  }
+
+  .historial-container > h1 {
+    font-size: 27px;
+  }
+
+  .historial-container > p {
+    font-size: 13px;
+  }
+
+  .historial-container > div > button {
+    flex: 1 1 160px;
+    min-height: 48px;
+  }
+
+  .historial-container > article {
+    margin-bottom: 16px !important;
+    padding: 20px 18px !important;
+    border-radius: 13px !important;
+  }
+
+  .historial-container article h2 {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    font-size: 18px;
+  }
+
+  .historial-container article p {
+    padding: 8px 0;
+    font-size: 14px;
+  }
+
+  .historial-container article p strong {
+    min-width: 100px;
+    margin-right: 5px;
+    font-size: 12px;
+  }
+
+  .historial-container article h2 + p {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .historial-container article h2 + p strong {
+    min-width: 0;
+    margin-right: 0;
+  }
+
+  .historial-container article p:not(:has(strong)) {
+    padding: 13px;
+    font-size: 13px;
+  }
+
+  .historial-container .empty-report {
+    padding: 34px 20px;
+  }
+}
+
+/* Celulares pequeños */
+
+@media (max-width: 360px) {
+  .historial-container {
+    padding: 22px 10px;
+  }
+
+  .historial-container > h1 {
+    font-size: 24px;
+  }
+
+  .historial-container > article {
+    padding: 18px 14px !important;
+  }
+
+  .historial-container article p strong {
+    min-width: 0;
+  }
+
+  .historial-container button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .historial-container button {
+    transition: none;
+  }
 }

@@ -1,167 +1,239 @@
-.login-page{
+/* Inicio de sesión, registro y pantallas de acceso */
 
-min-height:100vh;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-background:linear-gradient(
-135deg,
-#0f3c68,
-#2563eb
-);
-
-padding:20px;
-
+body:has(.login-page) {
+  margin: 0;
 }
 
-
-
-.login-card{
-
-
-width:420px;
-
-background:white;
-
-padding:45px;
-
-border-radius:30px;
-
-box-shadow:
-0 20px 50px rgba(0,0,0,.25);
-
-text-align:center;
-
-
+.login-page,
+.login-page * {
+  box-sizing: border-box;
 }
 
-
-
-.login-logo{
-
-font-size:70px;
-
-margin-bottom:20px;
-
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px;
+  background: linear-gradient(135deg, #123b68, #245ddd);
+  color: #17243b;
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.5;
 }
 
-
-
-.login-card h1{
-
-color:#0f172a;
-
-font-size:32px;
-
-margin-bottom:10px;
-
+/* El margen automático centra la tarjeta cuando hay espacio.
+   Si la pantalla es baja, permite desplazar el formulario completo. */
+.login-page .login-card {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 460px;
+  min-width: 0;
+  margin: auto 0;
+  padding: 36px;
+  border: 1px solid #e5ebf3;
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 18px 50px rgb(8 28 60 / 20%);
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
-
-
-.login-card p{
-
-color:#64748b;
-
+.login-page .login-logo {
+  margin-bottom: 16px;
+  font-size: 52px;
+  line-height: 1.2;
 }
 
-
-
-.login-card label{
-
-display:block;
-
-text-align:left;
-
-margin-top:20px;
-
-font-weight:bold;
-
-color:#334155;
-
+.login-page .login-card h1 {
+  margin: 0 0 10px;
+  color: #14253e;
+  font-size: clamp(24px, 5vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.6px;
 }
 
-
-
-.login-card input{
-
-
-width:100%;
-
-padding:15px;
-
-margin-top:8px;
-
-border-radius:15px;
-
-border:1px solid #cbd5e1;
-
-font-size:16px;
-
-box-sizing:border-box;
-
+.login-page .login-card p {
+  margin: 12px 0;
+  color: #64748b;
+  font-size: 14px;
 }
 
-
-
-
-.login-card button{
-
-
-width:100%;
-
-margin-top:30px;
-
-padding:16px;
-
-background:#2563eb;
-
-color:white;
-
-border:none;
-
-border-radius:15px;
-
-font-size:18px;
-
-cursor:pointer;
-
+.login-page .login-card form {
+  width: 100%;
+  min-width: 0;
+  margin-top: 24px;
 }
 
-
-
-.login-card button:hover{
-
-background:#1d4ed8;
-
+.login-page .login-card label {
+  display: block;
+  margin: 18px 0 7px;
+  color: #344761;
+  font-size: 14px;
+  font-weight: 650;
+  text-align: left;
 }
 
-
-
-.register-text{
-
-margin-top:25px;
-
+.login-page .login-card input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #ccd7e6;
+  border-radius: 10px;
+  background: white;
+  color: #17243b;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.4;
 }
 
-
-
-.register-text button{
-
-background:none;
-
-color:#2563eb;
-
-padding:0;
-
-margin-top:10px;
-
-font-size:15px;
-
+/* Mantiene el texto legible y evita el zoom automático
+   de algunos navegadores móviles al tocar los campos. */
+.login-page .login-card input::placeholder {
+  color: #7a889c;
 }
-.login-card .auth-error { color: #991b1b; background: #fee2e2; border-radius: 10px; padding: 12px; }
-.login-card button:disabled { opacity: 0.6; cursor: wait; }
+
+.login-page .login-card input:focus-visible {
+  outline: 3px solid #b8d2ff;
+  outline-offset: 2px;
+  border-color: #3775df;
+}
+
+.login-page .login-card button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin: 20px 0 0;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: #2863da;
+  color: white;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  box-shadow: none;
+  transform: none;
+  transition: background-color 0.15s;
+}
+
+.login-page .login-card button:hover {
+  background: #1e50b8;
+}
+
+.login-page .login-card button:focus-visible,
+.login-page .login-card a:focus-visible {
+  outline: 3px solid #93b7f5;
+  outline-offset: 3px;
+}
+
+.login-page .login-card button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* Crear cuenta / Volver al inicio de sesión */
+.login-page .login-card > button {
+  margin-top: 12px;
+  border-color: #d5e0f0;
+  background: #f5f8fe;
+  color: #245bc9;
+}
+
+.login-page .login-card > button:hover {
+  background: #e8f0ff;
+}
+
+.login-page .login-card form + p {
+  margin-top: 24px;
+  margin-bottom: 0;
+}
+
+.login-page .login-card #password-help {
+  margin: 8px 0 0;
+  font-size: 12px;
+  text-align: left;
+}
+
+.login-page .login-card .auth-error {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #f1c9c9;
+  border-radius: 9px;
+  background: #fff0f0;
+  color: #993434;
+  font-size: 14px;
+  text-align: left;
+}
+
+.login-page .register-text {
+  margin-top: 24px;
+}
+
+.login-page .register-text button {
+  margin-top: 8px;
+  background: #f5f8fe;
+  color: #245bc9;
+}
+
+/* Celulares */
+@media (max-width: 480px) {
+  .login-page {
+    padding: 20px 14px;
+  }
+
+  .login-page .login-card {
+    padding: 26px 20px;
+    border-radius: 17px;
+  }
+
+  .login-page .login-logo {
+    margin-bottom: 12px;
+    font-size: 44px;
+  }
+
+  .login-page .login-card form {
+    margin-top: 20px;
+  }
+}
+
+/* Pantallas muy angostas */
+@media (max-width: 360px) {
+  .login-page {
+    padding: 14px 10px;
+  }
+
+  .login-page .login-card {
+    padding: 24px 16px;
+  }
+}
+
+/* Celular horizontal o ventana de poca altura */
+@media (max-height: 600px) {
+  .login-page {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .login-page .login-logo {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page .login-card button {
+    transition: none;
+  }
+}

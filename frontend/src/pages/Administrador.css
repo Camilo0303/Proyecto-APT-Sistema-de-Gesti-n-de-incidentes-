@@ -1,3 +1,7 @@
+/* ==================================================
+   ADMINISTRACIÓN — PC, TABLET Y CELULAR
+   ================================================== */
+
 body:has(.admin-panel) {
   margin: 0;
 }
@@ -9,15 +13,20 @@ body:has(.admin-panel) {
 
 .admin-panel {
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 36px 24px;
-  background: #f4f7fb;
+  background: #f3f6fb;
   color: #172b49;
-  font: 14px/1.5 "Segoe UI", Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .admin-panel .ad-contenido {
+  width: 100%;
   max-width: 1250px;
-  margin: auto;
+  min-width: 0;
+  margin: 0 auto;
 }
 
 .admin-panel h1,
@@ -27,53 +36,106 @@ body:has(.admin-panel) {
   margin: 0;
 }
 
-.admin-panel .ad-cabecera,
-.admin-panel .ad-titulo {
+.admin-panel h1,
+.admin-panel h2,
+.admin-panel h3,
+.admin-panel p,
+.admin-panel td {
+  overflow-wrap: anywhere;
+}
+
+/* ==================================================
+   ENCABEZADO
+   ================================================== */
+
+.admin-panel .ad-cabecera {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 30px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #163b75, #2863d7);
+  color: white;
+  box-shadow: 0 8px 24px rgb(28 69 136 / 12%);
+}
+
+.admin-panel .ad-cabecera > div {
+  min-width: 0;
 }
 
 .admin-panel .ad-marca {
-  color: #2863ca;
+  display: block;
+  margin-bottom: 10px;
+  color: #c8ddff;
   font-size: 11px;
   font-weight: 750;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
-.admin-panel h1 {
-  margin-top: 8px;
-  font-size: 30px;
+.admin-panel .ad-cabecera h1 {
+  color: white;
+  font-size: clamp(25px, 3vw, 34px);
+  font-weight: 750;
+  line-height: 1.2;
   letter-spacing: -0.7px;
 }
 
-.admin-panel h2 {
-  font-size: 19px;
+.admin-panel .ad-cabecera p {
+  max-width: 660px;
+  margin-top: 12px;
+  color: #e0eaff;
+  font-size: 14px;
 }
 
-.admin-panel .ad-cabecera p,
-.admin-panel .ad-titulo p {
-  margin-top: 6px;
-  color: #64758c;
+.admin-panel .ad-cabecera > button {
+  flex-shrink: 0;
+  border-color: rgb(255 255 255 / 45%);
+  background: white;
+  color: #2454a3;
+  box-shadow: none;
 }
+
+.admin-panel .ad-cabecera > button:hover {
+  background: #edf4ff;
+}
+
+/* ==================================================
+   BOTONES Y ACCESIBILIDAD
+   ================================================== */
 
 .admin-panel button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: auto;
+  min-height: 46px;
   margin: 0;
-  padding: 10px 16px;
-  border: 1px solid #d7e1ef;
-  border-radius: 9px;
+  padding: 11px 17px;
+  border: 1px solid #d4dfef;
+  border-radius: 10px;
   background: white;
   color: #245bc9;
-  font: 600 13px/1.4 "Segoe UI", Arial, sans-serif;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
   cursor: pointer;
   box-shadow: none;
   transform: none;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
 }
 
 .admin-panel button:hover {
-  background: #eaf1ff;
+  border-color: #acc5ef;
+  background: #edf3ff;
 }
 
 .admin-panel button:disabled {
@@ -83,162 +145,306 @@ body:has(.admin-panel) {
 
 .admin-panel button:focus-visible,
 .admin-panel input:focus-visible,
-.admin-panel select:focus-visible {
+.admin-panel select:focus-visible,
+.admin-panel a:focus-visible {
   outline: 3px solid #93b7f5;
   outline-offset: 3px;
 }
+
+/* ==================================================
+   RESUMEN DE CUENTAS
+   ================================================== */
 
 .admin-panel .ad-resumen {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin: 28px 0;
+  margin: 24px 0;
 }
 
 .admin-panel .ad-resumen article {
-  padding: 24px;
-  border: 1px solid #e1e7f0;
+  min-width: 0;
+  padding: 23px 25px;
+  border: 1px solid #e0e7f1;
+  border-top: 3px solid #3974df;
   border-radius: 14px;
   background: white;
+  box-shadow: 0 3px 14px rgb(23 43 73 / 3%);
+}
+
+.admin-panel .ad-resumen article:nth-child(2) {
+  border-top-color: #23936b;
+}
+
+.admin-panel .ad-resumen article:nth-child(3) {
+  border-top-color: #8b98ac;
 }
 
 .admin-panel .ad-resumen span {
+  display: block;
   color: #64758c;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .admin-panel .ad-resumen strong {
   display: block;
   margin-top: 8px;
-  font-size: 32px;
+  color: #203b60;
+  font-size: 36px;
+  font-weight: 750;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
 }
 
+.admin-panel .ad-resumen article:nth-child(2) strong {
+  color: #18744f;
+}
+
+.admin-panel .ad-resumen article:nth-child(3) strong {
+  color: #64748b;
+}
+
+/* ==================================================
+   SECCIONES
+   ================================================== */
+
 .admin-panel .ad-tarjeta {
+  min-width: 0;
   overflow: hidden;
-  border: 1px solid #e1e7f0;
-  border-radius: 16px;
+  border: 1px solid #e0e7f1;
+  border-radius: 18px;
   background: white;
+  box-shadow: 0 4px 18px rgb(23 43 73 / 3%);
 }
 
 .admin-panel .ad-titulo {
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 26px;
 }
+
+.admin-panel .ad-titulo > div {
+  min-width: 0;
+}
+
+.admin-panel .ad-titulo h2 {
+  color: #203b60;
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+}
+
+.admin-panel .ad-titulo p {
+  margin-top: 7px;
+  color: #6b7c93;
+  font-size: 13px;
+}
+
+.admin-panel .ad-titulo > button {
+  flex-shrink: 0;
+  background: #f7faff;
+}
+
+/* ==================================================
+   FORMULARIOS Y FILTROS
+   ================================================== */
 
 .admin-panel .ad-filtros {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  align-items: end;
   gap: 16px;
-  padding: 0 24px 24px;
+  min-width: 0;
+  padding: 0 26px 26px;
 }
 
 .admin-panel label {
   display: grid;
-  gap: 7px;
+  gap: 8px;
+  min-width: 0;
   margin: 0;
-  color: #40536e;
+  color: #405674;
   font-size: 12px;
   font-weight: 650;
 }
 
 .admin-panel input,
 .admin-panel select {
+  display: block;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
-  height: 43px;
+  min-height: 48px;
   margin: 0;
-  padding: 9px 12px;
-  border: 1px solid #d7e1ef;
-  border-radius: 8px;
+  padding: 11px 13px;
+  border: 1px solid #d2ddeb;
+  border-radius: 10px;
   background: white;
-  color: #172b49;
-  font: 14px "Segoe UI", Arial, sans-serif;
+  color: #243b58;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
+.admin-panel select {
+  padding-right: 30px;
+}
+
+.admin-panel input::placeholder {
+  color: #8694a8;
+}
+
+.admin-panel input:hover,
+.admin-panel select:hover {
+  border-color: #aebfd7;
+}
+
+.admin-panel input:disabled,
+.admin-panel select:disabled {
+  background: #f1f4f8;
+  color: #748298;
+  cursor: not-allowed;
+}
+
+.admin-panel form.ad-filtros > button[type="submit"] {
+  min-height: 48px;
+  border-color: #2863da;
+  background: #2863da;
+  color: white;
+  box-shadow: 0 3px 9px rgb(40 99 218 / 12%);
+}
+
+.admin-panel form.ad-filtros > button[type="submit"]:hover {
+  border-color: #1e50b8;
+  background: #1e50b8;
+}
+
+/* ==================================================
+   TABLAS EN PC
+   ================================================== */
+
 .admin-panel .ad-tabla-contenedor {
+  width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 .admin-panel table {
   width: 100%;
   margin: 0;
+  border: 0;
   border-collapse: collapse;
   text-align: left;
 }
 
+.admin-panel thead {
+  background: #f5f8fd;
+}
+
 .admin-panel th {
-  padding: 14px 24px;
+  padding: 14px 22px;
   border: 0;
-  background: #f6f8fc;
-  color: #64758c;
-  font-size: 12px;
+  border-top: 1px solid #e7edf6;
+  border-bottom: 1px solid #e7edf6;
+  background: #f5f8fd;
+  color: #637895;
+  font-size: 11px;
+  font-weight: 750;
   text-align: left;
   white-space: nowrap;
+  letter-spacing: 0.2px;
 }
 
 .admin-panel td {
-  padding: 17px 24px;
+  padding: 18px 22px;
   border: 0;
-  border-bottom: 1px solid #edf1f6;
-  color: #344963;
+  border-bottom: 1px solid #edf1f7;
+  color: #465d79;
   font-size: 13px;
   text-align: left;
+  vertical-align: middle;
+}
+
+.admin-panel tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-panel tbody tr:hover {
+  background: #fafcff;
+}
+
+.admin-panel td strong {
+  display: block;
+  color: #2b4465;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .admin-panel td small {
   display: block;
-  color: #748298;
+  margin-top: 4px;
+  color: #7c8ba0;
   font-size: 11px;
+  line-height: 1.5;
 }
 
-.admin-panel tbody tr:hover {
-  background: #fbfcff;
+.admin-panel td button {
+  min-height: 44px;
+  padding: 9px 14px;
+  font-size: 12px;
 }
+
+/* Estado de usuarios y autorizaciones */
 
 .admin-panel .ad-activo,
 .admin-panel .ad-inactivo {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 6px;
+  max-width: 100%;
+  padding: 5px 10px;
+  border-radius: 7px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 650;
+  line-height: 1.5;
 }
 
 .admin-panel .ad-activo {
-  color: #176447;
-  background: #e5f6ed;
+  background: #e6f6ee;
+  color: #17694b;
 }
 
 .admin-panel .ad-inactivo {
-  color: #8e4444;
-  background: #ffeded;
+  background: #fff0ee;
+  color: #9b4942;
 }
 
-.admin-panel .ad-error,
-.admin-panel .ad-exito {
-  margin-bottom: 18px;
-  padding: 15px 18px;
-  border-radius: 9px;
-}
-
-.admin-panel .ad-error {
-  background: #ffeded;
-  color: #913737;
-}
-
-.admin-panel .ad-exito {
-  background: #e5f6ed;
-  color: #176447;
-}
+/* ==================================================
+   CONFIRMACIÓN DE CAMBIOS
+   ================================================== */
 
 .admin-panel .ad-confirmacion {
-  margin: 0 24px 24px;
-  padding: 20px;
-  border: 1px solid #d2e0f6;
-  border-radius: 11px;
-  background: #f1f6ff;
+  margin: 0 26px 24px;
+  padding: 22px;
+  border: 1px solid #cadcf8;
+  border-left: 4px solid #3974df;
+  border-radius: 12px;
+  background: #f2f7ff;
+}
+
+.admin-panel .ad-confirmacion h3 {
+  color: #254f86;
+  font-size: 17px;
 }
 
 .admin-panel .ad-confirmacion p {
-  margin-top: 7px;
+  margin-top: 8px;
+  color: #506887;
+  font-size: 13px;
   overflow-wrap: anywhere;
 }
 
@@ -246,49 +452,409 @@ body:has(.admin-panel) {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 18px;
+}
+
+.admin-panel .ad-acciones button:first-child {
+  border-color: #2863da;
+  background: #2863da;
+  color: white;
+}
+
+.admin-panel .ad-acciones button:first-child:hover {
+  background: #1e50b8;
+}
+
+/* ==================================================
+   MENSAJES Y LISTAS VACÍAS
+   ================================================== */
+
+.admin-panel .ad-error,
+.admin-panel .ad-exito {
+  margin: 0 0 18px;
+  padding: 14px 17px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.admin-panel .ad-error {
+  border-color: #f0cece;
+  background: #fff1f1;
+  color: #963838;
+}
+
+.admin-panel .ad-exito {
+  border-color: #cce9da;
+  background: #eaf8f0;
+  color: #1b6d4e;
 }
 
 .admin-panel .ad-vacio {
-  padding: 36px 24px;
+  padding: 40px 24px;
+  color: #72839a;
+  font-size: 14px;
   text-align: center;
-  color: #64758c;
 }
 
 .admin-panel .ad-total {
   padding: 16px 24px;
-  color: #748298;
+  border-top: 1px solid #edf1f7;
+  color: #7c8ba0;
   font-size: 12px;
 }
 
-@media (max-width: 700px) {
+/* ==================================================
+   TABLETS
+   ================================================== */
+
+@media (max-width: 1000px) {
   .admin-panel {
-    padding: 24px 14px;
+    padding: 28px 20px;
   }
 
-  .admin-panel .ad-cabecera,
-  .admin-panel .ad-titulo {
-    align-items: flex-start;
+  .admin-panel .ad-cabecera {
+    padding: 26px;
+  }
+
+  .admin-panel .ad-filtros {
+    gap: 12px;
+  }
+
+  .admin-panel th,
+  .admin-panel td {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* ==================================================
+   CELULAR: TABLAS CONVERTIDAS EN TARJETAS
+   ================================================== */
+
+@media (max-width: 700px) {
+  .admin-panel {
+    padding: 20px 14px;
+  }
+
+  .admin-panel .ad-cabecera {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+    padding: 25px 22px;
+    border-radius: 16px;
+  }
+
+  .admin-panel .ad-marca {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .admin-panel .ad-cabecera h1 {
+    font-size: 27px;
+  }
+
+  .admin-panel .ad-cabecera p {
+    font-size: 13px;
+  }
+
+  .admin-panel .ad-cabecera > button {
+    width: 100%;
   }
 
   .admin-panel .ad-resumen {
     gap: 8px;
+    margin: 18px 0;
   }
 
   .admin-panel .ad-resumen article {
-    padding: 14px;
+    padding: 15px 10px;
+    border-radius: 11px;
   }
 
   .admin-panel .ad-resumen span {
     font-size: 11px;
+    line-height: 1.4;
   }
 
   .admin-panel .ad-resumen strong {
-    font-size: 27px;
+    font-size: 28px;
+  }
+
+  .admin-panel .ad-tarjeta {
+    border-radius: 15px;
+  }
+
+  .admin-panel .ad-titulo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 23px 18px;
+  }
+
+  .admin-panel .ad-titulo h2 {
+    font-size: 20px;
+  }
+
+  .admin-panel .ad-titulo p {
+    font-size: 13px;
+  }
+
+  .admin-panel .ad-titulo > button {
+    width: 100%;
   }
 
   .admin-panel .ad-filtros {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 0 18px 24px;
+  }
+
+  .admin-panel .ad-filtros > button {
+    width: 100%;
+  }
+
+  .admin-panel .ad-tabla-contenedor {
+    padding: 0 14px 16px;
+    overflow: visible;
+  }
+
+  .admin-panel table {
+    display: block;
+    width: 100%;
+  }
+
+  /* Los encabezados siguen disponibles para
+     tecnologías de asistencia. */
+  .admin-panel thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .admin-panel tbody {
+    display: grid;
+    width: 100%;
+    gap: 14px;
+  }
+
+  .admin-panel tbody tr {
+    display: block;
+    min-width: 0;
+    padding: 8px 16px;
+    border: 1px solid #dfe7f2;
+    border-left: 3px solid #3974df;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 3px 12px rgb(23 43 73 / 4%);
+  }
+
+  .admin-panel tbody tr:hover {
+    background: white;
+  }
+
+  .admin-panel tbody td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 1px solid #edf1f6;
+    color: #344963;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-panel tbody tr:last-child td {
+    border-bottom: 1px solid #edf1f6;
+  }
+
+  .admin-panel tbody tr td:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-panel tbody td::before {
+    display: block;
+    margin-bottom: 5px;
+    color: #748298;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.3px;
+  }
+
+  /* Etiquetas de usuarios */
+
+  .admin-panel
+  section[aria-labelledby="ad-listado"]
+  td:nth-child(1)::before {
+    content: "Usuario";
+  }
+
+  .admin-panel
+  section[aria-labelledby="ad-listado"]
+  td:nth-child(2)::before {
+    content: "Correo";
+  }
+
+  .admin-panel
+  section[aria-labelledby="ad-listado"]
+  td:nth-child(3)::before {
+    content: "Rol";
+  }
+
+  .admin-panel
+  section[aria-labelledby="ad-listado"]
+  td:nth-child(4)::before {
+    content: "Estado";
+  }
+
+  .admin-panel
+  section[aria-labelledby="ad-listado"]
+  td:nth-child(5)::before {
+    content: "Acceso";
+  }
+
+  /* Etiquetas de correos autorizados */
+
+  .admin-panel
+  section[aria-labelledby="ad-correos-titulo"]
+  td:nth-child(1)::before {
+    content: "Correo autorizado";
+  }
+
+  .admin-panel
+  section[aria-labelledby="ad-correos-titulo"]
+  td:nth-child(2)::before {
+    content: "Rol al registrarse";
+  }
+
+  .admin-panel
+  section[aria-labelledby="ad-correos-titulo"]
+  td:nth-child(3)::before {
+    content: "Situación";
+  }
+
+  .admin-panel
+  section[aria-labelledby="ad-correos-titulo"]
+  td:nth-child(4)::before {
+    content: "Autorización";
+  }
+
+  .admin-panel td strong {
+    color: #213b60;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .admin-panel td small {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+
+  .admin-panel td button {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px;
+    background: #f4f7fd;
+    font-size: 14px;
+  }
+
+  .admin-panel td button:hover {
+    background: #e8f0ff;
+  }
+
+  .admin-panel .ad-activo,
+  .admin-panel .ad-inactivo {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .admin-panel .ad-confirmacion {
+    margin: 0 14px 20px;
+    padding: 18px;
+  }
+
+  .admin-panel .ad-acciones {
+    flex-direction: column;
+  }
+
+  .admin-panel .ad-acciones button {
+    width: 100%;
+  }
+
+  .admin-panel .ad-total {
+    padding: 14px 18px;
+  }
+
+  .admin-panel .ad-vacio {
+    padding: 32px 18px;
+  }
+}
+
+/* ==================================================
+   CELULARES MUY PEQUEÑOS
+   ================================================== */
+
+@media (max-width: 360px) {
+  .admin-panel {
+    padding: 16px 10px;
+  }
+
+  .admin-panel .ad-cabecera {
+    padding: 22px 18px;
+  }
+
+  .admin-panel .ad-cabecera h1 {
+    font-size: 24px;
+  }
+
+  .admin-panel .ad-resumen {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-panel .ad-resumen article {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-top-width: 1px;
+    border-left: 3px solid #3974df;
+  }
+
+  .admin-panel .ad-resumen article:nth-child(2) {
+    border-left-color: #23936b;
+  }
+
+  .admin-panel .ad-resumen article:nth-child(3) {
+    border-left-color: #8b98ac;
+  }
+
+  .admin-panel .ad-resumen span {
+    font-size: 12px;
+  }
+
+  .admin-panel .ad-resumen strong {
+    margin: 0;
+    font-size: 26px;
+  }
+
+  .admin-panel tbody tr {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-panel button {
+    transition: none;
   }
 }

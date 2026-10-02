@@ -1,4 +1,6 @@
-/* Estos estilos se aplican al panel del profesor. */
+/* ==================================================
+   PANEL DEL PROFESOR
+   ================================================== */
 
 body:has(.profesor-dashboard) {
   margin: 0;
@@ -10,14 +12,15 @@ body:has(.profesor-dashboard) {
 }
 
 .profesor-dashboard {
-  min-height: 100vh;
   display: grid;
   grid-template-columns: 242px minmax(0, 1fr);
-  background: #f4f7fb;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #f3f6fb;
   color: #17243b;
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .profesor-dashboard h1,
@@ -32,8 +35,6 @@ body:has(.profesor-dashboard) {
   text-decoration: none;
 }
 
-/* Evita que los estilos globales de otros formularios
-   agranden los botones de este panel. */
 .profesor-dashboard button {
   appearance: none;
   width: auto;
@@ -48,33 +49,38 @@ body:has(.profesor-dashboard) {
 .profesor-dashboard a:focus-visible,
 .profesor-dashboard button:focus-visible,
 .profesor-dashboard [tabindex]:focus-visible {
-  outline: 3px solid #60a5fa;
-  outline-offset: 4px;
+  outline: 3px solid #93b7f5;
+  outline-offset: 3px;
 }
 
 .profesor-dashboard .pd-saltar {
   position: fixed;
-  top: -100px;
+  top: -120px;
   left: 16px;
   z-index: 100;
   padding: 12px 18px;
+  border-radius: 9px;
   background: white;
   color: #17243b;
-  border-radius: 8px;
 }
 
 .profesor-dashboard .pd-saltar:focus {
   top: 16px;
 }
 
-/* Menú lateral */
+/* ==================================================
+   MENÚ LATERAL
+   ================================================== */
 
 .profesor-dashboard .pd-sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
   padding: 30px 18px 20px;
   background: #101e35;
   color: #dce6f5;
@@ -84,55 +90,62 @@ body:has(.profesor-dashboard) {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 12px;
+  padding: 0 10px;
 }
 
 .profesor-dashboard .pd-logo {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  flex: 0 0 44px;
+  height: 44px;
   border-radius: 13px;
-  background: #3775ed;
+  background: #3974ed;
   color: white;
-  font-size: 25px;
+  font-size: 27px;
   font-weight: 800;
 }
 
 .profesor-dashboard .pd-marca strong {
   display: block;
   color: white;
-  font-size: 24px;
+  font-size: 25px;
+  line-height: 1.3;
   letter-spacing: 1px;
 }
 
 .profesor-dashboard .pd-marca small {
+  display: block;
+  margin-top: 4px;
   color: #a7b8d2;
   font-size: 11px;
 }
 
 .profesor-dashboard .pd-menu-titulo {
-  margin: 44px 12px 14px;
-  color: #91a5c3;
+  margin: 38px 12px 14px;
+  color: #94a8c5;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
+  font-weight: 750;
+  letter-spacing: 1px;
 }
 
 .profesor-dashboard .pd-nav {
   display: grid;
-  gap: 7px;
+  gap: 8px;
 }
 
 .profesor-dashboard .pd-nav a {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 46px;
-  padding: 11px 13px;
+  gap: 11px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid transparent;
   border-radius: 10px;
   color: #c6d4e8;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.15s;
 }
 
 .profesor-dashboard .pd-nav a:hover {
@@ -141,23 +154,25 @@ body:has(.profesor-dashboard) {
 }
 
 .profesor-dashboard .pd-nav .pd-nav-activo {
-  background: #2a66df;
+  border-color: #3974df;
+  background: #2863da;
   color: white;
 }
 
 .profesor-dashboard .pd-nav a > span {
-  width: 20px;
+  flex: 0 0 20px;
   text-align: center;
-  font-size: 22px;
+  font-size: 21px;
   line-height: 1;
 }
 
 .profesor-dashboard .pd-nav small {
+  flex-shrink: 0;
   margin-left: auto;
   padding: 2px 6px;
   border-radius: 5px;
   background: #30415b;
-  color: #dbe6f5;
+  color: #e2eaf7;
   font-size: 10px;
 }
 
@@ -166,19 +181,22 @@ body:has(.profesor-dashboard) {
   align-items: center;
   gap: 10px;
   margin-top: auto;
-  padding: 20px 8px 0;
-  border-top: 1px solid #2a3a52;
+  padding: 24px 8px 0;
+}
+
+.profesor-dashboard .pd-sidebar-pie > div {
+  min-width: 0;
 }
 
 .profesor-dashboard .pd-avatar {
   display: grid;
   place-items: center;
-  flex: 0 0 36px;
-  height: 36px;
+  flex: 0 0 38px;
+  height: 38px;
   border-radius: 50%;
   background: #2a405f;
   color: #e0ebff;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .profesor-dashboard .pd-sidebar-pie strong {
@@ -192,7 +210,9 @@ body:has(.profesor-dashboard) {
   font-size: 11px;
 }
 
-/* Contenido y botones */
+/* ==================================================
+   CONTENIDO Y CABECERA
+   ================================================== */
 
 .profesor-dashboard .pd-main {
   width: 100%;
@@ -210,27 +230,44 @@ body:has(.profesor-dashboard) {
   gap: 20px;
 }
 
+.profesor-dashboard .pd-cabecera > div,
+.profesor-dashboard .pd-seccion-cabecera > div {
+  min-width: 0;
+}
+
 .profesor-dashboard .pd-etiqueta {
-  margin-bottom: 5px;
-  color: #61758f;
+  margin-bottom: 6px;
+  color: #647b99;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.4px;
 }
 
 .profesor-dashboard .pd-cabecera h1 {
-  color: #14253e;
-  font-size: clamp(23px, 2.4vw, 30px);
+  color: #172b49;
+  font-size: clamp(24px, 2.5vw, 32px);
   font-weight: 750;
+  line-height: 1.25;
   letter-spacing: -0.7px;
 }
 
 .profesor-dashboard .pd-cabecera p:last-child,
 .profesor-dashboard .pd-seccion-cabecera p {
-  margin-top: 5px;
-  color: #63738a;
+  margin-top: 7px;
+  color: #687b94;
   font-size: 13px;
 }
+
+.profesor-dashboard h1,
+.profesor-dashboard h2,
+.profesor-dashboard h3,
+.profesor-dashboard p {
+  overflow-wrap: anywhere;
+}
+
+/* ==================================================
+   BOTONES
+   ================================================== */
 
 .profesor-dashboard .pd-boton {
   display: inline-flex;
@@ -238,16 +275,19 @@ body:has(.profesor-dashboard) {
   justify-content: center;
   gap: 8px;
   width: auto;
-  min-height: 42px;
-  padding: 10px 17px;
+  min-height: 46px;
+  padding: 11px 18px;
   border: 1px solid transparent;
-  border-radius: 9px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 650;
   line-height: 1.4;
   text-align: center;
+  white-space: normal;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
 }
 
 .profesor-dashboard .pd-boton:disabled {
@@ -257,13 +297,14 @@ body:has(.profesor-dashboard) {
 
 .profesor-dashboard .pd-boton-secundario {
   flex-shrink: 0;
+  border-color: #d7e1ef;
   background: white;
-  border-color: #d9e2ef;
-  color: #344761;
+  color: #344d70;
 }
 
 .profesor-dashboard .pd-boton-secundario:hover {
-  background: #edf2fa;
+  border-color: #b2c8e8;
+  background: #edf3ff;
 }
 
 .profesor-dashboard .pd-boton-primario {
@@ -278,47 +319,61 @@ body:has(.profesor-dashboard) {
 .profesor-dashboard .pd-boton-blanco {
   flex-shrink: 0;
   background: white;
-  color: #2256c2;
+  color: #2454b4;
 }
 
 .profesor-dashboard .pd-boton-blanco:hover {
   background: #eaf1ff;
 }
 
-/* Bienvenida y accesos */
+/* ==================================================
+   BIENVENIDA
+   ================================================== */
 
 .profesor-dashboard .pd-bienvenida {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 28px;
-  margin-top: 28px;
-  padding: 30px;
-  border-radius: 18px;
-  background: linear-gradient(115deg, #245bc9, #174399);
+  margin-top: 26px;
+  padding: 32px;
+  border-radius: 19px;
+  background: linear-gradient(115deg, #285fd0, #173f92);
   color: white;
+  box-shadow: 0 7px 22px rgb(30 75 160 / 10%);
+}
+
+.profesor-dashboard .pd-bienvenida > div {
+  min-width: 0;
 }
 
 .profesor-dashboard .pd-bienvenida-etiqueta {
-  color: #c8dcff;
+  display: block;
+  color: #cee0ff;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 750;
+  letter-spacing: 0.8px;
 }
 
 .profesor-dashboard .pd-bienvenida h2 {
-  margin-top: 8px;
+  margin-top: 10px;
   color: white;
-  font-size: 28px;
+  font-size: 29px;
+  line-height: 1.3;
   letter-spacing: -0.5px;
 }
 
 .profesor-dashboard .pd-bienvenida p {
-  max-width: 560px;
-  margin-top: 9px;
-  color: #e2ebff;
+  max-width: 570px;
+  margin-top: 12px;
+  color: #e3ecff;
   font-size: 14px;
+  line-height: 1.7;
 }
+
+/* ==================================================
+   ACCESOS RÁPIDOS
+   ================================================== */
 
 .profesor-dashboard .pd-accesos {
   display: grid;
@@ -331,15 +386,20 @@ body:has(.profesor-dashboard) {
   display: flex;
   align-items: center;
   gap: 13px;
+  min-width: 0;
   padding: 20px 17px;
-  border: 1px solid #e1e7f0;
+  border: 1px solid #e0e7f1;
   border-radius: 13px;
   background: white;
+  transition: border-color 0.15s;
 }
 
 .profesor-dashboard .pd-acceso:hover {
   border-color: #9fbbea;
-  box-shadow: 0 4px 16px #244c9010;
+}
+
+.profesor-dashboard .pd-acceso > div {
+  min-width: 0;
 }
 
 .profesor-dashboard .pd-acceso-icono {
@@ -352,31 +412,38 @@ body:has(.profesor-dashboard) {
 }
 
 .profesor-dashboard .pd-acceso h2 {
+  color: #263e5d;
   font-size: 14px;
   font-weight: 700;
+  line-height: 1.4;
 }
 
 .profesor-dashboard .pd-acceso p {
-  margin-top: 4px;
-  color: #6a7890;
+  margin-top: 5px;
+  color: #718099;
   font-size: 12px;
 }
 
 .profesor-dashboard .pd-flecha {
+  flex-shrink: 0;
   margin-left: auto;
-  color: #61758f;
+  color: #647b99;
   font-size: 20px;
 }
 
-/* Resumen */
+/* ==================================================
+   ESTADÍSTICAS
+   ================================================== */
 
 .profesor-dashboard .pd-resumen {
-  margin-top: 32px;
+  margin-top: 30px;
 }
 
 .profesor-dashboard .pd-seccion-cabecera h2 {
-  font-size: 18px;
+  color: #203b60;
+  font-size: 19px;
   font-weight: 750;
+  line-height: 1.3;
   letter-spacing: -0.3px;
 }
 
@@ -388,10 +455,12 @@ body:has(.profesor-dashboard) {
 }
 
 .profesor-dashboard .pd-estadistica {
-  padding: 18px;
-  border: 1px solid #e1e7f0;
+  min-width: 0;
+  padding: 19px;
+  border: 1px solid #e0e7f1;
   border-radius: 13px;
   background: white;
+  box-shadow: 0 3px 12px rgb(23 43 73 / 2%);
 }
 
 .profesor-dashboard .pd-punto {
@@ -404,17 +473,21 @@ body:has(.profesor-dashboard) {
 }
 
 .profesor-dashboard .pd-estadistica p {
-  color: #63738a;
+  color: #64758c;
   font-size: 12px;
 }
 
 .profesor-dashboard .pd-estadistica strong {
   display: block;
-  margin-top: 3px;
-  color: #172b49;
-  font-size: 30px;
+  margin-top: 5px;
+  color: #203b60;
+  font-size: 31px;
   font-weight: 750;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
 }
+
+/* Colores de estados */
 
 .profesor-dashboard .pd-azul {
   color: #245bc9;
@@ -446,18 +519,21 @@ body:has(.profesor-dashboard) {
   background: #ffeded;
 }
 
-/* Tabla */
+/* ==================================================
+   ÚLTIMOS REPORTES EN PC
+   ================================================== */
 
 .profesor-dashboard .pd-reportes {
+  min-width: 0;
   margin-top: 26px;
   overflow: hidden;
-  border: 1px solid #e1e7f0;
-  border-radius: 15px;
+  border: 1px solid #e0e7f1;
+  border-radius: 16px;
   background: white;
 }
 
 .profesor-dashboard .pd-reportes-cabecera {
-  padding: 23px;
+  padding: 24px;
 }
 
 .profesor-dashboard .pd-enlace {
@@ -472,35 +548,39 @@ body:has(.profesor-dashboard) {
 }
 
 .profesor-dashboard .pd-tabla-contenedor {
+  width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 .profesor-dashboard .pd-tabla {
   width: 100%;
   margin: 0;
+  border: 0;
   border-collapse: collapse;
   text-align: left;
   font-size: 12px;
 }
 
 .profesor-dashboard .pd-tabla th {
-  padding: 13px 20px;
+  padding: 13px 19px;
   border: 0;
   border-top: 1px solid #e8edf5;
   border-bottom: 1px solid #e8edf5;
-  background: #f8fafd;
-  color: #607089;
+  background: #f6f9fd;
+  color: #607591;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 750;
   text-align: left;
   white-space: nowrap;
 }
 
 .profesor-dashboard .pd-tabla td {
-  padding: 16px 20px;
+  padding: 17px 19px;
   border: 0;
   border-bottom: 1px solid #edf1f6;
-  color: #3f5069;
+  color: #465d79;
   text-align: left;
   vertical-align: middle;
 }
@@ -517,32 +597,36 @@ body:has(.profesor-dashboard) {
   display: block;
   color: #2863ca;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 750;
+  letter-spacing: 0.4px;
 }
 
 .profesor-dashboard .pd-titulo-reporte {
   display: block;
-  min-width: 170px;
+  min-width: 160px;
   max-width: 290px;
-  margin-top: 3px;
-  color: #21334e;
+  margin-top: 4px;
+  color: #253c5b;
   font-size: 13px;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
 .profesor-dashboard .pd-categoria {
   display: block;
-  margin-top: 3px;
-  color: #708097;
+  margin-top: 4px;
+  color: #74849a;
   font-size: 11px;
 }
 
 .profesor-dashboard .pd-insignia {
   display: inline-block;
+  max-width: 100%;
   padding: 5px 9px;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 650;
+  line-height: 1.5;
   white-space: nowrap;
 }
 
@@ -550,43 +634,60 @@ body:has(.profesor-dashboard) {
   white-space: nowrap;
 }
 
+/* ==================================================
+   CARGA, ERRORES Y LISTA VACÍA
+   ================================================== */
+
 .profesor-dashboard .pd-vacio {
-  padding: 40px 20px;
-  color: #687a92;
+  padding: 40px 22px;
+  color: #71829a;
   text-align: center;
 }
 
 .profesor-dashboard .pd-vacio h3 {
-  margin: 10px 0 7px;
-  color: #273c59;
-  font-size: 17px;
+  margin: 12px 0 8px;
+  color: #2b4567;
+  font-size: 18px;
+}
+
+.profesor-dashboard .pd-vacio p {
+  font-size: 13px;
 }
 
 .profesor-dashboard .pd-vacio .pd-boton {
-  margin-top: 18px;
+  margin-top: 20px;
 }
 
 .profesor-dashboard .pd-vacio-icono {
-  color: #8398b7;
-  font-size: 35px;
+  display: inline-grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 15px;
+  background: #edf3ff;
+  color: #6086c5;
+  font-size: 32px;
 }
 
 .profesor-dashboard .pd-error {
   margin-top: 16px;
   padding: 14px 16px;
-  border: 1px solid #f3caca;
+  border: 1px solid #f0cccc;
   border-radius: 10px;
   background: #fff1f1;
-  color: #9b3030;
+  color: #963737;
+  overflow-wrap: anywhere;
 }
 
 .profesor-dashboard .pd-cargando {
   margin-top: 12px;
-  color: #63738a;
+  color: #64758c;
   font-size: 12px;
 }
 
-/* Emergencia */
+/* ==================================================
+   EMERGENCIA EN DEMOSTRACIÓN
+   ================================================== */
 
 .profesor-dashboard .pd-emergencia {
   display: flex;
@@ -594,20 +695,24 @@ body:has(.profesor-dashboard) {
   gap: 17px;
   margin-top: 24px;
   padding: 22px;
-  border: 1px solid #efdbdb;
-  border-radius: 13px;
+  border: 1px solid #eedada;
+  border-radius: 14px;
   background: #fffafa;
+}
+
+.profesor-dashboard .pd-emergencia > div {
+  min-width: 0;
 }
 
 .profesor-dashboard .pd-emergencia-icono {
   display: grid;
   place-items: center;
-  flex: 0 0 38px;
-  height: 38px;
-  border-radius: 50%;
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: 12px;
   background: #fde7e7;
   color: #af3d3d;
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 800;
 }
 
@@ -618,7 +723,7 @@ body:has(.profesor-dashboard) {
 
 .profesor-dashboard .pd-emergencia p {
   max-width: 650px;
-  margin-top: 4px;
+  margin-top: 5px;
   color: #846565;
   font-size: 12px;
 }
@@ -636,13 +741,15 @@ body:has(.profesor-dashboard) {
 }
 
 .profesor-dashboard .pd-pie {
-  padding: 26px 0 0;
-  color: #78869a;
+  padding-top: 26px;
+  color: #8090a4;
   font-size: 11px;
   text-align: center;
 }
 
-/* Pantallas medianas */
+/* ==================================================
+   TABLETS Y VENTANAS MEDIANAS
+   ================================================== */
 
 @media (max-width: 1200px) {
   .profesor-dashboard {
@@ -654,12 +761,12 @@ body:has(.profesor-dashboard) {
   }
 
   .profesor-dashboard .pd-accesos {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
 
   .profesor-dashboard .pd-acceso {
-    padding: 14px 18px;
+    padding: 15px 18px;
   }
 
   .profesor-dashboard .pd-estadisticas {
@@ -667,27 +774,40 @@ body:has(.profesor-dashboard) {
   }
 
   .profesor-dashboard .pd-bienvenida {
-    align-items: flex-start;
     flex-direction: column;
-    gap: 20px;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+  .profesor-dashboard .pd-emergencia {
+    flex-wrap: wrap;
   }
 }
 
-/* Celulares y tablets */
+/* ==================================================
+   CELULAR
+   ================================================== */
 
 @media (max-width: 760px) {
   .profesor-dashboard {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* Menú visible sin desplazamiento horizontal */
+
   .profesor-dashboard .pd-sidebar {
     position: static;
     height: auto;
-    padding: 18px 16px;
+    overflow: visible;
+    padding: 20px 16px;
   }
 
   .profesor-dashboard .pd-marca {
     padding: 0;
+  }
+
+  .profesor-dashboard .pd-marca strong {
+    font-size: 24px;
   }
 
   .profesor-dashboard .pd-menu-titulo,
@@ -696,42 +816,105 @@ body:has(.profesor-dashboard) {
   }
 
   .profesor-dashboard .pd-nav {
-    display: flex;
-    gap: 6px;
-    margin-top: 17px;
-    overflow-x: auto;
-    padding-bottom: 3px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 20px;
+    overflow: visible;
   }
 
   .profesor-dashboard .pd-nav a {
-    flex-shrink: 0;
-    min-height: 40px;
-    padding: 9px 12px;
+    min-width: 0;
+    min-height: 48px;
+    padding: 11px 10px;
+    gap: 8px;
+    border-color: #2b3d58;
+    background: #192b45;
     font-size: 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .profesor-dashboard .pd-nav .pd-nav-activo {
+    border-color: #3974df;
+    background: #2863da;
+  }
+
+  .profesor-dashboard .pd-nav a:last-child {
+    grid-column: 1 / -1;
   }
 
   .profesor-dashboard .pd-nav a > span {
-    width: auto;
-    font-size: 18px;
+    flex-basis: 18px;
+    font-size: 19px;
   }
 
+  /* Cabecera y bienvenida */
+
   .profesor-dashboard .pd-main {
-    padding: 22px 16px;
+    padding: 24px 16px;
   }
 
   .profesor-dashboard .pd-cabecera {
+    flex-direction: column;
     align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 14px;
+    gap: 16px;
+  }
+
+  .profesor-dashboard .pd-cabecera h1 {
+    font-size: 25px;
+  }
+
+  .profesor-dashboard .pd-cabecera > .pd-boton {
+    width: 100%;
   }
 
   .profesor-dashboard .pd-bienvenida {
     margin-top: 22px;
-    padding: 24px;
+    padding: 25px 22px;
+    border-radius: 16px;
+  }
+
+  .profesor-dashboard .pd-bienvenida-etiqueta {
+    font-size: 9px;
+    line-height: 1.6;
   }
 
   .profesor-dashboard .pd-bienvenida h2 {
-    font-size: 25px;
+    font-size: 26px;
+  }
+
+  .profesor-dashboard .pd-bienvenida p {
+    font-size: 13px;
+  }
+
+  .profesor-dashboard .pd-bienvenida > .pd-boton {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .profesor-dashboard .pd-acceso {
+    padding: 17px 14px;
+    gap: 11px;
+  }
+
+  .profesor-dashboard .pd-acceso h2 {
+    font-size: 13px;
+  }
+
+  .profesor-dashboard .pd-acceso p {
+    font-size: 11px;
+  }
+
+  /* Contadores */
+
+  .profesor-dashboard .pd-resumen {
+    margin-top: 26px;
+  }
+
+  .profesor-dashboard .pd-seccion-cabecera {
+    flex-wrap: wrap;
+    gap: 14px;
   }
 
   .profesor-dashboard .pd-estadisticas {
@@ -739,26 +922,196 @@ body:has(.profesor-dashboard) {
     gap: 10px;
   }
 
-  .profesor-dashboard .pd-seccion-cabecera {
-    flex-wrap: wrap;
-    gap: 12px;
+  .profesor-dashboard .pd-estadistica {
+    padding: 17px;
   }
+
+  .profesor-dashboard .pd-estadistica strong {
+    font-size: 29px;
+  }
+
+  /* Reportes como tarjetas */
 
   .profesor-dashboard .pd-reportes-cabecera {
-    padding: 19px;
+    padding: 21px 18px;
   }
+
+  .profesor-dashboard .pd-enlace {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .profesor-dashboard .pd-tabla-contenedor {
+    padding: 0 14px 14px;
+    overflow: visible;
+  }
+
+  .profesor-dashboard .pd-tabla {
+    display: block;
+    width: 100%;
+  }
+
+  .profesor-dashboard .pd-tabla thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .profesor-dashboard .pd-tabla tbody {
+    display: grid;
+    width: 100%;
+    gap: 14px;
+  }
+
+  .profesor-dashboard .pd-tabla tbody tr {
+    display: block;
+    min-width: 0;
+    padding: 8px 15px;
+    border: 1px solid #dfe7f2;
+    border-left: 3px solid #3974df;
+    border-radius: 12px;
+    background: white;
+  }
+
+  .profesor-dashboard .pd-tabla tbody tr:hover {
+    background: white;
+  }
+
+  .profesor-dashboard .pd-tabla tbody td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 11px 0;
+    border: 0;
+    border-bottom: 1px solid #edf1f6;
+    font-size: 13px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .profesor-dashboard .pd-tabla tbody tr:last-child td {
+    border-bottom: 1px solid #edf1f6;
+  }
+
+  .profesor-dashboard .pd-tabla tbody tr td:last-child {
+    border-bottom: 0;
+  }
+
+  .profesor-dashboard .pd-tabla td::before {
+    display: block;
+    margin-bottom: 5px;
+    color: #78889e;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.3px;
+  }
+
+  .profesor-dashboard .pd-tabla td:nth-child(2)::before {
+    content: "Ubicación";
+  }
+
+  .profesor-dashboard .pd-tabla td:nth-child(3)::before {
+    content: "Prioridad";
+  }
+
+  .profesor-dashboard .pd-tabla td:nth-child(4)::before {
+    content: "Estado";
+  }
+
+  .profesor-dashboard .pd-tabla td:nth-child(5)::before {
+    content: "Responsable";
+  }
+
+  .profesor-dashboard .pd-tabla td:nth-child(6)::before {
+    content: "Fecha";
+  }
+
+  .profesor-dashboard .pd-titulo-reporte {
+    min-width: 0;
+    max-width: none;
+    margin-top: 5px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .profesor-dashboard .pd-codigo {
+    font-size: 11px;
+  }
+
+  .profesor-dashboard .pd-categoria {
+    margin-top: 7px;
+    font-size: 12px;
+  }
+
+  .profesor-dashboard .pd-insignia {
+    padding: 6px 10px;
+    font-size: 12px;
+    white-space: normal;
+  }
+
+  /* Emergencia */
 
   .profesor-dashboard .pd-emergencia {
-    flex-wrap: wrap;
-    padding: 19px;
-  }
-
-  .profesor-dashboard .pd-emergencia > div {
-    flex: 1;
-    min-width: 180px;
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: start;
+    gap: 13px;
+    padding: 20px 17px;
   }
 
   .profesor-dashboard .pd-boton-emergencia {
+    grid-column: 1 / -1;
+    width: 100%;
     margin-left: 0;
+  }
+}
+
+/* ==================================================
+   CELULARES PEQUEÑOS
+   ================================================== */
+
+@media (max-width: 360px) {
+  .profesor-dashboard .pd-sidebar {
+    padding: 18px 12px;
+  }
+
+  .profesor-dashboard .pd-main {
+    padding: 22px 12px;
+  }
+
+  .profesor-dashboard .pd-nav a {
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+
+  .profesor-dashboard .pd-bienvenida {
+    padding: 22px 18px;
+  }
+
+  .profesor-dashboard .pd-estadistica {
+    padding: 14px;
+  }
+
+  .profesor-dashboard .pd-acceso-icono {
+    flex-basis: 36px;
+    height: 36px;
+  }
+
+  .profesor-dashboard .pd-flecha {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profesor-dashboard .pd-nav a,
+  .profesor-dashboard .pd-boton,
+  .profesor-dashboard .pd-acceso {
+    transition: none;
   }
 }
