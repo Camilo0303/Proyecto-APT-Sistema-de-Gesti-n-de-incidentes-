@@ -13,6 +13,7 @@ const { createIncidencias } = require('./incidencias.cjs');
 const { permitirRoles } = require('./permisos.cjs');
 const { createAdministracion } = require('./administracion.cjs');
 const { createCorreos } = require('./correos.cjs');
+const { createCetecom } = require('./cetecom.cjs');
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
@@ -32,6 +33,10 @@ const pool = mysql.createPool({
 });
 
 const auth = createAuth(pool);
+app.use(
+  '/api/cetecom',
+  createCetecom(pool, auth.requireAuth)
+);
 
 app.use('/api/auth', auth.router);
 app.use(

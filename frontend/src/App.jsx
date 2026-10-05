@@ -54,9 +54,7 @@ function BotonSalir() {
       await cerrarSesion();
       window.location.replace('/login');
     } catch (err) {
-      setError(
-        err.message || 'No se pudo cerrar sesión.'
-      );
+      setError(err.message || 'No se pudo cerrar sesión.');
       setCerrando(false);
     }
   }
@@ -143,6 +141,7 @@ function RutaProtegida({ rol, children }) {
                 error: '',
                 usuario: null,
               });
+
               setIntento(valor => valor + 1);
             }}
           >
@@ -284,34 +283,22 @@ function RutasAplicacion() {
 
       <Route
         path="/profesor"
-        element={proteger(
-          'Profesor',
-          <Home />
-        )}
+        element={proteger('Profesor', <Home />)}
       />
 
       <Route
         path="/reportar"
-        element={proteger(
-          'Profesor',
-          <Reportar />
-        )}
+        element={proteger('Profesor', <Reportar />)}
       />
 
       <Route
         path="/historial"
-        element={proteger(
-          'Profesor',
-          <Historial />
-        )}
+        element={proteger('Profesor', <Historial />)}
       />
 
       <Route
         path="/escanear"
-        element={proteger(
-          'Profesor',
-          <EscanearQR />
-        )}
+        element={proteger('Profesor', <EscanearQR />)}
       />
 
       <Route
@@ -342,25 +329,7 @@ function RutasAplicacion() {
 
       <Route
         path="/cetecom"
-        element={proteger(
-          'Técnico',
-          <div>
-            <header style={{ padding: '20px 30px' }}>
-              <p>
-                Sesión de {obtenerUsuario()?.nombre}
-              </p>
-
-              <BotonSalir />
-
-              <p>
-                Vista de demostración: los contadores y
-                reportes todavía son datos de ejemplo.
-              </p>
-            </header>
-
-            <Cetecom />
-          </div>
-        )}
+        element={proteger('Técnico', <Cetecom />)}
       />
 
       <Route
@@ -408,7 +377,9 @@ export default function App() {
 
     restaurarSesion()
       .then(() => {
-        if (activo) setListo(true);
+        if (activo) {
+          setListo(true);
+        }
       })
       .catch(err => {
         if (activo) {
