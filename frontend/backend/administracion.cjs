@@ -38,6 +38,21 @@ function createAdministracion(pool, requireAuth) {
     }
   });
 
+  router.get('/salas-qr', async (_req, res, next) => {
+    try {
+      const [salas] = await pool.execute(`
+        SELECT s.id_sala, s.nombre, s.codigo_sala, s.codigo_qr,
+               e.nombre AS edificio, p.numero_piso AS piso
+        FROM salas s
+        JOIN pisos p ON p.id_piso = s.id_piso
+        JOIN edificios e ON e.id_edificio = p.id_edificio
+        WHERE s.activo = 1
+        ORDER BY e.nombre, p.numero_piso, s.codigo_sala, s.id_sala
+      `);
+      res.json({ salas });
+    } catch (error) { next(error); }
+  });
+
   router.patch('/usuarios/:id/estado', async (req, res, next) => {
     if (
       !req.is('application/json') ||

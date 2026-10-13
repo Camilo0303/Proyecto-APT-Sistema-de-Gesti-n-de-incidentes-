@@ -11,6 +11,27 @@ function createIncidencias(pool, requireAuth) {
   });
 
   // Opciones del formulario.
+  router.get('/sala-qr', async (req, res, next) => {
+    const codigo = req.query.codigo;
+    if (typeof codigo !== 'string' || !codigo.trim() || codigo.length > 150) {
+      return res.status(400).json({ mensaje: 'Código QR inválido.' });
+    }
+    try {
+      const [salas] = await pool.execute(`
+        SELECT s.id_sala, s.nombre, s.codigo_sala,
+               e.nombre AS edificio, p.numero_piso AS piso
+        FROM salas s
+        JOIN pisos p ON p.id_piso = s.id_piso
+        JOIN edificios e ON e.id_edificio = p.id_edificio
+        WHERE BINARY s.codigo_qr = ? AND s.activo = 1
+      `, [codigo.trim()]);
+      if (salas.length !== 1) {
+        return res.status(404).json({ mensaje: 'El QR no corresponde a una sala activa del sistema.' });
+      }
+      res.json({ sala: salas[0] });
+    } catch (error) { next(error); }
+  });
+
   router.get('/catalogos', async (_req, res, next) => {
     try {
       const [categorias] = await pool.execute(

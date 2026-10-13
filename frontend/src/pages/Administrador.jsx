@@ -4,6 +4,7 @@ import {
   olvidarSesion,
 } from '../data/sesion';
 import CorreosAutorizados from './CorreosAutorizados';
+import SalasQR from './SalasQR';
 import './Administrador.css';
 
 async function consultar(ruta, opciones = {}) {
@@ -419,6 +420,7 @@ export default function Administrador() {
         </section>
 
         <CorreosAutorizados />
+        <SalasQR />
       </div>
     </main>
   );

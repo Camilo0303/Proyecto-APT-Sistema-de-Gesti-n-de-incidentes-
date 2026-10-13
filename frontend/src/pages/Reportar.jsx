@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { obtenerUsuario } from '../data/sesion';
 import { api } from '../data/api';
 import './Reportar.css';
 
 function Reportar() {
   const navigate = useNavigate();
+  const [parametros] = useSearchParams();
+  const salaQR = parametros.get('sala');
   const usuario = obtenerUsuario();
 
   const [catalogos, setCatalogos] = useState(null);
@@ -28,7 +30,14 @@ function Reportar() {
 
     api('/incidencias/catalogos')
       .then(resultado => {
-        if (activo) setCatalogos(resultado);
+        if (activo) {
+          setCatalogos(resultado);
+          if (salaQR) {
+            const sala = resultado.salas.find(s => String(s.id_sala) === salaQR);
+            if (sala) setForm(f => ({ ...f, id_sala: String(sala.id_sala), id_equipo: '' }));
+            else setError('La sala del QR ya no está disponible. Selecciona una sala activa.');
+          }
+        }
       })
       .catch(err => {
         if (activo) setError(err.message);
@@ -37,7 +46,7 @@ function Reportar() {
     return () => {
       activo = false;
     };
-  }, [usuario]);
+  }, [usuario, salaQR]);
 
   function cambiar(event) {
     const { name, value } = event.target;

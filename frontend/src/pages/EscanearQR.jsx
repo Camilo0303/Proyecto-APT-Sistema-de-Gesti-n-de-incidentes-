@@ -1,190 +1,44 @@
-import { useEffect, useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
-import "./EscanearQR.css";
-
-
-function EscanearQR() {
-
-
-  const [sala, setSala] = useState(null);
-
-
-
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { api } from '../data/api';
+import './EscanearQR.css';
+export default function EscanearQR() {
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [validando, setValidando] = useState(false);
   useEffect(() => {
-
-
-    const scanner = new Html5QrcodeScanner(
-      "reader",
-      {
-        fps:10,
-        qrbox:{
-          width:250,
-          height:250
-        }
-      },
-      false
-    );
-
-
-
-    scanner.render(
-
-      (decodedText)=>{
-
-
-        console.log(
-          "QR leído:",
-          decodedText
-        );
-
-
-        setSala(decodedText);
-
-
-        scanner.clear();
-
-
-      },
-
-
-      ()=>{}
-
-    );
-
-
-
-    return ()=>{
-
-      scanner.clear()
-      .catch(()=>{});
-
-    };
-
-
-  },[]);
-
-
-
-
-
-  return (
-
-
-    <main className="qr-page">
-
-
-      <section className="qr-header">
-
-
-        <h1>
-          📷 Escanear código QR
-        </h1>
-
-
-        <p>
-          Identificación automática de sala
-        </p>
-
-
-      </section>
-
-
-
-
-
-      <section className="qr-container">
-
-
-        {
-          !sala &&
-
-          <>
-
-
-          <h2>
-            Escanea el código de la sala
-          </h2>
-
-
-          <p>
-            Apunta la cámara al código QR instalado en el aula.
-          </p>
-
-
-
-          <div className="scanner-box">
-
-
-            <div id="reader"></div>
-
-
-          </div>
-
-
-
-          </>
-
-        }
-
-
-
-
-
-        {
-          sala &&
-
-
-          <div className="qr-success">
-
-
-            <div className="success-icon">
-              ✅
-            </div>
-
-
-            <h2>
-              Sala identificada correctamente
-            </h2>
-
-
-            <p>
-              Código detectado:
-            </p>
-
-
-            <strong>
-              {sala}
-            </strong>
-
-
-            <button
-              className="continue-button"
-            >
-
-              Reportar incidencia
-
-            </button>
-
-
-          </div>
-
-
-        }
-
-
-
-      </section>
-
-
-
-    </main>
-
-
-  )
-
-
+    let vigente = true, ocupado = false, ultimo = '', momento = 0;
+    let limpieza;
+    const scanner = new Html5QrcodeScanner('reader', {
+      fps: 10, qrbox: { width: 220, height: 220 },
+      videoConstraints: { facingMode: 'environment' }, rememberLastUsedCamera: false,
+    }, false);
+    const limpiar = () => limpieza ||= scanner.clear().catch(() => {});
+    scanner.render(async codigo => {
+      if (!vigente || ocupado || (codigo === ultimo && Date.now() - momento < 4000)) return;
+      ultimo = codigo; momento = Date.now(); ocupado = true;
+      setError(''); setValidando(true);
+      try {
+        const { sala } = await api(`/incidencias/sala-qr?codigo=${encodeURIComponent(codigo)}`);
+        if (!vigente) return;
+        await limpiar();
+        if (vigente) navigate(`/reportar?sala=${sala.id_sala}`);
+      } catch (err) { if (vigente) setError(err.message); }
+      finally { ocupado = false; if (vigente) setValidando(false); }
+    }, () => {});
+    return () => { vigente = false; void limpiar(); };
+  }, [navigate]);
+  return <main className="qr-page"><section className="qr-header">
+    <h1>Escanear código QR</h1>
+    <p>Apunta al código de la sala. El reporte se abrirá con su ubicación seleccionada.</p>
+  </section><section className="qr-container">
+    <p>Permite el acceso a la cámara. También puedes cargar una imagen del QR.</p>
+    {!window.isSecureContext && <p role="alert">La cámara requiere HTTPS o localhost. Usa la carga de imagen en esta conexión.</p>}
+    <div className="scanner-box"><div id="reader" /></div>
+    {validando && <p role="status">Comprobando la sala...</p>}
+    {error && <p role="alert">{error} Puedes escanear otro código.</p>}
+    <p>Si rechazaste el permiso o no hay cámara, revisa los permisos del navegador o carga una imagen.</p>
+    <button type="button" onClick={() => navigate('/profesor')}>Volver al inicio</button>
+  </section></main>;
 }
-
-
-
-export default EscanearQR;
