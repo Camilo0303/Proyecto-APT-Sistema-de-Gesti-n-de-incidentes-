@@ -53,6 +53,65 @@ function createAdministracion(pool, requireAuth) {
     } catch (error) { next(error); }
   });
 
+  router.get('/incidencias', async (req, res, next) => {
+    const pagina = Number(req.query.pagina || 1);
+    if (!Number.isSafeInteger(pagina) || pagina < 1 || pagina > 1000000) {
+      return res.status(400).json({ mensaje: 'Página inválida.' });
+    }
+    try {
+      const [[conteo]] = await pool.execute('SELECT COUNT(*) AS total FROM incidencias');
+      const total = Number(conteo.total);
+      const paginas = Math.max(1, Math.ceil(total / 20));
+      const actual = Math.min(pagina, paginas);
+      const [incidencias] = await pool.execute(`
+        SELECT i.id_incidencia, i.titulo, i.descripcion,
+          DATE_FORMAT(i.fecha_creacion, '%d/%m/%Y %H:%i:%s') AS fecha,
+          s.nombre AS sala, c.nombre AS categoria, p.nombre AS prioridad,
+          e.nombre AS estado,
+          CONCAT(creador.nombre, ' ', creador.apellido) AS creador,
+          COALESCE(CONCAT(u.nombre, ' ', u.apellido), 'Sin asignar') AS responsable
+        FROM incidencias i
+        LEFT JOIN salas s ON s.id_sala = i.id_sala
+        LEFT JOIN categorias c ON c.id_categoria = i.id_categoria
+        LEFT JOIN prioridades p ON p.id_prioridad = i.id_prioridad
+        LEFT JOIN estados_incidencia e ON e.id_estado = i.id_estado
+        LEFT JOIN usuarios creador ON creador.id_usuario = i.id_usuario_creador
+        LEFT JOIN usuarios u ON u.id_usuario = i.id_responsable
+        ORDER BY i.fecha_creacion DESC, i.id_incidencia DESC
+        LIMIT 20 OFFSET ${(actual - 1) * 20}
+      `);
+      res.json({ incidencias, total, pagina: actual, paginas });
+    } catch (error) { next(error); }
+  });
+
+  router.get('/incidencias/:id/historial', async (req, res, next) => {
+    const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id < 1) {
+      return res.status(400).json({ mensaje: 'Incidencia inválida.' });
+    }
+    try {
+      const [[incidencia]] = await pool.execute(
+        'SELECT id_incidencia, titulo, descripcion FROM incidencias WHERE id_incidencia = ?', [id]
+      );
+      if (!incidencia) return res.status(404).json({ mensaje: 'La incidencia no existe.' });
+      const [historial] = await pool.execute(`
+        SELECT h.id_historial, h.tipo_movimiento, h.comentario,
+          DATE_FORMAT(h.fecha_cambio, '%d/%m/%Y %H:%i:%s') AS fecha,
+          anterior.nombre AS estado_anterior, nuevo.nombre AS estado_nuevo,
+          CONCAT(u.nombre, ' ', u.apellido) AS realizado_por,
+          CONCAT(r.nombre, ' ', r.apellido) AS responsable_asignado
+        FROM historial_incidencias h
+        LEFT JOIN estados_incidencia anterior ON anterior.id_estado = h.id_estado_anterior
+        LEFT JOIN estados_incidencia nuevo ON nuevo.id_estado = h.id_estado_nuevo
+        LEFT JOIN usuarios u ON u.id_usuario = h.id_usuario
+        LEFT JOIN usuarios r ON r.id_usuario = h.id_responsable_asignado
+        WHERE h.id_incidencia = ?
+        ORDER BY h.fecha_cambio ASC, h.id_historial ASC
+      `, [id]);
+      res.json({ incidencia, historial });
+    } catch (error) { next(error); }
+  });
+
   router.patch('/usuarios/:id/estado', async (req, res, next) => {
     if (
       !req.is('application/json') ||

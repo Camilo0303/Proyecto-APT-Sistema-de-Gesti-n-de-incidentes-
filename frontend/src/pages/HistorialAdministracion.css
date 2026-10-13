@@ -1,0 +1,13 @@
+.ad-historial { margin-top: 24px; padding: 24px; background: white; border: 1px solid #dce5f1; border-radius: 16px; }
+.ad-historial-cabecera { display: flex; gap: 16px; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.ad-historial-tabla { overflow-x: auto; margin-top: 16px; }
+.ad-historial table { width: 100%; border-collapse: collapse; min-width: 850px; }
+.ad-historial th, .ad-historial td { padding: 12px; text-align: left; border-bottom: 1px solid #dce5f1; vertical-align: top; }
+.ad-historial th { background: #f3f6fb; }
+.ad-historial button { padding: 10px 14px; border: 1px solid #cbd8ed; background: #f3f6fb; border-radius: 8px; color: #173c78; cursor: pointer; }
+.ad-historial button:disabled { opacity: .55; cursor: default; }
+.ad-historial-controles { display: flex; gap: 12px; margin-top: 16px; }
+.ad-historial-detalle { margin-top: 24px; padding-top: 20px; border-top: 1px solid #dce5f1; }
+.ad-historial-movimientos { padding-left: 24px; }
+.ad-historial-movimientos li { padding: 12px; margin-top: 12px; background: #f3f6fb; border-radius: 8px; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .ad-historial { padding: 16px; } }

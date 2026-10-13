@@ -5,6 +5,7 @@ import {
 } from '../data/sesion';
 import CorreosAutorizados from './CorreosAutorizados';
 import SalasQR from './SalasQR';
+import HistorialAdministracion from './HistorialAdministracion';
 import './Administrador.css';
 
 async function consultar(ruta, opciones = {}) {
@@ -419,6 +420,7 @@ export default function Administrador() {
           )}
         </section>
 
+        <HistorialAdministracion />
         <CorreosAutorizados />
         <SalasQR />
       </div>
