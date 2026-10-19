@@ -35,7 +35,7 @@ export default function EscanearQR() {
   }, [navigate, emergencia]);
   return <main className="qr-page"><section className="qr-header">
     <h1>Escanear código QR</h1>
-    <p>Apunta al código de la sala. {emergencia ? 'Se abrirá la confirmación de emergencia.' : 'El reporte se abrirá con su ubicación seleccionada.'}</p>
+    <p>Apunta al código de la sala. {emergencia ? 'Se abrirá el botón de alerta con esta ubicación.' : 'El reporte se abrirá con su ubicación seleccionada.'}</p>
   </section><section className="qr-container">
     <p>Permite el acceso a la cámara. También puedes cargar una imagen del QR.</p>
     {!window.isSecureContext && <p role="alert">La cámara requiere HTTPS o localhost. Usa la carga de imagen en esta conexión.</p>}
@@ -46,3 +46,4 @@ export default function EscanearQR() {
     <button type="button" onClick={() => navigate('/profesor')}>Volver al inicio</button>
   </section></main>;
 }
+

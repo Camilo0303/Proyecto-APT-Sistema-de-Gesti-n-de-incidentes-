@@ -1,32 +1,119 @@
 import { useEffect, useState } from 'react';
 import { api } from '../data/api';
 import { cerrarSesion, obtenerUsuario } from '../data/sesion';
-import './Emergencias.css';
-export default function Enfermeria(){
-  const [datos,setDatos]=useState(null),[error,setError]=useState(''),[ocupado,setOcupado]=useState(false),[recarga,setRecarga]=useState(0),[hora,setHora]=useState('');
-  const usuario=obtenerUsuario();
-  useEffect(()=>{
-    let vigente=true,consultando=false;
-    async function cargar(){if(consultando)return;consultando=true;try{const r=await api('/emergencias');if(vigente){setDatos(r);setError('');setHora(new Date().toLocaleTimeString());}}catch(e){if(vigente)setError(e.message);}finally{consultando=false;}}
-    void cargar();const timer=setInterval(cargar,5000);
-    const foco=()=>void cargar();window.addEventListener('focus',foco);
-    return ()=>{vigente=false;clearInterval(timer);window.removeEventListener('focus',foco);};
-  },[recarga]);
-  async function cambiar(a,estado){if(ocupado)return;setOcupado(true);try{await api(`/emergencias/${a.id_alerta}/estado`,{estado});setRecarga(n=>n+1);}catch(e){setError(e.message);}finally{setOcupado(false);}}
-  async function salir(){try{await cerrarSesion();window.location.replace('/login');}catch(e){setError(e.message);}}
-  const pendientes=datos?.alertas.filter(a=>a.estado==='Pendiente').length||0;
-  return <main className="emergencias"><header className="em-cabecera"><div><h1>Enfermería</h1><p>{usuario?.nombre} {usuario?.apellido}</p></div><button onClick={salir}>Cerrar sesión</button></header>
-    <p>Alertas internas del establecimiento. Revisión automática cada 5 segundos mientras este panel está abierto.</p>
-    <button onClick={()=>setRecarga(n=>n+1)}>Actualizar alertas</button>
-    <p>Última consulta correcta: {hora||'Pendiente'}</p>
-    {error&&<p role="alert" className="em-error">No se pudo actualizar: {error}. Los datos mostrados pueden estar desactualizados.</p>}
-    <div aria-live="polite">{pendientes>0&&<div role="alert" className="em-urgente"><h2>{pendientes} alerta(s) urgente(s) pendiente(s)</h2><p>Revisa la ubicación y toma la atención.</p></div>}</div>
-    {!datos?<p role="status">Cargando alertas...</p>:<><h2>Alertas activas ({datos.alertas.length})</h2>{!datos.alertas.length&&<p>No hay alertas activas en la última consulta.</p>}
-      {datos.alertas.map(a=><article className={`em-tarjeta ${a.estado==='Pendiente'?'em-pendiente':''}`} key={a.id_alerta}>
-        <h2>Alerta #{a.id_alerta} · {a.tipo}</h2><p><strong>{a.sala}</strong></p><p>Edificio {a.edificio} · Piso {a.piso}</p><p>{a.fecha} · Reporta: {a.profesor}</p><p>Estado: <strong>{a.estado}</strong></p>{a.descripcion&&<p>{a.descripcion}</p>}{a.responsable&&<p>Atiende: {a.responsable}</p>}
-        {a.estado==='Pendiente'?<button disabled={ocupado} onClick={()=>cambiar(a,'En atención')}>Tomar atención</button>:Number(a.atendida_por)===Number(usuario?.id_usuario)&&<button disabled={ocupado} onClick={()=>cambiar(a,'Atendida')}>Marcar atendida</button>}
-      </article>)}
-      <h2>Últimas 20 alertas atendidas</h2>{datos.atendidas.map(a=><article className="em-tarjeta" key={a.id_alerta}><h3>#{a.id_alerta} · {a.sala}</h3><p>{a.tipo} · {a.fecha} · {a.responsable}</p></article>)}
-    </>}
-  </main>;
+import './Enfermeria.css';
+
+const numeroAlerta = id => `ALT-${String(id).padStart(4, '0')}`;
+
+function TarjetaAlerta({ alerta, usuario, ocupado, cambiar }) {
+  const pendiente = alerta.estado === 'Pendiente';
+  const propia = Number(alerta.atendida_por) === Number(usuario?.id_usuario);
+  return <article className={`enf-alerta ${pendiente ? 'enf-alerta-pendiente' : ''}`}>
+    <div className="enf-alerta-cabecera">
+      <span className="enf-ticket">{numeroAlerta(alerta.id_alerta)}</span>
+      <span className={`enf-estado ${pendiente ? 'enf-estado-rojo' : 'enf-estado-azul'}`}>{pendiente ? 'Pendiente de atención' : 'En atención'}</span>
+    </div>
+    <h3>{alerta.tipo}</h3>
+    <div className="enf-ubicacion">
+      <span className="enf-etiqueta">UBICACIÓN DE LA EMERGENCIA</span>
+      <strong>{alerta.codigo_sala || alerta.sala}</strong>
+      {alerta.codigo_sala && alerta.sala !== alerta.codigo_sala && <p>{alerta.sala}</p>}
+      <div className="enf-ubicacion-datos"><span>Edificio <b>{alerta.edificio}</b></span><span>Piso <b>{alerta.piso}</b></span></div>
+    </div>
+    <dl className="enf-datos"><div><dt>Reportada por</dt><dd>{alerta.profesor}</dd></div><div><dt>Fecha y hora</dt><dd>{alerta.fecha}</dd></div></dl>
+    {alerta.descripcion && <p className="enf-descripcion">{alerta.descripcion}</p>}
+    <footer className="enf-alerta-pie">
+      <p>{pendiente ? 'Sin responsable asignado' : <>Atiende: <strong>{alerta.responsable || 'Sin información'}</strong></>}</p>
+      {pendiente ? <button className="enf-boton enf-boton-rojo" disabled={ocupado} onClick={() => cambiar(alerta, 'En atención')}>Tomar atención</button>
+        : propia ? <button className="enf-boton enf-boton-primario" disabled={ocupado} onClick={() => cambiar(alerta, 'Atendida')}>Marcar como atendida</button>
+          : <span className="enf-nota">En atención por otra persona</span>}
+    </footer>
+  </article>;
 }
+
+export default function Enfermeria() {
+  const [datos, setDatos] = useState(null);
+  const [errorConsulta, setErrorConsulta] = useState('');
+  const [errorAccion, setErrorAccion] = useState('');
+  const [ocupado, setOcupado] = useState(false);
+  const [cerrando, setCerrando] = useState(false);
+  const [recarga, setRecarga] = useState(0);
+  const [hora, setHora] = useState('');
+  const [vista, setVista] = useState('panel');
+  const [busqueda, setBusqueda] = useState('');
+  const [sinPulso, setSinPulso] = useState(false);
+  const usuario = obtenerUsuario();
+
+  useEffect(() => {
+    let vigente = true, consultando = false;
+    async function cargar() {
+      if (consultando) return;
+      consultando = true;
+      try {
+        const r = await api('/emergencias');
+        if (vigente) { setDatos(r); setErrorConsulta(''); setHora(new Date().toLocaleTimeString('es-CL')); }
+      } catch (e) { if (vigente) setErrorConsulta(e.message); }
+      finally { consultando = false; }
+    }
+    void cargar();
+    const timer = setInterval(cargar, 5000);
+    const foco = () => void cargar();
+    window.addEventListener('focus', foco);
+    return () => { vigente = false; clearInterval(timer); window.removeEventListener('focus', foco); };
+  }, [recarga]);
+
+  async function cambiar(alerta, estado) {
+    if (ocupado) return;
+    setOcupado(true); setErrorAccion('');
+    try { await api(`/emergencias/${alerta.id_alerta}/estado`, { estado }); setRecarga(n => n + 1); }
+    catch (e) { setErrorAccion(e.message); }
+    finally { setOcupado(false); }
+  }
+  async function salir() {
+    if (cerrando) return;
+    setCerrando(true);
+    try { await cerrarSesion(); window.location.replace('/login'); }
+    catch (e) { setErrorAccion(e.message); setCerrando(false); }
+  }
+  function ir(destino) { setVista(destino); setBusqueda(''); }
+  const pendientes = datos?.alertas.filter(a => a.estado === 'Pendiente') || [];
+  const enAtencion = datos?.alertas.filter(a => a.estado === 'En atención') || [];
+  const texto = busqueda.trim().toLocaleLowerCase();
+  const coincide = a => [numeroAlerta(a.id_alerta), a.tipo, a.sala, a.codigo_sala, a.edificio, a.piso, a.profesor, a.responsable].join(' ').toLocaleLowerCase().includes(texto);
+  const pendientesVisibles = pendientes.filter(coincide);
+  const atencionVisibles = enAtencion.filter(coincide);
+  const atendidas = datos?.atendidas.filter(coincide) || [];
+  const titulos = { panel: 'Alertas activas', pendientes: 'Pendientes de atención', atencion: 'En atención', historial: 'Alertas atendidas' };
+  const menu = [ ['panel', 'Mi panel', '⌂'], ['pendientes', 'Pendientes', '!'], ['atencion', 'En atención', '+'], ['historial', 'Atendidas', '☷'] ];
+  function grupo(titulo, lista, rojo) {
+    return <section className="enf-grupo"><div className="enf-grupo-titulo"><h3>{titulo}</h3><span className={rojo ? 'enf-contador-rojo' : 'enf-contador'}>{lista.length}</span></div>
+      {lista.length ? <div className="enf-alertas-grid">{lista.map(a => <TarjetaAlerta key={a.id_alerta} alerta={a} usuario={usuario} ocupado={ocupado} cambiar={cambiar} />)}</div>
+        : <div className="enf-vacio"><strong>{texto ? 'No hay coincidencias' : rojo ? 'Sin alertas pendientes' : 'Sin alertas en atención'}</strong><p>{texto ? 'Prueba otra sala, profesor o número de alerta.' : 'Las nuevas alertas se mostrarán automáticamente en este panel.'}</p></div>}
+    </section>;
+  }
+
+  return <div className={`enfermeria-dashboard${sinPulso ? ' enf-sin-pulso' : ''}`} lang="es">
+    <a className="enf-saltar" href="#enf-contenido">Saltar al contenido</a>
+    <aside className="enf-sidebar">
+      <a className="enf-marca" href="/enfermeria"><span className="enf-logo">S</span><span><strong>SIGI</strong><small>Gestión de incidencias</small></span></a>
+      <p className="enf-menu-etiqueta">ESPACIO DE ENFERMERÍA</p>
+      <nav aria-label="Menú de Enfermería">{menu.map(([destino, nombre, icono]) => <button key={destino} className={vista === destino ? 'enf-nav-activo' : ''} aria-current={vista === destino ? 'page' : undefined} onClick={() => ir(destino)}><span aria-hidden="true">{icono}</span>{nombre}{destino === 'pendientes' && pendientes.length > 0 && <b className="enf-nav-numero">{pendientes.length}</b>}</button>)}</nav>
+      <div className="enf-perfil"><span className="enf-avatar" aria-hidden="true">{usuario?.nombre?.charAt(0) || 'E'}</span><div><strong>{usuario?.nombre} {usuario?.apellido}</strong><small>Enfermería</small></div></div>
+    </aside>
+    <main className="enf-main" id="enf-contenido">
+      <header className="enf-cabecera"><div><p className="enf-etiqueta">MI ESPACIO</p><h1>Panel de Enfermería</h1><p>Recibe las alertas del establecimiento y coordina su atención.</p></div><button className="enf-boton" disabled={cerrando} onClick={salir}>{cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}</button></header>
+      <section className="enf-bienvenida"><div><p className="enf-etiqueta">ATENCIÓN Y SEGUIMIENTO</p><h2>Hola, {usuario?.nombre}</h2><p>La ubicación y el estado de cada emergencia, en un solo lugar.</p></div><span className="enf-bienvenida-cruz" aria-hidden="true">+</span></section>
+      <div className="enf-actualizacion"><span className={errorConsulta ? 'enf-conexion enf-conexion-error' : 'enf-conexion'}><i aria-hidden="true" />{errorConsulta ? 'Sin actualización' : hora ? 'Actualización automática cada 5 s' : 'Conectando con el servidor…'}</span><span>Última consulta: {hora || 'Pendiente'}</span><button className="enf-boton" onClick={() => setRecarga(n => n + 1)}>Actualizar alertas</button></div>
+      {errorConsulta && <p role="alert" className="enf-error">No se pudo actualizar: {errorConsulta}. Los datos visibles pueden estar desactualizados.</p>}
+      {errorAccion && <p role="alert" className="enf-error">{errorAccion}</p>}
+      <section className="enf-resumen" aria-label="Resumen de alertas"><button className="enf-resumen-rojo" onClick={() => ir('pendientes')}><span>Pendientes</span><strong>{datos ? pendientes.length : '—'}</strong><small>Requieren atención</small></button><button onClick={() => ir('atencion')}><span>En atención</span><strong>{datos ? enAtencion.length : '—'}</strong><small>Con responsable asignado</small></button><button onClick={() => ir('historial')}><span>Atendidas recientes</span><strong>{datos ? datos.atendidas.length : '—'}</strong><small>Últimas 20 registradas</small></button></section>
+      <div aria-live="polite">{pendientes.length > 0 && <section className="enf-aviso-urgente"><span className="enf-aviso-icono" aria-hidden="true">!</span><div><h2>{pendientes.length === 1 ? 'Hay una alerta urgente pendiente' : `Hay ${pendientes.length} alertas urgentes pendientes`}</h2><p>Revisa la sala y toma la atención para informar al profesor.</p></div><div className="enf-aviso-acciones"><button className="enf-boton" onClick={() => ir('pendientes')}>Ver pendientes</button><button className="enf-pulso-control" aria-pressed={sinPulso} onClick={() => setSinPulso(p => !p)}>{sinPulso ? 'Activar pulso' : 'Detener animación'}</button></div></section>}</div>
+      <section className="enf-contenido"><div className="enf-seccion-cabecera"><div><h2>{titulos[vista]}</h2><p>{vista === 'historial' ? 'Las últimas 20 alertas finalizadas. No representa todo el historial.' : 'Las pendientes se muestran primero, desde la más antigua.'}</p></div><label className="enf-buscador">Buscar alerta<input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Sala, profesor o ALT-0001" type="search" /></label></div>
+        {!datos ? <div className="enf-vacio" role="status">{errorConsulta ? 'No hay datos disponibles. Intenta actualizar.' : 'Cargando alertas…'}</div> : vista === 'historial' ? <div className="enf-historial">{atendidas.length ? atendidas.map(a => <article key={a.id_alerta}><div><span className="enf-ticket">{numeroAlerta(a.id_alerta)}</span><h3>{a.codigo_sala || a.sala}</h3><p>{a.tipo} · Edificio {a.edificio} · Piso {a.piso}</p></div><div><span className="enf-estado enf-estado-verde">Atendida</span><p>Reportada: {a.fecha}</p><p>Atendió: {a.responsable || 'Sin información'}</p></div></article>) : <div className="enf-vacio"><strong>{texto ? 'No hay coincidencias' : 'Todavía no hay alertas atendidas'}</strong></div>}</div>
+          : <>{(vista === 'panel' || vista === 'pendientes') && grupo('Pendientes de atención', pendientesVisibles, true)}{(vista === 'panel' || vista === 'atencion') && grupo('En atención', atencionVisibles, false)}</>}
+      </section>
+      <footer className="enf-pie">Alertas internas del establecimiento. Mantén el panel abierto para recibir actualizaciones. No reemplaza los protocolos de emergencia.</footer>
+    </main>
+  </div>;
+}
+
