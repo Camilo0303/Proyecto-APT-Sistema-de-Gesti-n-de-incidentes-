@@ -1,4 +1,4 @@
-﻿import './Home.css';
+import './Home.css';
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
@@ -172,7 +172,7 @@ export default function Home() {
           <Link to="/panico">
             <span aria-hidden="true">!</span>
             Emergencia
-            <small>Demo</small>
+            
           </Link>
         </nav>
 
@@ -379,12 +379,12 @@ export default function Home() {
           <div>
             <h2 id="pd-emergencia-titulo">Botón de emergencia</h2>
             <p>
-              En preparación: todavía no envía alertas a enfermería.
+              Identifica la sala por QR y confirma la alerta interna a Enfermería.
               Ante una emergencia real, utiliza el protocolo del establecimiento.
             </p>
           </div>
           <Link to="/panico" className="pd-boton pd-boton-emergencia">
-            Ver demostración
+            Reportar emergencia
           </Link>
         </section>
 

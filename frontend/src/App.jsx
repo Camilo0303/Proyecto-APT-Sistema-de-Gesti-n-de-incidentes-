@@ -5,7 +5,7 @@ import {
   Routes,
   Route,
   Navigate,
-  Link,
+
   useLocation,
 } from 'react-router-dom';
 
@@ -22,6 +22,7 @@ import Reportar from './pages/Reportar';
 import Historial from './pages/Historial';
 import EscanearQR from './pages/EscanearQR';
 import Panico from './pages/Panico';
+import Enfermeria from './pages/Enfermeria';
 import Cetecom from './pages/Cetecom';
 import Administrador from './pages/Administrador';
 
@@ -183,28 +184,6 @@ function RutaPublica({ children }) {
   return children;
 }
 
-// Pantalla temporal de Enfermería.
-// La recepción de alertas se implementará después.
-function PanelInicial({ titulo, descripcion }) {
-  const usuario = obtenerUsuario();
-
-  return (
-    <div className="login-page">
-      <div className="login-card">
-        <h1>{titulo}</h1>
-
-        <p>
-          Bienvenido, {usuario?.nombre} {usuario?.apellido}
-        </p>
-
-        <p>{descripcion}</p>
-
-        <BotonSalir />
-      </div>
-    </div>
-  );
-}
-
 function SinAcceso() {
   const usuario = obtenerUsuario();
 
@@ -301,31 +280,7 @@ function RutasAplicacion() {
         element={proteger('Profesor', <EscanearQR />)}
       />
 
-      <Route
-        path="/panico"
-        element={proteger(
-          'Profesor',
-          <div>
-            <div
-              role="status"
-              style={{
-                padding: 16,
-                background: '#fff3cd',
-                color: '#664d03',
-              }}
-            >
-              El botón de emergencia todavía es una
-              demostración: no envía alertas a Enfermería.
-              {' '}
-              <Link to="/profesor">
-                Volver al inicio
-              </Link>
-            </div>
-
-            <Panico />
-          </div>
-        )}
-      />
+      <Route path="/panico" element={proteger('Profesor', <Panico />)} />
 
       <Route
         path="/cetecom"
@@ -340,19 +295,7 @@ function RutasAplicacion() {
         )}
       />
 
-      <Route
-        path="/enfermeria"
-        element={proteger(
-          'Enfermería',
-          <PanelInicial
-            titulo="Enfermería"
-            descripcion={
-              'Acceso de Enfermería habilitado. ' +
-              'La recepción de alertas todavía no está conectada.'
-            }
-          />
-        )}
-      />
+      <Route path="/enfermeria" element={proteger('Enfermería', <Enfermeria />)} />
 
       <Route
         path="/sin-acceso"

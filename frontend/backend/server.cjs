@@ -14,6 +14,7 @@ const { permitirRoles } = require('./permisos.cjs');
 const { createAdministracion } = require('./administracion.cjs');
 const { createCorreos } = require('./correos.cjs');
 const { createCetecom } = require('./cetecom.cjs');
+const { createEmergencias } = require('./emergencias.cjs');
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
@@ -33,6 +34,7 @@ const pool = mysql.createPool({
 });
 
 const auth = createAuth(pool);
+app.use('/api/emergencias', createEmergencias(pool, auth.requireAuth));
 app.use(
   '/api/cetecom',
   createCetecom(pool, auth.requireAuth)
