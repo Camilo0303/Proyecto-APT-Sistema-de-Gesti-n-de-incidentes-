@@ -1,5 +1,8 @@
+/* SIGI — FORMULARIO DE INCIDENCIAS */
+
 body:has(.report-container) {
   margin: 0;
+  background: #f4f7fb;
 }
 
 .report-container,
@@ -24,17 +27,33 @@ body:has(.report-container) {
   margin: 0 auto;
   padding: 32px;
   border: 1px solid #e1e7f0;
-  border-radius: 18px;
+  border-radius: 20px;
   background: white;
   box-shadow: 0 8px 28px rgb(23 43 73 / 5%);
+}
+
+/* Encabezado */
+
+.report-container .report-encabezado {
+  padding-bottom: 23px;
+  border-bottom: 1px solid #e8edf5;
+}
+
+.report-container .report-etiqueta {
+  display: block;
+  margin-bottom: 10px;
+  color: #456fa7;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 1.2px;
 }
 
 .report-container h1 {
   margin: 0 0 12px;
   color: #172b49;
-  font-size: clamp(23px, 4.5vw, 30px);
+  font-size: clamp(24px, 4.5vw, 32px);
   line-height: 1.25;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.7px;
   overflow-wrap: anywhere;
 }
 
@@ -44,6 +63,21 @@ body:has(.report-container) {
   font-size: 14px;
   overflow-wrap: anywhere;
 }
+
+.report-container .report-usuario {
+  display: inline-block;
+  max-width: 100%;
+  margin: 6px 0 0;
+  padding: 7px 12px;
+  border: 1px solid #e1e9f5;
+  border-radius: 9px;
+  background: #f4f7fd;
+  color: #42618a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Formulario */
 
 .report-container form {
   min-width: 0;
@@ -56,6 +90,15 @@ body:has(.report-container) {
   color: #344761;
   font-size: 14px;
   font-weight: 650;
+}
+
+.report-container form > label:first-child {
+  margin-top: 0;
+}
+
+.report-container .report-opcional {
+  color: #7a879b;
+  font-weight: 400;
 }
 
 .report-container input,
@@ -92,7 +135,15 @@ body:has(.report-container) {
   color: #7a889c;
 }
 
-.report-container select:disabled {
+.report-container input:hover:not(:disabled),
+.report-container select:hover:not(:disabled),
+.report-container textarea:hover:not(:disabled) {
+  border-color: #a8bbd5;
+}
+
+.report-container input:disabled,
+.report-container select:disabled,
+.report-container textarea:disabled {
   background: #f1f4f8;
   color: #6b778b;
   cursor: not-allowed;
@@ -106,11 +157,70 @@ body:has(.report-container) {
   outline-offset: 2px;
 }
 
+/* Ayuda discreta de prioridad */
+
+.report-container .report-ayuda-prioridad {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  margin: 9px 0 18px;
+  padding: 11px 13px;
+  border: 1px solid #e0e7f0;
+  border-radius: 10px;
+  background: #f5f7fb;
+  color: #526681;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.report-container .report-ayuda-prioridad svg {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.report-container .report-ayuda-prioridad span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.report-container .report-prioridad-baja {
+  border-color: #d8e8e0;
+  background: #f2f8f5;
+  color: #38634f;
+}
+
+.report-container .report-prioridad-media {
+  border-color: #d8e4f4;
+  background: #f1f6fd;
+  color: #3e608b;
+}
+
+.report-container .report-prioridad-alta {
+  border-color: #eddfc6;
+  background: #fff9ef;
+  color: #7e6030;
+}
+
+.report-container .report-prioridad-critica {
+  border-color: #eed6dd;
+  background: #fff5f7;
+  color: #8a4357;
+}
+
+/* Botones */
+
 .report-container button {
   appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 9px;
   width: 100%;
   min-height: 48px;
   margin: 22px 0 0;
@@ -128,7 +238,7 @@ body:has(.report-container) {
   cursor: pointer;
 }
 
-.report-container button:hover {
+.report-container button:hover:not(:disabled) {
   background: #1e50b8;
 }
 
@@ -137,16 +247,23 @@ body:has(.report-container) {
   cursor: wait;
 }
 
-.report-container .form-card > button:last-child {
+.report-container button.report-volver {
   margin-top: 14px;
   border-color: #d5e0f0;
   background: #f5f8fe;
   color: #245bc9;
 }
 
-.report-container .form-card > button:last-child:hover {
+.report-container button.report-volver:hover:not(:disabled) {
   background: #e8f0ff;
 }
+
+.report-container .report-volver span {
+  font-size: 21px;
+  line-height: 1;
+}
+
+/* Mensajes */
 
 .report-container [role="alert"] {
   padding: 12px 14px;
@@ -156,6 +273,13 @@ body:has(.report-container) {
   color: #993434;
 }
 
+.report-container .report-cargando {
+  padding: 20px 12px;
+  text-align: center;
+}
+
+/* Celular */
+
 @media (max-width: 600px) {
   .report-container {
     padding: 20px 14px;
@@ -163,7 +287,17 @@ body:has(.report-container) {
 
   .report-container .form-card {
     padding: 24px 20px;
-    border-radius: 14px;
+    border-radius: 16px;
+  }
+
+  .report-container .report-encabezado {
+    padding-bottom: 20px;
+  }
+
+  .report-container .report-ayuda-prioridad {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 9px;
   }
 }
 

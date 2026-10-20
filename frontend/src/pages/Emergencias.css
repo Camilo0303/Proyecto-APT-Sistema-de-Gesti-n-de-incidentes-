@@ -1,5 +1,813 @@
-.emergencias{max-width:1000px;margin:24px auto;padding:24px;font:16px/1.5 'Segoe UI',sans-serif;color:#152b48;background:#fff;border-radius:16px}.emergencias label{display:block;margin:16px 0}.emergencias select,.emergencias textarea{display:block;width:100%;padding:12px;margin-top:8px;box-sizing:border-box}.emergencias button{padding:12px 18px;border:1px solid #bbc7d8;border-radius:8px;cursor:pointer}.emergencias button:disabled{opacity:.6;cursor:default}.em-tarjeta{border:1px solid #cad5e5;border-radius:12px;padding:20px;margin:18px 0;overflow-wrap:anywhere}.em-urgente{background:#a20d22!important;color:white!important;border-radius:12px;padding:20px;margin:16px 0}.em-pendiente{background:#fff0f2;border:3px solid #b5172d}.em-error{background:#fff0f2;color:#8d1424;padding:16px;border:1px solid #be2440}.em-cabecera{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}@media(max-width:600px){.emergencias{margin:0;padding:16px}.em-tarjeta{padding:14px}}
-/* Flujo rápido de alerta del profesor. */
+/* SIGI — EMERGENCIAS Y ENFERMERÍA */
+
+body:has(.emergencias) {
+  margin: 0;
+  background: #f2f5fa;
+}
+
+.emergencias,
+.emergencias * {
+  box-sizing: border-box;
+}
+
+.emergencias {
+  width: min(1120px, calc(100% - 48px));
+  min-height: calc(100dvh - 64px);
+  margin: 32px auto;
+  padding: 34px;
+  border: 1px solid #e0e7f1;
+  border-radius: 26px;
+  background: #f8fafd;
+  color: #1c304d;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  box-shadow: 0 12px 45px rgb(25 48 83 / 5%);
+}
+
+.emergencias h1,
+.emergencias h2,
+.emergencias h3,
+.emergencias p {
+  overflow-wrap: anywhere;
+}
+
+.emergencias h1,
+.emergencias h2,
+.emergencias h3 {
+  color: #1c304d;
+  line-height: 1.3;
+}
+
+.emergencias h1 {
+  margin: 0;
+  font-size: clamp(27px, 4vw, 38px);
+  font-weight: 750;
+  letter-spacing: -1px;
+}
+
+.emergencias h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.emergencias h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.emergencias p {
+  margin: 10px 0;
+  color: #60718a;
+}
+
+.emergencias > h2 {
+  margin-top: 32px;
+}
+
+/* Encabezado de Enfermería */
+
+.emergencias .em-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 28px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #123e60, #146c79);
+  color: white;
+}
+
+.emergencias .em-cabecera > div {
+  min-width: 0;
+}
+
+.emergencias .em-cabecera h1 {
+  color: white;
+}
+
+.emergencias .em-cabecera p {
+  margin-bottom: 0;
+  color: #d8edf3;
+}
+
+.emergencias .em-cabecera button {
+  flex-shrink: 0;
+  border-color: #ffffff70;
+  background: #ffffff;
+  color: #174b62;
+  box-shadow: none;
+}
+
+.emergencias .em-cabecera button:hover:not(:disabled) {
+  background: #eaf5f7;
+}
+
+/* Encabezado de Emergencia del profesor */
+
+.emergencias > h1 {
+  padding: 26px 28px;
+  border: 1px solid #f0d6dc;
+  border-left: 5px solid #ba2644;
+  border-radius: 18px;
+  background: #fff6f7;
+  color: #85253b;
+}
+
+.emergencias > h1 + p {
+  margin: 18px 4px 26px;
+  max-width: 850px;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* Botones generales */
+
+.emergencias button,
+.emergencias a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.emergencias button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  min-height: 48px;
+  margin: 0;
+  padding: 12px 20px;
+  border: 1px solid #235bc2;
+  border-radius: 12px;
+  background: #2863ce;
+  color: white;
+  font: 650 15px/1.45 "Segoe UI", Arial, sans-serif;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgb(35 83 169 / 10%);
+  transition: background-color 160ms, border-color 160ms;
+}
+
+.emergencias button:hover:not(:disabled) {
+  border-color: #1b479c;
+  background: #214fa8;
+}
+
+.emergencias button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.emergencias button:focus-visible,
+.emergencias a:focus-visible,
+.emergencias select:focus-visible,
+.emergencias textarea:focus-visible,
+.emergencias input:focus-visible {
+  outline: 3px solid #80a8ee;
+  outline-offset: 4px;
+}
+
+.emergencias > button {
+  margin: 8px 0;
+}
+
+/* Formulario del profesor */
+
+.emergencias form {
+  margin-top: 22px;
+  padding: 28px;
+  border: 1px solid #dfe7f2;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 5px 20px rgb(24 45 77 / 3%);
+}
+
+.emergencias label {
+  display: block;
+  margin: 22px 0;
+  color: #304969;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.emergencias select,
+.emergencias textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 50px;
+  margin-top: 9px;
+  padding: 13px 15px;
+  border: 1px solid #cdd9e9;
+  border-radius: 11px;
+  background: #fcfdff;
+  color: #223954;
+  font: 400 16px/1.5 "Segoe UI", Arial, sans-serif;
+}
+
+.emergencias select {
+  padding-right: 32px;
+}
+
+.emergencias textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.emergencias select:hover,
+.emergencias textarea:hover {
+  border-color: #9db5d8;
+}
+
+/* Confirmación antes del envío */
+
+.emergencias label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid #ead6db;
+  border-radius: 13px;
+  background: #fff8f9;
+  color: #783446;
+  font-size: 15px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.emergencias input[type="checkbox"] {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin: 2px 0 0;
+  accent-color: #b82341;
+  cursor: pointer;
+}
+
+/* Enlace para identificar la ubicación */
+
+.emergencias form > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 13px 20px;
+  border: 1px solid #b9ceed;
+  border-radius: 12px;
+  background: #edf4ff;
+  color: #2457a4;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.emergencias form > a:hover {
+  background: #dfeaff;
+  border-color: #89abe0;
+}
+
+/* Tarjetas de ubicación, seguimiento y alertas */
+
+.emergencias .em-tarjeta {
+  margin: 18px 0;
+  padding: 25px;
+  border: 1px solid #dce5f0;
+  border-radius: 17px;
+  background: white;
+  box-shadow: 0 4px 16px rgb(25 48 83 / 3%);
+  overflow-wrap: anywhere;
+}
+
+.emergencias .em-tarjeta p:last-child {
+  margin-bottom: 0;
+}
+
+.emergencias .em-tarjeta strong {
+  color: #233e60;
+}
+
+.emergencias form .em-tarjeta {
+  margin-top: 22px;
+  border-color: #c8dced;
+  border-left: 4px solid #387caa;
+  background: #f2f8fc;
+  box-shadow: none;
+}
+
+.emergencias form .em-tarjeta h2 {
+  color: #204c70;
+}
+
+.emergencias .em-tarjeta > button {
+  margin-top: 16px;
+  min-width: 180px;
+}
+
+/* Alertas pendientes de Enfermería */
+
+.emergencias .em-pendiente {
+  border: 1px solid #ecc6cf;
+  border-left: 5px solid #c32947;
+  background: #fffafb;
+}
+
+.emergencias .em-pendiente h2 {
+  color: #8b2940;
+}
+
+.emergencias .em-pendiente > p:first-of-type {
+  margin: 16px 0 8px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  background: #fff0f3;
+  font-size: 18px;
+}
+
+.emergencias .em-pendiente > button {
+  border-color: #a91e39;
+  background: #b82341;
+}
+
+.emergencias .em-pendiente > button:hover:not(:disabled) {
+  border-color: #86182d;
+  background: #981c35;
+}
+
+/* Aviso destacado de alertas pendientes */
+
+.emergencias div.em-urgente {
+  margin: 24px 0;
+  padding: 23px 25px;
+  border: 1px solid #b72542;
+  border-radius: 17px;
+  background: #a61f3b;
+  color: white;
+  box-shadow: 0 6px 20px rgb(142 25 49 / 12%);
+}
+
+.emergencias div.em-urgente h2 {
+  margin-bottom: 7px;
+  color: white;
+}
+
+.emergencias div.em-urgente p {
+  margin: 0;
+  color: #ffe7ed;
+}
+
+/* BOTÓN GRANDE DE EMERGENCIA DEL PROFESOR */
+
+.emergencias button.em-urgente {
+  display: flex;
+  width: 100%;
+  min-height: 112px;
+  margin: 26px 0 4px;
+  padding: 26px 30px;
+  border: 2px solid #a71936;
+  border-radius: 19px;
+  background: linear-gradient(120deg, #c72c49, #a71936);
+  color: white;
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 750;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+  box-shadow: 0 8px 22px rgb(166 31 59 / 19%);
+}
+
+.emergencias button.em-urgente:hover:not(:disabled) {
+  border-color: #84142a;
+  background: linear-gradient(120deg, #b3223e, #8b152d);
+}
+
+.emergencias button.em-urgente:disabled {
+  border-color: #d6b6be;
+  background: #f1e2e6;
+  color: #795560;
+  opacity: 1;
+  box-shadow: none;
+}
+
+.emergencias button.em-urgente:focus-visible {
+  outline-color: #e68ba1;
+}
+
+/* Errores */
+
+.emergencias .em-error {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid #edc7d0;
+  border-left: 4px solid #bd2845;
+  border-radius: 12px;
+  background: #fff0f3;
+  color: #8c233b;
+  font-weight: 500;
+}
+
+/* Volver al panel */
+
+.emergencias > p:last-child > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  margin-top: 18px;
+  padding: 11px 17px;
+  border: 1px solid #d4dfed;
+  border-radius: 11px;
+  background: white;
+  color: #35577e;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.emergencias > p:last-child > a::before {
+  content: "←";
+  font-size: 21px;
+}
+
+.emergencias > p:last-child > a:hover {
+  background: #edf3fc;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+  .emergencias {
+    width: calc(100% - 32px);
+    margin: 20px auto;
+    padding: 24px;
+  }
+
+  .emergencias .em-cabecera {
+    padding: 24px;
+  }
+}
+
+/* CELULAR */
+
+@media (max-width: 600px) {
+  .emergencias {
+    width: 100%;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 20px 14px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .emergencias h1 {
+    font-size: 28px;
+  }
+
+  .emergencias h2 {
+    font-size: 20px;
+  }
+
+  .emergencias > h1 {
+    padding: 22px 18px;
+    border-radius: 15px;
+  }
+
+  .emergencias > h1 + p {
+    margin: 16px 3px 22px;
+    font-size: 13px;
+  }
+
+  .emergencias .em-cabecera {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 18px;
+    padding: 23px 20px;
+    border-radius: 17px;
+  }
+
+  .emergencias .em-cabecera button {
+    width: 100%;
+  }
+
+  .emergencias form {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .emergencias form > a {
+    width: 100%;
+  }
+
+  .emergencias label {
+    margin: 20px 0;
+  }
+
+  .emergencias label:has(input[type="checkbox"]) {
+    padding: 15px 12px;
+    font-size: 14px;
+  }
+
+  .emergencias .em-tarjeta {
+    padding: 20px 17px;
+    border-radius: 14px;
+  }
+
+  .emergencias .em-tarjeta > button {
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+  }
+
+  .emergencias .em-pendiente > p:first-of-type {
+    padding: 11px 12px;
+    font-size: 17px;
+  }
+
+  .emergencias div.em-urgente {
+    padding: 20px 18px;
+    border-radius: 14px;
+  }
+
+  .emergencias button.em-urgente {
+    min-height: 118px;
+    padding: 23px 18px;
+    border-radius: 16px;
+    font-size: 22px;
+  }
+
+  .emergencias > button {
+    width: 100%;
+  }
+}
+
+/* PANTALLAS MUY ESTRECHAS */
+
+@media (max-width: 360px) {
+  .emergencias {
+    padding: 16px 10px;
+  }
+
+  .emergencias h1 {
+    font-size: 25px;
+  }
+
+  .emergencias form {
+    padding: 18px 13px;
+  }
+
+  .emergencias button.em-urgente {
+    font-size: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emergencias button {
+    transition: none;
+  }
+}
+/* EMERGENCIA DEL PROFESOR — DISEÑO Y BOTÓN CIRCULAR */
+
+/* Ajustes exclusivos de la pantalla del profesor */
+.emergencias:has(.em-boton-panico) {
+  max-width: 920px;
+  background: #f8fafd;
+}
+
+.emergencias:has(.em-boton-panico) > h1 {
+  padding: 30px;
+  border: 1px solid #f1d8df;
+  border-left: 5px solid #bb2949;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #fff5f7, #ffffff);
+  color: #86263e;
+}
+
+.emergencias:has(.em-boton-panico) form {
+  padding: 30px;
+  border-color: #e0e7f1;
+  border-radius: 22px;
+  box-shadow: 0 8px 28px rgb(34 51 78 / 4%);
+}
+
+/* Ubicación claramente separada del resto del formulario */
+.emergencias:has(.em-boton-panico) form .em-tarjeta {
+  padding: 22px;
+  border: 1px solid #cbddef;
+  border-left: 4px solid #3b78a6;
+  border-radius: 15px;
+  background: #f2f8fc;
+}
+
+.emergencias:has(.em-boton-panico) form .em-tarjeta h2 {
+  margin-bottom: 10px;
+  color: #214d70;
+  font-size: clamp(19px, 3vw, 24px);
+}
+
+/* Área de envío */
+.emergencias .em-envio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+  padding: 28px 20px;
+  border: 1px solid #f0dce2;
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      circle at center,
+      #fff0f4 0,
+      #fff9fa 52%,
+      #ffffff 100%
+    );
+  text-align: center;
+}
+
+.emergencias .em-envio-titulo {
+  margin: 0;
+  color: #713147;
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.4px;
+}
+
+.emergencias .em-envio-ayuda {
+  max-width: 420px;
+  margin: 10px 0 22px;
+  color: #79616c;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* Botón circular: mantiene su forma en PC y celular */
+.emergencias button.em-boton-panico {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  width: min(250px, 100%);
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+
+  margin: 10px 0 18px;
+  padding: 24px;
+
+  border: 2px solid #a41b37;
+  border-radius: 50%;
+
+  background: linear-gradient(145deg, #d63755, #ae1d3a);
+  color: white;
+
+  box-shadow:
+    0 0 0 8px #fce7ed,
+    0 12px 28px rgb(170 25 55 / 20%),
+    inset 0 2px 0 rgb(255 255 255 / 18%);
+
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+
+  transition:
+    background 160ms,
+    box-shadow 160ms;
+}
+
+.emergencias button.em-boton-panico:hover:not(:disabled) {
+  border-color: #8f1630;
+  background: linear-gradient(145deg, #c92b49, #97162f);
+  box-shadow:
+    0 0 0 8px #f9dbe4,
+    0 14px 30px rgb(170 25 55 / 23%),
+    inset 0 2px 0 rgb(255 255 255 / 16%);
+}
+
+.emergencias button.em-boton-panico:active:not(:disabled) {
+  box-shadow:
+    0 0 0 8px #f9dbe4,
+    0 5px 14px rgb(170 25 55 / 15%),
+    inset 0 3px 8px rgb(80 10 25 / 18%);
+}
+
+.emergencias button.em-boton-panico:focus-visible {
+  outline: 3px solid #8b2040;
+  outline-offset: 12px;
+}
+
+/* Se distingue claramente cuándo aún no puede enviarse */
+.emergencias button.em-boton-panico:disabled {
+  border-color: #d8bdc5;
+  background: #eee1e5;
+  color: #80616c;
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: 0 0 0 8px #f7f0f2;
+}
+
+.emergencias .em-panico-icono {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 5px;
+}
+
+.emergencias .em-panico-texto {
+  display: block;
+  font-size: clamp(21px, 4vw, 26px);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+}
+
+.emergencias .em-panico-subtexto {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.emergencias .em-envio-nota {
+  max-width: 360px;
+  margin: 12px 0 0;
+  color: #8a737c;
+  font-size: 12px;
+}
+
+/* Confirmación más clara */
+.emergencias:has(.em-boton-panico)
+label:has(input[type="checkbox"]) {
+  padding: 18px;
+  border: 1px solid #e8d3db;
+  border-radius: 14px;
+  background: #fff8fa;
+  color: #73374a;
+}
+
+.emergencias:has(.em-boton-panico)
+label:has(input[type="checkbox"]:checked) {
+  border-color: #b7d8c9;
+  background: #eff8f3;
+  color: #286547;
+}
+
+/* Celular */
+@media (max-width: 600px) {
+  .emergencias:has(.em-boton-panico) > h1 {
+    padding: 23px 19px;
+    border-radius: 17px;
+    font-size: 27px;
+  }
+
+  .emergencias:has(.em-boton-panico) form {
+    padding: 20px 15px;
+    border-radius: 18px;
+  }
+
+  .emergencias:has(.em-boton-panico) form .em-tarjeta {
+    padding: 18px 15px;
+  }
+
+  .emergencias .em-envio {
+    margin-top: 24px;
+    padding: 25px 14px;
+    border-radius: 17px;
+  }
+
+  .emergencias .em-envio-titulo {
+    font-size: 20px;
+  }
+
+  .emergencias .em-envio-ayuda {
+    font-size: 13px;
+  }
+
+  .emergencias button.em-boton-panico {
+    width: min(230px, 100%);
+    min-height: 0;
+    padding: 20px;
+    border-radius: 50%;
+  }
+
+  .emergencias .em-panico-icono {
+    width: 43px;
+    height: 43px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emergencias button.em-boton-panico {
+    transition: none;
+  }
+}/* Flujo rápido de alerta del profesor. */
 .emergencias.panico-rapido{max-width:620px;padding:28px;margin:28px auto;border:1px solid #dce5f1;border-radius:20px;box-shadow:0 12px 35px #1838630c}
 .panico-rapido,.panico-rapido *{box-sizing:border-box}
 .panico-rapido .panico-volver{display:inline-block;color:#315b96;font-size:13px;margin-bottom:24px;text-decoration:none}
