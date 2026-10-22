@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../data/api';
 import { cerrarSesion, obtenerUsuario } from '../data/sesion';
+import useSonidoAlertas from '../hooks/useSonidoAlertas';
 import './Enfermeria.css';
 
 const numeroAlerta = id => `ALT-${String(id).padStart(4, '0')}`;
@@ -43,6 +44,7 @@ export default function Enfermeria() {
   const [busqueda, setBusqueda] = useState('');
   const [sinPulso, setSinPulso] = useState(false);
   const usuario = obtenerUsuario();
+  const sonido = useSonidoAlertas(datos?.alertas);
 
   useEffect(() => {
     let vigente = true, consultando = false;
@@ -104,6 +106,8 @@ export default function Enfermeria() {
       <header className="enf-cabecera"><div><p className="enf-etiqueta">MI ESPACIO</p><h1>Panel de Enfermería</h1><p>Recibe las alertas del establecimiento y coordina su atención.</p></div><button className="enf-boton" disabled={cerrando} onClick={salir}>{cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}</button></header>
       <section className="enf-bienvenida"><div><p className="enf-etiqueta">ATENCIÓN Y SEGUIMIENTO</p><h2>Hola, {usuario?.nombre}</h2><p>La ubicación y el estado de cada emergencia, en un solo lugar.</p></div><span className="enf-bienvenida-cruz" aria-hidden="true">+</span></section>
       <div className="enf-actualizacion"><span className={errorConsulta ? 'enf-conexion enf-conexion-error' : 'enf-conexion'}><i aria-hidden="true" />{errorConsulta ? 'Sin actualización' : hora ? 'Actualización automática cada 5 s' : 'Conectando con el servidor…'}</span><span>Última consulta: {hora || 'Pendiente'}</span><button className="enf-boton" onClick={() => setRecarga(n => n + 1)}>Actualizar alertas</button></div>
+      <div className="enf-sonido"><button className="enf-boton" type="button" onClick={sonido.alternar} disabled={sonido.ocupado} aria-pressed={sonido.activo}>{sonido.ocupado ? 'Activando sonido…' : sonido.activo ? 'Silenciar avisos' : 'Activar avisos sonoros'}</button><p>{sonido.activo ? 'Sonido activado: un aviso por cada nueva alerta pendiente.' : 'Sonido desactivado. Actívalo para recibir avisos de nuevas alertas.'}<small>Al activar escucharás una prueba. Mantén el panel abierto y el volumen del dispositivo encendido.</small></p></div>
+      {sonido.error && <p className="enf-error" role="alert">{sonido.error}</p>}
       {errorConsulta && <p role="alert" className="enf-error">No se pudo actualizar: {errorConsulta}. Los datos visibles pueden estar desactualizados.</p>}
       {errorAccion && <p role="alert" className="enf-error">{errorAccion}</p>}
       <section className="enf-resumen" aria-label="Resumen de alertas"><button className="enf-resumen-rojo" onClick={() => ir('pendientes')}><span>Pendientes</span><strong>{datos ? pendientes.length : '—'}</strong><small>Requieren atención</small></button><button onClick={() => ir('atencion')}><span>En atención</span><strong>{datos ? enAtencion.length : '—'}</strong><small>Con responsable asignado</small></button><button onClick={() => ir('historial')}><span>Atendidas recientes</span><strong>{datos ? datos.atendidas.length : '—'}</strong><small>Últimas 20 registradas</small></button></section>
@@ -116,4 +120,5 @@ export default function Enfermeria() {
     </main>
   </div>;
 }
+
 
