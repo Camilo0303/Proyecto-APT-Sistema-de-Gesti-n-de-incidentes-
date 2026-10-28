@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { obtenerUsuario } from '../data/sesion';
 import { api } from '../data/api';
+import FiltrosIncidencias from '../components/FiltrosIncidencias';
 import './Cetecom.css';
 
 const filtrosIniciales = {
+  desde: '', hasta: '', sala: '', categoria: '',
   buscar: '',
   prioridad: '',
   estado: 'activas',
@@ -94,6 +96,7 @@ export default function Cetecom() {
       setError('');
 
       const parametros = new URLSearchParams({
+        desde: filtros.desde, hasta: filtros.hasta, sala: filtros.sala, categoria: filtros.categoria,
         buscar: filtros.buscar,
         prioridad: filtros.prioridad,
         estado: filtros.estado,
@@ -292,6 +295,7 @@ export default function Cetecom() {
             </button>
           </div>
 
+          <FiltrosIncidencias key={`${filtros.desde}-${filtros.hasta}-${filtros.sala}-${filtros.categoria}`} valor={filtros} incluirEstado={false} incluirOrden={false} aplicar={f => { setCargando(true); setFiltros(actual => ({ ...actual, ...f, pagina: 1 })); }} />
           <form className="ct-filters" onSubmit={buscar}>
             <label className="ct-search">
               Buscar incidencia

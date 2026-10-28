@@ -1,5 +1,6 @@
 const express = require('express');
 const { permitirRoles } = require('./permisos.cjs');
+const { filtrarIncidencias, ordenFecha, leerPagina } = require('./filtros-incidencias.cjs');
 
 function createAdministracion(pool, requireAuth) {
   const router = express.Router();
@@ -54,12 +55,11 @@ function createAdministracion(pool, requireAuth) {
   });
 
   router.get('/incidencias', async (req, res, next) => {
-    const pagina = Number(req.query.pagina || 1);
-    if (!Number.isSafeInteger(pagina) || pagina < 1 || pagina > 1000000) {
-      return res.status(400).json({ mensaje: 'Página inválida.' });
-    }
     try {
-      const [[conteo]] = await pool.execute('SELECT COUNT(*) AS total FROM incidencias');
+      const pagina = leerPagina(req.query);
+      const filtros = filtrarIncidencias(req.query);
+      const orden = ordenFecha(req.query);
+      const [[conteo]] = await pool.execute(`SELECT COUNT(*) AS total FROM incidencias i ${filtros.donde}`, filtros.parametros);
       const total = Number(conteo.total);
       const paginas = Math.max(1, Math.ceil(total / 20));
       const actual = Math.min(pagina, paginas);
@@ -77,9 +77,10 @@ function createAdministracion(pool, requireAuth) {
         LEFT JOIN estados_incidencia e ON e.id_estado = i.id_estado
         LEFT JOIN usuarios creador ON creador.id_usuario = i.id_usuario_creador
         LEFT JOIN usuarios u ON u.id_usuario = i.id_responsable
-        ORDER BY i.fecha_creacion DESC, i.id_incidencia DESC
+        ${filtros.donde}
+        ORDER BY i.fecha_creacion ${orden}, i.id_incidencia ${orden}
         LIMIT 20 OFFSET ${(actual - 1) * 20}
-      `);
+      `, filtros.parametros);
       res.json({ incidencias, total, pagina: actual, paginas });
     } catch (error) { next(error); }
   });

@@ -1,4 +1,5 @@
 const express = require('express');
+const { filtrarIncidencias, ordenFecha, leerPagina } = require('./filtros-incidencias.cjs');
 
 function createIncidencias(pool, requireAuth) {
   const router = express.Router();
@@ -78,6 +79,14 @@ function createIncidencias(pool, requireAuth) {
   // Solo devuelve los reportes del usuario conectado.
   router.get('/mias', async (req, res, next) => {
     try {
+      const filtros = filtrarIncidencias(req.query);
+      const orden = ordenFecha(req.query);
+      const solicitada = leerPagina(req.query);
+      const donde = `WHERE i.id_usuario_creador = ?${filtros.condiciones.length ? ' AND ' + filtros.condiciones.join(' AND ') : ''}`;
+      const parametros = [req.usuario.id_usuario, ...filtros.parametros];
+      const [[conteo]] = await pool.execute(`SELECT COUNT(*) AS total FROM incidencias i ${donde}`, parametros);
+      const total = Number(conteo.total), paginas = Math.max(1, Math.ceil(total / 20));
+      const pagina = Math.min(solicitada, paginas);
       const [incidencias] = await pool.execute(
         `
         SELECT
@@ -103,14 +112,14 @@ function createIncidencias(pool, requireAuth) {
         JOIN estados_incidencia e ON e.id_estado = i.id_estado
         LEFT JOIN equipos q ON q.id_equipo = i.id_equipo
         LEFT JOIN usuarios u ON u.id_usuario = i.id_responsable
-        WHERE i.id_usuario_creador = ?
-        ORDER BY i.fecha_creacion DESC, i.id_incidencia DESC
-        LIMIT 100
+        ${donde}
+        ORDER BY i.fecha_creacion ${orden}, i.id_incidencia ${orden}
+        LIMIT 20 OFFSET ${(pagina - 1) * 20}
         `,
-        [req.usuario.id_usuario]
+        parametros
       );
 
-      res.json({ incidencias });
+      res.json({ incidencias, total, pagina, paginas });
     } catch (error) {
       next(error);
     }

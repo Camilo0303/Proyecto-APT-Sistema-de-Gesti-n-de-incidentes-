@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { obtenerUsuario } from '../data/sesion';
 import { api } from '../data/api';
+import FiltrosIncidencias from '../components/FiltrosIncidencias';
 import './Historial.css';
 
 function Historial() {
@@ -12,15 +13,18 @@ function Historial() {
   const [incidencias, setIncidencias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [filtros, setFiltros] = useState({});
+  const [pagina, setPagina] = useState(1);
+  const [resumen, setResumen] = useState(null);
 
   useEffect(() => {
     if (!usuario) return;
 
     let activo = true;
 
-    api('/incidencias/mias')
+    api(`/incidencias/mias?${new URLSearchParams({ ...filtros, pagina })}`)
       .then(resultado => {
-        if (activo) setIncidencias(resultado.incidencias);
+        if (activo) { setIncidencias(resultado.incidencias); setResumen(resultado); }
       })
       .catch(err => {
         if (activo) setError(err.message);
@@ -32,7 +36,9 @@ function Historial() {
     return () => {
       activo = false;
     };
-  }, [usuario]);
+  }, [usuario, filtros, pagina]);
+
+  function cargarPagina(p) { setPagina(p); setCargando(true); setError(''); }
 
   if (!usuario) {
     return (
@@ -49,7 +55,9 @@ function Historial() {
   return (
     <div className="historial-container">
       <h1>📋 Mis reportes</h1>
-      <p>Tus últimas 100 incidencias registradas.</p>
+      <p>Consulta tus incidencias por fecha de creación, sala, categoría y estado.</p>
+      <FiltrosIncidencias valor={filtros} aplicar={f => { setFiltros(f); cargarPagina(1); }} />
+      {!cargando && !error && resumen && <p>{resumen.total} reportes encontrados · Página {resumen.pagina} de {resumen.paginas}</p>}
 
       {location.state?.mensaje && (
         <p role="status" style={{ color: '#166534' }}>
@@ -79,8 +87,8 @@ function Historial() {
         </div>
       ) : incidencias.length === 0 ? (
         <div className="empty-report">
-          <h2>No tienes reportes registrados</h2>
-          <p>Cuando generes una incidencia aparecerá aquí.</p>
+          <h2>No hay reportes para estos filtros</h2>
+          <p>Prueba otro rango o limpia los filtros para ver todos tus reportes.</p>
         </div>
       ) : (
         incidencias.map(incidencia => (
@@ -129,6 +137,10 @@ function Historial() {
           </article>
         ))
       )}
+      {!cargando && !error && resumen && <div style={{ display: 'flex', gap: 12 }}>
+        <button disabled={resumen.pagina <= 1} onClick={() => cargarPagina(resumen.pagina - 1)}>Anterior</button>
+        <button disabled={resumen.pagina >= resumen.paginas} onClick={() => cargarPagina(resumen.pagina + 1)}>Siguiente</button>
+      </div>}
     </div>
   );
 }

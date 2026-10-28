@@ -1,0 +1,7 @@
+.sigi-filtros{padding:20px;margin:20px 0;border:1px solid #dce5f1;border-radius:12px;background:#f8faff;color:#183455}
+.sigi-filtros *{box-sizing:border-box}.sigi-filtros h3{font-size:15px;margin:0}.sigi-filtros>p{font-size:12px;margin:5px 0 14px;color:#61758f}
+.sigi-filtros form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.sigi-filtros label{display:grid;gap:6px;min-width:0;font-size:12px;font-weight:600;margin:0}
+.sigi-filtros input,.sigi-filtros select{width:100%;min-width:0;max-width:100%;margin:0;padding:10px;border:1px solid #c8d6e9;border-radius:8px;background:white;color:#183455;font:inherit;min-height:44px}
+.sigi-filtros .sigi-filtros-acciones{display:flex;gap:10px;flex-wrap:wrap;align-items:end;grid-column:1/-1}.sigi-filtros button{width:auto;margin:0;padding:10px 16px;border:1px solid #c8d6e9;border-radius:8px;background:white;color:#254f8f;font:600 12px/1.5 'Segoe UI',Arial,sans-serif;box-shadow:none;cursor:pointer;min-height:42px}.sigi-filtros button[type=submit]{background:#2862d9;color:white;border-color:#2862d9}
+.sigi-filtros .sigi-filtros-error{color:#a31931}.sigi-filtros :focus-visible{outline:3px solid #8cb3ef;outline-offset:2px}
+@media(max-width:900px){.sigi-filtros form{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:540px){.sigi-filtros{padding:14px}.sigi-filtros form{grid-template-columns:1fr}}

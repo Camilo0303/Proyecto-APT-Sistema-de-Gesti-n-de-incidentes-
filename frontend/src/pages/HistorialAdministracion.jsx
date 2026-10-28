@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../data/api';
+import FiltrosIncidencias from '../components/FiltrosIncidencias';
 import './HistorialAdministracion.css';
 
 const ticket = id => `INC-${String(id).padStart(4, '0')}`;
@@ -7,6 +8,7 @@ const movimientos = { CREACION: 'Creación', ATENCION: 'Atención', ASIGNACION: 
 
 export default function HistorialAdministracion() {
   const [pagina, setPagina] = useState(1);
+  const [filtros, setFiltros] = useState({});
   const [recarga, setRecarga] = useState(0);
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState('');
@@ -15,11 +17,11 @@ export default function HistorialAdministracion() {
   const [errorDetalle, setErrorDetalle] = useState('');
   useEffect(() => {
     let vigente = true;
-    api(`/admin/incidencias?pagina=${pagina}`).then(r => {
+    api(`/admin/incidencias?${new URLSearchParams({ ...filtros, pagina })}`).then(r => {
       if (vigente) setDatos(r);
     }).catch(e => { if (vigente) setError(e.message); });
     return () => { vigente = false; };
-  }, [pagina, recarga]);
+  }, [pagina, recarga, filtros]);
   useEffect(() => {
     if (id === null) return;
     let vigente = true;
@@ -41,9 +43,10 @@ export default function HistorialAdministracion() {
         <p>Reportes de todos los usuarios, incluidos los resueltos, cerrados y anulados.</p></div>
       <button type="button" onClick={actualizar}>Actualizar incidencias</button>
     </div>
+    <FiltrosIncidencias valor={filtros} aplicar={f => { setFiltros(f); cambiarPagina(1); }} />
     {error ? <p role="alert">{error}</p> : !datos ? <p role="status">Cargando incidencias...</p> : <>
       <p>{datos.total} incidencias · Página {datos.pagina} de {datos.paginas}</p>
-      {datos.incidencias.length === 0 ? <p>No hay incidencias registradas.</p> : <div className="ad-historial-tabla">
+      {datos.incidencias.length === 0 ? <p>No hay incidencias para los filtros seleccionados.</p> : <div className="ad-historial-tabla">
         <table><thead><tr><th>Incidencia</th><th>Sala</th><th>Reportada por</th><th>Estado / prioridad</th><th>Responsable</th><th>Fecha</th><th>Seguimiento</th></tr></thead>
           <tbody>{datos.incidencias.map(i => <tr key={i.id_incidencia}>
             <td><strong>{ticket(i.id_incidencia)}</strong><br />{i.titulo}</td>

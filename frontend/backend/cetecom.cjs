@@ -1,5 +1,6 @@
 const express = require('express');
 const { permitirRoles } = require('./permisos.cjs');
+const { filtrarIncidencias } = require('./filtros-incidencias.cjs');
 
 function createCetecom(pool, requireAuth) {
   const router = express.Router();
@@ -75,6 +76,10 @@ function createCetecom(pool, requireAuth) {
 
     const condiciones = [];
     const parametros = [];
+    try {
+      const extras = filtrarIncidencias(req.query, false);
+      condiciones.push(...extras.condiciones); parametros.push(...extras.parametros);
+    } catch (error) { return next(error); }
 
     if (estado === 'activas') {
       condiciones.push(

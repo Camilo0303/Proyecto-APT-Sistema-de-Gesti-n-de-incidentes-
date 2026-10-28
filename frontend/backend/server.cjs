@@ -15,6 +15,7 @@ const { createAdministracion } = require('./administracion.cjs');
 const { createCorreos } = require('./correos.cjs');
 const { createCetecom } = require('./cetecom.cjs');
 const { createEmergencias } = require('./emergencias.cjs');
+const { catalogosFiltros } = require('./filtros-incidencias.cjs');
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
@@ -34,6 +35,10 @@ const pool = mysql.createPool({
 });
 
 const auth = createAuth(pool);
+app.get('/api/filtros-incidencias', auth.requireAuth, permitirRoles('Profesor', 'Técnico', 'Administrador'), async (_req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  try { res.json(await catalogosFiltros(pool)); } catch (error) { next(error); }
+});
 app.use('/api/emergencias', createEmergencias(pool, auth.requireAuth));
 app.use(
   '/api/cetecom',
