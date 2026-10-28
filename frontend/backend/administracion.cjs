@@ -1,4 +1,5 @@
 const express = require('express');
+const { consultarDashboard, exportarDashboard } = require('./dashboard.cjs');
 const { permitirRoles } = require('./permisos.cjs');
 const { filtrarIncidencias, ordenFecha, leerPagina } = require('./filtros-incidencias.cjs');
 
@@ -10,6 +11,15 @@ function createAdministracion(pool, requireAuth) {
   router.use((_req, res, next) => {
     res.set('Cache-Control', 'no-store');
     next();
+  });
+
+  router.get('/dashboard', async (req, res, next) => {
+    try { res.json(await consultarDashboard(pool, req.query)); }
+    catch (error) { next(error); }
+  });
+  router.get('/dashboard/exportar', async (req, res, next) => {
+    try { await exportarDashboard(pool, req.query, res); }
+    catch (error) { next(error); }
   });
 
   router.get('/usuarios', async (_req, res, next) => {

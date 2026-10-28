@@ -5,6 +5,7 @@ const profesor = [
 ];
 const administrador = [
   ['Mi panel', '/administrador', '⌂'],
+  ['Dashboard', '/administrador?seccion=dashboard', '▥'],
   ['Usuarios registrados', '/administrador?seccion=usuarios', '◎'],
   ['Correos autorizados', '/administrador?seccion=correos', '@'],
   ['Historial de incidencias', '/administrador?seccion=historial', '☷'],

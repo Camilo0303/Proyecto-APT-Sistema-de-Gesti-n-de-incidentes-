@@ -4,9 +4,11 @@ import { olvidarSesion } from '../data/sesion';
 import CorreosAutorizados from './CorreosAutorizados';
 import SalasQR from './SalasQR';
 import HistorialAdministracion from './HistorialAdministracion';
+import DashboardAdministracion from './DashboardAdministracion';
 import './Administrador.css';
 
 const opciones = [
+  { id: 'dashboard', icono: '▥', titulo: 'Dashboard', descripcion: 'Analiza las incidencias y exporta datos para Power BI.', color: 'azul' },
   {
     id: 'usuarios',
     icono: '◎',
@@ -416,6 +418,7 @@ export default function Administrador() {
         ) : (
           <div className="ad-seccion">
             {seccion === 'usuarios' && <UsuariosAdministracion />}
+            {seccion === 'dashboard' && <DashboardAdministracion />}
             {seccion === 'correos' && <CorreosAutorizados />}
             {seccion === 'historial' && <HistorialAdministracion />}
             {seccion === 'salas' && <SalasQR />}

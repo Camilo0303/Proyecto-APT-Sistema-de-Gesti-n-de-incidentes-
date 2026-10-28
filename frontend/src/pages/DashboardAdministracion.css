@@ -1,0 +1,27 @@
+.dash-admin { display:grid; gap:24px; min-width:0; color:#163354; }
+.dash-herramientas { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.dash-herramientas p { flex:1 1 280px; margin:0; }
+.dash-herramientas button,.dash-exportar { padding:12px 16px; border:1px solid #cbdafa; background:white; border-radius:10px; color:#1d4ed8; font:inherit; text-decoration:none; cursor:pointer; }
+.dash-exportar { background:#1d4ed8; color:white; }
+.dash-herramientas button:disabled { opacity:.6; cursor:wait; }
+.dash-fecha { margin:0; color:#526582; font-size:.9rem; }
+.dash-resumen { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+.dash-resumen article,.dash-tarjeta { background:white; border:1px solid #dce5f3; border-radius:16px; padding:24px; }
+.dash-resumen article { border-top:4px solid #2563eb; display:flex; flex-direction:column; gap:10px; }
+.dash-resumen strong { font-size:1.8rem; color:#153c70; }
+.dash-resumen small,.dash-tarjeta p { color:#526582; line-height:1.6; }
+.dash-tarjeta h2 { margin:0 0 16px; font-size:1.2rem; }
+.dash-columnas { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+.dash-barras { display:grid; gap:18px; list-style:none; margin:0; padding:0; }
+.dash-barras li>div:first-child { display:flex; gap:16px; justify-content:space-between; font-size:.95rem; }
+.dash-barras span { overflow-wrap:anywhere; }
+.dash-pista { height:10px; background:#edf2fa; border-radius:6px; margin-top:7px; overflow:hidden; }
+.dash-pista span { display:block; height:100%; background:#2563eb; border-radius:6px; }
+.dash-tabla { overflow-x:auto; }
+.dash-tabla table { border-collapse:collapse; width:100%; text-align:left; }
+.dash-tabla th,.dash-tabla td { padding:12px; border-bottom:1px solid #e2e8f0; }
+.dash-tabla th { background:#f4f7fc; }
+.dash-meses { max-height:240px; }
+.dash-linea { width:100%; max-height:280px; display:block; margin-bottom:16px; font-size:12px; fill:#526582; }
+@media(max-width:1100px) { .dash-resumen { grid-template-columns:repeat(2,minmax(0,1fr)); } .dash-columnas { grid-template-columns:1fr; } }
+@media(max-width:520px) { .dash-resumen { grid-template-columns:1fr; } .dash-tarjeta { padding:16px; } }
