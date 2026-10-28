@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { obtenerUsuario } from '../data/sesion';
 import { api } from '../data/api';
 import './Reportar.css';
 
 const ayudasPrioridad = {
-  baja: 'Puedes continuar la clase con normalidad.',
-  media: 'Puedes continuar, pero el problema dificulta algunas actividades.',
-  alta: 'No puedes realizar la actividad principal de la clase.',
+  baja: 'La clase puede continuar con normalidad. Ej.: un mouse falla, pero hay otro disponible.',
+  media: 'El problema dificulta una actividad, pero existe una alternativa para continuar. Ej.: falla el proyector y puedes usar otro recurso.',
+  alta: 'La actividad principal no puede realizarse y no hay una alternativa disponible. Ej.: el laboratorio no tiene conexión y la actividad requiere Internet.',
   critica:
-    'La clase está completamente interrumpida y no tienes una alternativa para continuar.',
+    'El problema interrumpe completamente las actividades de varias salas o afecta un servicio general, sin alternativa disponible.',
 };
 
 function obtenerAyudaPrioridad(prioridades, id) {
@@ -311,6 +311,21 @@ export default function Reportar() {
               ))}
             </select>
 
+            <aside className="report-guia-prioridad" aria-labelledby="guia-prioridad-titulo">
+              <h2 id="guia-prioridad-titulo">¿Qué prioridad corresponde?</h2>
+              <p id="criterio-prioridad">Elige según el impacto en la clase y las alternativas disponibles. Una prioridad alta no garantiza atención inmediata: ayuda a organizar los casos que más lo necesitan.</p>
+              <dl>
+                {catalogos.prioridades.map(prioridad => (
+                  <div key={prioridad.id_prioridad}>
+                    <dt>{prioridad.nombre}</dt>
+                    <dd>{obtenerAyudaPrioridad(catalogos.prioridades, prioridad.id_prioridad).texto}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p>Si tienes una alternativa para continuar, considera prioridad baja o media. Explica en la descripción qué actividad se ve afectada y si puedes continuar.</p>
+              <p>Para solicitar atención de Enfermería, utiliza <Link to="/panico">Emergencia</Link>.</p>
+            </aside>
+
             <label htmlFor="id_prioridad">Prioridad</label>
             <select
               id="id_prioridad"
@@ -318,7 +333,7 @@ export default function Reportar() {
               value={form.id_prioridad}
               onChange={cambiar}
               disabled={enviando}
-              aria-describedby="ayuda-prioridad"
+              aria-describedby="criterio-prioridad ayuda-prioridad"
               required
             >
               <option value="">Selecciona una prioridad</option>

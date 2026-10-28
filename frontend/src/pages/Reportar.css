@@ -157,6 +157,27 @@ body:has(.report-container) {
   outline-offset: 2px;
 }
 
+.report-container .report-guia-prioridad {
+  margin: 24px 0 18px;
+  padding: 20px;
+  background: #f0f6ff;
+  border: 1px solid #c8daf7;
+  border-left: 4px solid #2563eb;
+  border-radius: 12px;
+  color: #183b65;
+}
+.report-container .report-guia-prioridad h2 { margin: 0 0 10px; font-size: 1.05rem; }
+.report-container .report-guia-prioridad p { font-size: .9rem; line-height: 1.6; margin: 10px 0; }
+.report-container .report-guia-prioridad dl { display: grid; gap: 12px; margin: 16px 0; }
+.report-container .report-guia-prioridad dl > div { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 10px; }
+.report-container .report-guia-prioridad dt { font-weight: 700; }
+.report-container .report-guia-prioridad dd { margin: 0; line-height: 1.5; font-size: .9rem; }
+.report-container .report-guia-prioridad a { color: #1d4ed8; text-decoration: underline; font-weight: 600; }
+@media (max-width: 480px) {
+  .report-container .report-guia-prioridad { padding: 16px; }
+  .report-container .report-guia-prioridad dl > div { grid-template-columns: 1fr; gap: 4px; }
+}
+
 /* Ayuda discreta de prioridad */
 
 .report-container .report-ayuda-prioridad {
