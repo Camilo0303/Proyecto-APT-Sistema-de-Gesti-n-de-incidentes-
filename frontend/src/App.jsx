@@ -25,6 +25,7 @@ import Panico from './pages/Panico';
 import Enfermeria from './pages/Enfermeria';
 import Cetecom from './pages/Cetecom';
 import Administrador from './pages/Administrador';
+import MarcoAplicacion from './components/MarcoAplicacion';
 
 import './pages/Login.css';
 
@@ -225,7 +226,7 @@ function RutasAplicacion() {
         key={location.pathname}
         rol={rol}
       >
-        {contenido}
+        <MarcoAplicacion>{contenido}</MarcoAplicacion>
       </RutaProtegida>
     );
   }

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
   obtenerUsuario,
-  cerrarSesion,
   olvidarSesion,
 } from '../data/sesion';
 
@@ -35,9 +34,7 @@ export default function Home() {
   const [usuario, setUsuario] = useState(() => obtenerUsuario());
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
-  const [cerrando, setCerrando] = useState(false);
   const [error, setError] = useState('');
-  const [errorSesion, setErrorSesion] = useState('');
   const [recarga, setRecarga] = useState(0);
 
   useEffect(() => {
@@ -104,108 +101,14 @@ export default function Home() {
     };
   }, [usuario, recarga]);
 
-  async function salir() {
-    if (cerrando) return;
-
-    setCerrando(true);
-    setErrorSesion('');
-
-    try {
-      await cerrarSesion();
-      window.location.replace('/');
-    } catch (err) {
-      setErrorSesion(
-        err.message || 'No se pudo cerrar sesión. Intenta nuevamente.'
-      );
-      setCerrando(false);
-    }
-  }
-
   if (!usuario) {
     return <Navigate to="/login" replace />;
   }
 
-  const nombreCompleto = [usuario.nombre, usuario.apellido]
-    .filter(Boolean)
-    .join(' ');
-
-  const inicial = (usuario.nombre || 'P').charAt(0).toUpperCase();
-
   return (
     <div className="profesor-dashboard" lang="es" translate="no">
-      <a className="pd-saltar" href="#pd-contenido">
-        Saltar al contenido
-      </a>
-
-      <aside className="pd-sidebar">
-        <Link to="/profesor" className="pd-marca">
-          <span className="pd-logo" aria-hidden="true">S</span>
-          <span>
-            <strong>SIGI</strong>
-            <small>Gestión de incidencias</small>
-          </span>
-        </Link>
-
-        <p className="pd-menu-titulo">ESPACIO DEL PROFESOR</p>
-
-        <nav className="pd-nav" aria-label="Menú del profesor">
-          <Link to="/profesor" className="pd-nav-activo" aria-current="page">
-            <span aria-hidden="true">⌂</span>
-            Mi panel
-          </Link>
-
-          <Link to="/reportar">
-            <span aria-hidden="true">＋</span>
-            Reportar incidencia
-          </Link>
-
-          <Link to="/escanear">
-            <span aria-hidden="true">▦</span>
-            Escanear QR
-          </Link>
-
-          <Link to="/historial">
-            <span aria-hidden="true">☷</span>
-            Mis reportes
-          </Link>
-
-          <Link to="/panico">
-            <span aria-hidden="true">!</span>
-            Emergencia
-            
-          </Link>
-        </nav>
-
-        <div className="pd-sidebar-pie">
-          <span className="pd-avatar" aria-hidden="true">{inicial}</span>
-          <div>
-            <strong>{nombreCompleto}</strong>
-            <small>{usuario.rol || 'Profesor'}</small>
-          </div>
-        </div>
-      </aside>
 
       <main className="pd-main" id="pd-contenido">
-        <header className="pd-cabecera">
-          <div>
-            <p className="pd-etiqueta">MI ESPACIO</p>
-            <h1>Panel del profesor</h1>
-            <p>Reporta un problema y sigue su avance desde aquí.</p>
-          </div>
-
-          <button
-            type="button"
-            className="pd-boton pd-boton-secundario"
-            onClick={salir}
-            disabled={cerrando}
-          >
-            {cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}
-          </button>
-        </header>
-
-        {errorSesion && (
-          <div className="pd-error" role="alert">{errorSesion}</div>
-        )}
 
         <section className="pd-bienvenida">
           <div>

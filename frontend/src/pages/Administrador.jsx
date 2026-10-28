@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { cerrarSesion, olvidarSesion } from '../data/sesion';
+import { olvidarSesion } from '../data/sesion';
 import CorreosAutorizados from './CorreosAutorizados';
 import SalasQR from './SalasQR';
 import HistorialAdministracion from './HistorialAdministracion';
@@ -355,31 +355,12 @@ export default function Administrador() {
   const [parametros] = useSearchParams();
   const opcion = opciones.find(o => o.id === parametros.get('seccion'));
   const seccion = opcion?.id || 'inicio';
-  const [cerrando, setCerrando] = useState(false);
-  const [error, setError] = useState('');
   const titulo = useRef(null);
-  const salidaEnCurso = useRef(false);
 
   useEffect(() => {
     titulo.current?.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [seccion]);
-
-  async function salir() {
-    if (salidaEnCurso.current) return;
-    salidaEnCurso.current = true;
-    setCerrando(true);
-    setError('');
-
-    try {
-      await cerrarSesion();
-      window.location.replace('/login');
-    } catch (err) {
-      setError(err.message || 'No se pudo cerrar sesión.');
-      salidaEnCurso.current = false;
-      setCerrando(false);
-    }
-  }
 
   return (
     <main className="admin-panel" lang="es" translate="no">
@@ -431,23 +412,6 @@ export default function Administrador() {
                 </Link>
               ))}
             </nav>
-
-            <footer className="ad-menu-pie">
-              <div>
-                <strong>Tu sesión de administrador</strong>
-                <p>Cierra sesión cuando termines de trabajar.</p>
-              </div>
-              <button
-                type="button"
-                className="ad-salir"
-                onClick={salir}
-                disabled={cerrando}
-              >
-                {cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}
-              </button>
-            </footer>
-
-            {error && <p className="ad-error" role="alert">{error}</p>}
           </>
         ) : (
           <div className="ad-seccion">

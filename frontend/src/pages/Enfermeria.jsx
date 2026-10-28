@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../data/api';
-import { cerrarSesion, obtenerUsuario } from '../data/sesion';
+import { obtenerUsuario } from '../data/sesion';
 import useSonidoAlertas from '../hooks/useSonidoAlertas';
 import './Enfermeria.css';
 
@@ -37,10 +38,11 @@ export default function Enfermeria() {
   const [errorConsulta, setErrorConsulta] = useState('');
   const [errorAccion, setErrorAccion] = useState('');
   const [ocupado, setOcupado] = useState(false);
-  const [cerrando, setCerrando] = useState(false);
   const [recarga, setRecarga] = useState(0);
   const [hora, setHora] = useState('');
-  const [vista, setVista] = useState('panel');
+  const [parametros, setParametros] = useSearchParams();
+  const solicitada = parametros.get('seccion');
+  const vista = ['pendientes', 'atencion', 'historial'].includes(solicitada) ? solicitada : 'panel';
   const [busqueda, setBusqueda] = useState('');
   const [sinPulso, setSinPulso] = useState(false);
   const usuario = obtenerUsuario();
@@ -71,13 +73,7 @@ export default function Enfermeria() {
     catch (e) { setErrorAccion(e.message); }
     finally { setOcupado(false); }
   }
-  async function salir() {
-    if (cerrando) return;
-    setCerrando(true);
-    try { await cerrarSesion(); window.location.replace('/login'); }
-    catch (e) { setErrorAccion(e.message); setCerrando(false); }
-  }
-  function ir(destino) { setVista(destino); setBusqueda(''); }
+  function ir(destino) { setParametros(destino === 'panel' ? {} : { seccion: destino }); setBusqueda(''); }
   const pendientes = datos?.alertas.filter(a => a.estado === 'Pendiente') || [];
   const enAtencion = datos?.alertas.filter(a => a.estado === 'En atención') || [];
   const texto = busqueda.trim().toLocaleLowerCase();
@@ -86,7 +82,6 @@ export default function Enfermeria() {
   const atencionVisibles = enAtencion.filter(coincide);
   const atendidas = datos?.atendidas.filter(coincide) || [];
   const titulos = { panel: 'Alertas activas', pendientes: 'Pendientes de atención', atencion: 'En atención', historial: 'Alertas atendidas' };
-  const menu = [ ['panel', 'Mi panel', '⌂'], ['pendientes', 'Pendientes', '!'], ['atencion', 'En atención', '+'], ['historial', 'Atendidas', '☷'] ];
   function grupo(titulo, lista, rojo) {
     return <section className="enf-grupo"><div className="enf-grupo-titulo"><h3>{titulo}</h3><span className={rojo ? 'enf-contador-rojo' : 'enf-contador'}>{lista.length}</span></div>
       {lista.length ? <div className="enf-alertas-grid">{lista.map(a => <TarjetaAlerta key={a.id_alerta} alerta={a} usuario={usuario} ocupado={ocupado} cambiar={cambiar} />)}</div>
@@ -95,15 +90,7 @@ export default function Enfermeria() {
   }
 
   return <div className={`enfermeria-dashboard${sinPulso ? ' enf-sin-pulso' : ''}`} lang="es">
-    <a className="enf-saltar" href="#enf-contenido">Saltar al contenido</a>
-    <aside className="enf-sidebar">
-      <a className="enf-marca" href="/enfermeria"><span className="enf-logo">S</span><span><strong>SIGI</strong><small>Gestión de incidencias</small></span></a>
-      <p className="enf-menu-etiqueta">ESPACIO DE ENFERMERÍA</p>
-      <nav aria-label="Menú de Enfermería">{menu.map(([destino, nombre, icono]) => <button key={destino} className={vista === destino ? 'enf-nav-activo' : ''} aria-current={vista === destino ? 'page' : undefined} onClick={() => ir(destino)}><span aria-hidden="true">{icono}</span>{nombre}{destino === 'pendientes' && pendientes.length > 0 && <b className="enf-nav-numero">{pendientes.length}</b>}</button>)}</nav>
-      <div className="enf-perfil"><span className="enf-avatar" aria-hidden="true">{usuario?.nombre?.charAt(0) || 'E'}</span><div><strong>{usuario?.nombre} {usuario?.apellido}</strong><small>Enfermería</small></div></div>
-    </aside>
     <main className="enf-main" id="enf-contenido">
-      <header className="enf-cabecera"><div><p className="enf-etiqueta">MI ESPACIO</p><h1>Panel de Enfermería</h1><p>Recibe las alertas del establecimiento y coordina su atención.</p></div><button className="enf-boton" disabled={cerrando} onClick={salir}>{cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}</button></header>
       <section className="enf-bienvenida"><div><p className="enf-etiqueta">ATENCIÓN Y SEGUIMIENTO</p><h2>Hola, {usuario?.nombre}</h2><p>La ubicación y el estado de cada emergencia, en un solo lugar.</p></div><span className="enf-bienvenida-cruz" aria-hidden="true">+</span></section>
       <div className="enf-actualizacion"><span className={errorConsulta ? 'enf-conexion enf-conexion-error' : 'enf-conexion'}><i aria-hidden="true" />{errorConsulta ? 'Sin actualización' : hora ? 'Actualización automática cada 5 s' : 'Conectando con el servidor…'}</span><span>Última consulta: {hora || 'Pendiente'}</span><button className="enf-boton" onClick={() => setRecarga(n => n + 1)}>Actualizar alertas</button></div>
       <div className="enf-sonido"><button className="enf-boton" type="button" onClick={sonido.alternar} disabled={sonido.ocupado} aria-pressed={sonido.activo}>{sonido.ocupado ? 'Activando sonido…' : sonido.activo ? 'Silenciar avisos' : 'Activar avisos sonoros'}</button><p>{sonido.activo ? 'Sonido activado: un aviso por cada nueva alerta pendiente.' : 'Sonido desactivado. Actívalo para recibir avisos de nuevas alertas.'}<small>Al activar escucharás una prueba. Mantén el panel abierto y el volumen del dispositivo encendido.</small></p></div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { obtenerUsuario, cerrarSesion } from '../data/sesion';
+import { obtenerUsuario } from '../data/sesion';
 import { api } from '../data/api';
 import './Cetecom.css';
 
@@ -77,7 +77,6 @@ export default function Cetecom() {
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
   const [revision, setRevision] = useState(0);
-  const [cerrando, setCerrando] = useState(false);
 
   const [seleccion, setSeleccion] = useState(null);
   const [comentario, setComentario] = useState('');
@@ -227,21 +226,6 @@ export default function Cetecom() {
     }
   }
 
-  async function salir() {
-    if (cerrando) return;
-
-    setCerrando(true);
-    setAviso('');
-
-    try {
-      await cerrarSesion();
-      window.location.replace('/login');
-    } catch (err) {
-      setAviso(err.message || 'No se pudo cerrar sesión.');
-      setCerrando(false);
-    }
-  }
-
   const resumen = datos?.resumen || {};
 
   const tarjetas = [
@@ -263,26 +247,6 @@ export default function Cetecom() {
   return (
     <main className="ct-page" lang="es" translate="no">
       <div className="ct-content">
-        <header className="ct-header">
-          <div>
-            <span className="ct-eyebrow">SIGI · SOPORTE TECNOLÓGICO</span>
-            <h1>Panel Cetecom</h1>
-            <p>Organiza, atiende y da seguimiento a las incidencias.</p>
-
-            <span className="ct-user">
-              {usuario?.nombre} {usuario?.apellido} · Técnico
-            </span>
-          </div>
-
-          <button
-            type="button"
-            className="ct-btn ct-logout"
-            onClick={salir}
-            disabled={cerrando || guardando}
-          >
-            {cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}
-          </button>
-        </header>
 
         {aviso && (
           <div className="ct-notice" role="status">

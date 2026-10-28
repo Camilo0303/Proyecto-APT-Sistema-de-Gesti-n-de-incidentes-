@@ -1,4 +1,4 @@
-﻿const { test } = require('node:test');
+const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { randomBytes } = require('node:crypto');
 const express = require('express');
@@ -32,8 +32,8 @@ test('Registro y sesiones contra MySQL (datos temporales)', { skip: process.env.
   await new Promise(resolve => server.once('listening', resolve));
   const url = `http://127.0.0.1:${server.address().port}/api/auth`;
   const suffix = randomBytes(10).toString('hex');
-  const correo = `codex-test-${suffix}@example.invalid`;
-  const legacy = `codex-legacy-${suffix}@example.invalid`;
+  const correo = `sigi-test-${suffix}@example.invalid`;
+  const legacy = `sigi-legacy-${suffix}@example.invalid`;
   let cookie = '';
   async function request(route, body, extra = {}) {
     const response = await fetch(url + route, {
