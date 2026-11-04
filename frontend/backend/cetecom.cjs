@@ -208,10 +208,9 @@ function createCetecom(pool, requireAuth) {
             SUM(e.nombre IN ('Resuelta', 'Cerrada')), 0
           ) AS finalizadas,
           COALESCE(SUM(e.nombre = 'Anulada'), 0) AS anuladas
-        FROM incidencias i
-        JOIN estados_incidencia e
-          ON e.id_estado = i.id_estado
-      `);
+        ${desde}
+        ${donde}
+      `, parametros);
 
       await conexion.commit();
 

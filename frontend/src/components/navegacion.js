@@ -19,7 +19,7 @@ const enfermeria = [
 ];
 export function navegacionRol(rol) {
   const grupos = { Profesor: profesor, Administrador: administrador,
-    Técnico: [['Gestión de incidencias', '/cetecom', '☷']], Enfermería: enfermeria };
+    Técnico: [['Gestión de incidencias', '/cetecom', '☷'], ['Filtrar incidencias', '/cetecom?seccion=buscar', '⌕'], ['Resumen de reportes', '/cetecom?seccion=resumen', '▥']], Enfermería: enfermeria };
   return (grupos[rol] || []).map(([nombre, destino, icono]) => ({ nombre, destino, icono }));
 }
 export function destinoActivo(destino, pathname, search) {
