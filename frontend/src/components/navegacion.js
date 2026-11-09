@@ -1,5 +1,5 @@
 const profesor = [
-  ['Mi panel', '/profesor', '⌂'], ['Reportar incidencia', '/reportar', '+'],
+  ['Mi panel', '/profesor', '⌂'],
   ['Escanear QR', '/escanear', '▦'], ['Mis reportes', '/historial', '☷'],
   ['Emergencia', '/panico', '!'],
 ];
@@ -23,6 +23,8 @@ const tecnico = [
   ['Pendientes', '/cetecom?seccion=pendientes', '!'],
   ['En atención', '/cetecom?seccion=atencion', '+'],
   ['Historial de incidencias', '/cetecom?seccion=historial', '≡'],
+  ['Filtrar incidencias', '/cetecom?seccion=buscar', '⌕'],
+  ['Resumen de reportes', '/cetecom?seccion=resumen', '▥'],
 ];
 export function navegacionRol(rol) {
   const grupos = { Profesor: profesor, Administrador: administrador,
