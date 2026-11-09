@@ -8,6 +8,7 @@ import './Enfermeria.css';
 const numeroAlerta = id => `ALT-${String(id).padStart(4, '0')}`;
 
 function TarjetaAlerta({ alerta, usuario, ocupado, cambiar }) {
+  const [descripcionAtencion, setDescripcionAtencion] = useState('');
   const pendiente = alerta.estado === 'Pendiente';
   const propia = Number(alerta.atendida_por) === Number(usuario?.id_usuario);
   return <article className={`enf-alerta ${pendiente ? 'enf-alerta-pendiente' : ''}`}>
@@ -27,7 +28,12 @@ function TarjetaAlerta({ alerta, usuario, ocupado, cambiar }) {
     <footer className="enf-alerta-pie">
       <p>{pendiente ? 'Sin responsable asignado' : <>Atiende: <strong>{alerta.responsable || 'Sin información'}</strong></>}</p>
       {pendiente ? <button className="enf-boton enf-boton-rojo" disabled={ocupado} onClick={() => cambiar(alerta, 'En atención')}>Tomar atención</button>
-        : propia ? <button className="enf-boton enf-boton-primario" disabled={ocupado} onClick={() => cambiar(alerta, 'Atendida')}>Marcar como atendida</button>
+        : propia ? <form className="enf-form-atencion" onSubmit={e => { e.preventDefault(); if (descripcionAtencion.trim().length >= 5) void cambiar(alerta, 'Atendida', descripcionAtencion.trim()); }}>
+          <label htmlFor={`atencion-${alerta.id_alerta}`}>Descripción de la atención realizada <span>(obligatoria)</span></label>
+          <textarea id={`atencion-${alerta.id_alerta}`} value={descripcionAtencion} onChange={e => setDescripcionAtencion(e.target.value)} required minLength={5} maxLength={255} rows={4} disabled={ocupado} aria-describedby={`atencion-ayuda-${alerta.id_alerta}`} placeholder="Describe lo ocurrido y las acciones realizadas durante la atención." />
+          <small id={`atencion-ayuda-${alerta.id_alerta}`}>{descripcionAtencion.length}/255 caracteres. Quedará guardada en el historial al finalizar.</small>
+          <button type="submit" className="enf-boton enf-boton-primario" disabled={ocupado || descripcionAtencion.trim().length < 5}>{ocupado ? 'Guardando…' : 'Guardar y marcar como atendida'}</button>
+        </form>
           : <span className="enf-nota">En atención por otra persona</span>}
     </footer>
   </article>;
@@ -66,10 +72,10 @@ export default function Enfermeria() {
     return () => { vigente = false; clearInterval(timer); window.removeEventListener('focus', foco); };
   }, [recarga]);
 
-  async function cambiar(alerta, estado) {
+  async function cambiar(alerta, estado, comentario = '') {
     if (ocupado) return;
     setOcupado(true); setErrorAccion('');
-    try { await api(`/emergencias/${alerta.id_alerta}/estado`, { estado }); setRecarga(n => n + 1); }
+    try { await api(`/emergencias/${alerta.id_alerta}/estado`, { estado, comentario }); setRecarga(n => n + 1); }
     catch (e) { setErrorAccion(e.message); }
     finally { setOcupado(false); }
   }
@@ -100,12 +106,10 @@ export default function Enfermeria() {
       <section className="enf-resumen" aria-label="Resumen de alertas"><button className="enf-resumen-rojo" onClick={() => ir('pendientes')}><span>Pendientes</span><strong>{datos ? pendientes.length : '—'}</strong><small>Requieren atención</small></button><button onClick={() => ir('atencion')}><span>En atención</span><strong>{datos ? enAtencion.length : '—'}</strong><small>Con responsable asignado</small></button><button onClick={() => ir('historial')}><span>Atendidas recientes</span><strong>{datos ? datos.atendidas.length : '—'}</strong><small>Últimas 20 registradas</small></button></section>
       <div aria-live="polite">{pendientes.length > 0 && <section className="enf-aviso-urgente"><span className="enf-aviso-icono" aria-hidden="true">!</span><div><h2>{pendientes.length === 1 ? 'Hay una alerta urgente pendiente' : `Hay ${pendientes.length} alertas urgentes pendientes`}</h2><p>Revisa la sala y toma la atención para informar al profesor.</p></div><div className="enf-aviso-acciones"><button className="enf-boton" onClick={() => ir('pendientes')}>Ver pendientes</button><button className="enf-pulso-control" aria-pressed={sinPulso} onClick={() => setSinPulso(p => !p)}>{sinPulso ? 'Activar pulso' : 'Detener animación'}</button></div></section>}</div>
       <section className="enf-contenido"><div className="enf-seccion-cabecera"><div><h2>{titulos[vista]}</h2><p>{vista === 'historial' ? 'Las últimas 20 alertas finalizadas. No representa todo el historial.' : 'Las pendientes se muestran primero, desde la más antigua.'}</p></div><label className="enf-buscador">Buscar alerta<input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Sala, profesor o ALT-0001" type="search" /></label></div>
-        {!datos ? <div className="enf-vacio" role="status">{errorConsulta ? 'No hay datos disponibles. Intenta actualizar.' : 'Cargando alertas…'}</div> : vista === 'historial' ? <div className="enf-historial">{atendidas.length ? atendidas.map(a => <article key={a.id_alerta}><div><span className="enf-ticket">{numeroAlerta(a.id_alerta)}</span><h3>{a.codigo_sala || a.sala}</h3><p>{a.tipo} · Edificio {a.edificio} · Piso {a.piso}</p></div><div><span className="enf-estado enf-estado-verde">Atendida</span><p>Reportada: {a.fecha}</p><p>Atendió: {a.responsable || 'Sin información'}</p></div></article>) : <div className="enf-vacio"><strong>{texto ? 'No hay coincidencias' : 'Todavía no hay alertas atendidas'}</strong></div>}</div>
+        {!datos ? <div className="enf-vacio" role="status">{errorConsulta ? 'No hay datos disponibles. Intenta actualizar.' : 'Cargando alertas…'}</div> : vista === 'historial' ? <div className="enf-historial">{atendidas.length ? atendidas.map(a => <article key={a.id_alerta}><div><span className="enf-ticket">{numeroAlerta(a.id_alerta)}</span><h3>{a.codigo_sala || a.sala}</h3><p>{a.tipo} · Edificio {a.edificio} · Piso {a.piso}</p></div><div><span className="enf-estado enf-estado-verde">Atendida</span><p>Reportada: {a.fecha}</p><p>Atendió: {a.responsable || 'Sin información'}</p><div className="enf-registro-atencion"><strong>Atención realizada</strong><p>{a.descripcion_atencion || 'Sin descripción registrada (atención anterior).'}</p></div></div></article>) : <div className="enf-vacio"><strong>{texto ? 'No hay coincidencias' : 'Todavía no hay alertas atendidas'}</strong></div>}</div>
           : <>{(vista === 'panel' || vista === 'pendientes') && grupo('Pendientes de atención', pendientesVisibles, true)}{(vista === 'panel' || vista === 'atencion') && grupo('En atención', atencionVisibles, false)}</>}
       </section>
       <footer className="enf-pie">Alertas internas del establecimiento. Mantén el panel abierto para recibir actualizaciones. No reemplaza los protocolos de emergencia.</footer>
     </main>
   </div>;
 }
-
-

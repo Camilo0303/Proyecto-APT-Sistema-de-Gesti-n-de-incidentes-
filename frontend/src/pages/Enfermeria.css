@@ -49,3 +49,13 @@ body:has(.enfermeria-dashboard){margin:0}
 @media(prefers-reduced-motion:reduce){.enfermeria-dashboard .enf-aviso-urgente{animation:none}}
 @media(max-width:760px){.enf-aviso-acciones{width:100%;margin-left:0}.enfermeria-dashboard .enf-aviso-urgente h2{font-size:17px}}
 .enf-sonido{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:16px 0;color:#3d5678;font-size:12px}.enf-sonido p{flex:1;min-width:220px}.enf-sonido small{display:block;color:#64748b;font-size:11px;margin-top:3px}.enf-sonido .enf-boton[aria-pressed=true]{background:#e6f5ed;border-color:#a9d8c0;color:#1b6546}
+
+.enfermeria-dashboard .enf-form-atencion { display: grid; gap: 10px; width: 100%; flex-basis: 100%; }
+.enfermeria-dashboard .enf-alerta-pie:has(.enf-form-atencion) { flex-wrap: wrap; }
+.enfermeria-dashboard .enf-form-atencion label { font-weight: 700; color: #183b65; }
+.enfermeria-dashboard .enf-form-atencion label span { font-weight: 400; }
+.enfermeria-dashboard .enf-form-atencion textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #bdcde3; border-radius: 10px; font: inherit; color: #183b65; background: white; resize: vertical; }
+.enfermeria-dashboard .enf-form-atencion textarea:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.enfermeria-dashboard .enf-form-atencion small { color: #526582; }
+.enfermeria-dashboard .enf-registro-atencion { margin-top: 12px; padding: 12px; background: #f0f6ff; border-radius: 10px; }
+.enfermeria-dashboard .enf-registro-atencion p { white-space: pre-wrap; overflow-wrap: anywhere; }

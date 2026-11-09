@@ -28,7 +28,11 @@ function createEmergencias(pool, requireAuth) {
   router.get('/', permitirRoles('Enfermería'), async (_req,res,next) => {
     try {
       const [alertas]=await pool.execute(`${leer} WHERE ea.nombre IN ('Pendiente','En atención') ORDER BY a.fecha_alerta ASC,a.id_alerta ASC`);
-      const [atendidas]=await pool.execute(`${leer} WHERE ea.nombre='Atendida' ORDER BY a.fecha_alerta DESC,a.id_alerta DESC LIMIT 20`);
+      const leerAtendidas = leer.replace('SELECT a.id_alerta,', `SELECT
+        (SELECT MAX(h.comentario) FROM historial_alertas h
+         WHERE h.id_alerta=a.id_alerta AND h.id_estado_nuevo=a.id_estado_alerta) AS descripcion_atencion,
+        a.id_alerta,`);
+      const [atendidas]=await pool.execute(`${leerAtendidas} WHERE ea.nombre='Atendida' ORDER BY a.fecha_alerta DESC,a.id_alerta DESC LIMIT 20`);
       res.json({alertas,atendidas});
     } catch(e) { next(e); }
   });
@@ -54,8 +58,9 @@ function createEmergencias(pool, requireAuth) {
     } catch(e) { if(c) await c.rollback().catch(()=>{}); next(e); } finally { c?.release(); }
   });
   router.post('/:id/estado', permitirRoles('Enfermería'), async (req,res,next) => {
-    const id=Number(req.params.id), estado=req.body?.estado, comentario=req.body?.comentario||'';
+    const id=Number(req.params.id), estado=req.body?.estado, comentario=req.body?.comentario ?? '';
     if(!Number.isSafeInteger(id)||id<1||!['En atención','Atendida'].includes(estado)||typeof comentario!=='string'||comentario.length>255) return res.status(400).json({mensaje:'Estado o comentario inválido.'});
+    if(estado==='Atendida' && comentario.trim().length<5) return res.status(400).json({mensaje:'Describe la atención realizada con al menos 5 caracteres y un máximo de 255.'});
     let c;
     try {
       c=await pool.getConnection(); await c.beginTransaction();

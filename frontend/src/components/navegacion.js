@@ -17,9 +17,16 @@ const enfermeria = [
   ['En atención', '/enfermeria?seccion=atencion', '+'],
   ['Atendidas recientes', '/enfermeria?seccion=historial', '☷'],
 ];
+const tecnico = [
+  ['Mi panel', '/cetecom', '⌂'],
+  ['Incidencias activas', '/cetecom?seccion=activas', '☷'],
+  ['Pendientes', '/cetecom?seccion=pendientes', '!'],
+  ['En atención', '/cetecom?seccion=atencion', '+'],
+  ['Historial de incidencias', '/cetecom?seccion=historial', '≡'],
+];
 export function navegacionRol(rol) {
   const grupos = { Profesor: profesor, Administrador: administrador,
-    Técnico: [['Gestión de incidencias', '/cetecom', '☷']], Enfermería: enfermeria };
+    Técnico: tecnico, Enfermería: enfermeria };
   return (grupos[rol] || []).map(([nombre, destino, icono]) => ({ nombre, destino, icono }));
 }
 export function destinoActivo(destino, pathname, search) {

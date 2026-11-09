@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { obtenerUsuario } from '../data/sesion';
 import { api } from '../data/api';
 import FiltrosIncidencias from '../components/FiltrosIncidencias';
@@ -68,10 +69,33 @@ function claseEstado(estado) {
   }[estado] || 'neutra';
 }
 
+const seccionesTecnico = [
+  { id: 'activas', titulo: 'Incidencias activas', estado: 'activas', texto: 'Revisa los reportes pendientes, asignados y en atención.', icono: '☷' },
+  { id: 'pendientes', titulo: 'Pendientes', estado: 'Pendiente', texto: 'Consulta los problemas que aún esperan atención.', icono: '!' },
+  { id: 'atencion', titulo: 'En atención', estado: 'En proceso', texto: 'Revisa las incidencias que se están atendiendo.', icono: '+' },
+  { id: 'historial', titulo: 'Historial de incidencias', estado: 'todas', texto: 'Consulta todos los estados, incluidos los resueltos y cerrados.', icono: '≡' },
+];
+
 export default function Cetecom() {
+  const [parametros] = useSearchParams();
+  const usuario = obtenerUsuario();
+  const seccion = seccionesTecnico.find(s => s.id === parametros.get('seccion'));
+  if (seccion) return <GestionIncidencias key={seccion.id} estadoInicial={seccion.estado} tituloSeccion={seccion.titulo} />;
+  return <main className="ct-page" lang="es"><div className="ct-content">
+    <header className="ct-header"><div><span className="ct-eyebrow">CETECOM / TÉCNICO</span>
+      <h1>Hola, {usuario?.nombre || 'técnico'}</h1><p>Organiza la atención de los problemas reportados en la institución.</p></div></header>
+    <section className="ct-menu-inicio" aria-labelledby="ct-menu-titulo"><h2 id="ct-menu-titulo">Tu espacio de trabajo</h2>
+      <nav className="ct-accesos" aria-label="Accesos del técnico">{seccionesTecnico.map(s => <Link key={s.id} to={`/cetecom?seccion=${s.id}`}>
+        <span className="ct-acceso-icono" aria-hidden="true">{s.icono}</span><div><strong>{s.titulo}</strong><p>{s.texto}</p></div><span aria-hidden="true">→</span>
+      </Link>)}</nav>
+    </section>
+  </div></main>;
+}
+
+function GestionIncidencias({ estadoInicial, tituloSeccion }) {
   const usuario = obtenerUsuario();
 
-  const [filtros, setFiltros] = useState(filtrosIniciales);
+  const [filtros, setFiltros] = useState(() => ({ ...filtrosIniciales, estado: estadoInicial }));
   const [textoBusqueda, setTextoBusqueda] = useState('');
   const [prioridades, setPrioridades] = useState([]);
   const [datos, setDatos] = useState(null);
@@ -161,7 +185,7 @@ export default function Cetecom() {
   function limpiarFiltros() {
     setTextoBusqueda('');
     setCargando(true);
-    setFiltros({ ...filtrosIniciales });
+    setFiltros({ ...filtrosIniciales, estado: estadoInicial });
   }
 
   function actualizar() {
@@ -250,6 +274,7 @@ export default function Cetecom() {
   return (
     <main className="ct-page" lang="es" translate="no">
       <div className="ct-content">
+        <Link className="ct-volver-menu" to="/cetecom">← Volver a mi panel</Link>
 
         {aviso && (
           <div className="ct-notice" role="status">
@@ -279,7 +304,7 @@ export default function Cetecom() {
           <div className="ct-panel-heading">
             <div>
               <span className="ct-section-label">BANDEJA DE TRABAJO</span>
-              <h2 id="ct-title">Incidencias</h2>
+              <h2 id="ct-title">{tituloSeccion}</h2>
               <p>
                 Filtra por prioridad o estado para encontrar lo que necesitas.
               </p>

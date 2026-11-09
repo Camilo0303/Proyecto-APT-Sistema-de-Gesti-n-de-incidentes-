@@ -862,3 +862,15 @@ body:has(.ct-page) {
     transition: none;
   }
 }
+.ct-page .ct-menu-inicio { margin-top: 28px; }
+.ct-page .ct-menu-inicio h2 { margin-bottom: 18px; }
+.ct-page .ct-accesos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.ct-page .ct-accesos a { display: flex; align-items: center; gap: 18px; padding: 26px; border: 1px solid #dce5f0; border-radius: 16px; background: white; color: #20344e; text-decoration: none; }
+.ct-page .ct-accesos a:hover { border-color: #2563eb; background: #f8fbff; }
+.ct-page .ct-accesos a:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+.ct-page .ct-accesos a > div { flex: 1; }
+.ct-page .ct-accesos strong { font-size: 17px; }
+.ct-page .ct-accesos p { margin-top: 6px; color: #526582; }
+.ct-page .ct-acceso-icono { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; background: #eaf1ff; border-radius: 12px; color: #2563eb; font-size: 24px; }
+.ct-page .ct-volver-menu { display: inline-block; margin-bottom: 20px; color: #1d4ed8; font-weight: 600; }
+@media (max-width: 760px) { .ct-page .ct-accesos { grid-template-columns: 1fr; } .ct-page .ct-accesos a { padding: 20px; } }

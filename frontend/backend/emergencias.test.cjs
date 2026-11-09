@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const express=require('express');
 const {createEmergencias}=require('./emergencias.cjs');
 test('Emergencias: permisos, validación, persistencia y transiciones',async()=>{
- let estado='Pendiente',dupe=false,insertadas=0,movimientos=0,rollback=0;
+ let estado='Pendiente',dupe=false,insertadas=0,movimientos=0,rollback=0,notaGuardada='';
  const ids={'Pendiente':1,'En atención':2,'Atendida':3};
  const c={beginTransaction:async()=>{},commit:async()=>{},rollback:async()=>{rollback++;},release:()=>{},execute:async(sql,args)=>{
   if(sql.startsWith('SELECT id_sala'))return [[...(args[0]==='QR-PM-W304'?[{id_sala:9}]:[])]];
@@ -15,7 +15,7 @@ test('Emergencias: permisos, validación, persistencia y transiciones',async()=>
   if(sql.startsWith('SELECT nombre'))return [[{nombre:estado}]];
   if(sql.startsWith('SELECT id_estado_alerta'))return [[{id_estado_alerta:ids[args[0]]}]];
   if(sql.startsWith('UPDATE alertas')){estado=Object.keys(ids).find(k=>ids[k]===args[0]);return [{affectedRows:1}];}
-  if(sql.startsWith('INSERT INTO historial_alertas')){movimientos++;return [{affectedRows:1}];}
+  if(sql.startsWith('INSERT INTO historial_alertas')){movimientos++;notaGuardada=args[4];return [{affectedRows:1}];}
   throw Error(sql);
  }};
  const pool={getConnection:async()=>c,execute:async()=>[[]]};
@@ -32,9 +32,15 @@ test('Emergencias: permisos, validación, persistencia y transiciones',async()=>
  assert.equal((await post('','Profesor',body)).status,201);assert.equal(insertadas,1);
  dupe=true;assert.equal((await post('','Profesor',body)).status,200);assert.equal(insertadas,1);
  assert.equal((await post('/7/estado','Profesor',{estado:'En atención'})).status,403);
- assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida'})).status,409);
+ assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida',comentario:'Atención realizada'})).status,409);
  assert.equal((await post('/7/estado','Enfermería',{estado:'En atención'})).status,200);
- assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida'})).status,200);
+  assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida'})).status,400);
+ assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida',comentario:'    '})).status,400);
+ assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida',comentario:42})).status,400);
+ assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida',comentario:'a'.repeat(256)})).status,400);
+ assert.equal(estado,'En atención');assert.equal(movimientos,1);
+ assert.equal((await post('/7/estado','Enfermería',{estado:'Atendida',comentario:'  Se registra la atención realizada.  '})).status,200);
+ assert.equal(notaGuardada,'Se registra la atención realizada.');
  assert.equal(movimientos,2);assert.ok(rollback>=2);
  }finally{await new Promise(r=>server.close(r));}
 });
