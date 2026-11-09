@@ -1,0 +1,8 @@
+.sigi-marco .sigi-turno { display:flex; gap:18px; align-items:center; justify-content:space-between; margin:20px 28px 0; padding:20px; border:1px solid #cbd8ed; border-radius:14px; background:#f0f5fc; color:#183b65; }
+.sigi-marco .sigi-turno-activo { background:#edf9f3; border-color:#9ed5ba; }
+.sigi-marco .sigi-turno strong { font-size:18px; }
+.sigi-marco .sigi-turno p { margin:7px 0; }
+.sigi-marco .sigi-turno small { display:block; line-height:1.5; color:#526582; }
+.sigi-marco .sigi-turno button { width:auto; min-width:140px; padding:12px 16px; border:1px solid #2563eb; border-radius:10px; background:#2563eb; color:white; font:600 14px 'Segoe UI',sans-serif; cursor:pointer; }
+.sigi-marco .sigi-turno button:disabled { opacity:.6; cursor:wait; }
+@media(max-width:640px) { .sigi-marco .sigi-turno { margin:14px 14px 0; flex-direction:column; align-items:stretch; } }

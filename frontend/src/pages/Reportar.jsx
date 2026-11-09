@@ -51,7 +51,6 @@ export default function Reportar() {
     titulo: '',
     descripcion: '',
     id_sala: '',
-    id_equipo: '',
     id_categoria: '',
     id_prioridad: '',
   });
@@ -71,7 +70,6 @@ export default function Reportar() {
 
         const valido = [
           resultado.salas,
-          resultado.equipos,
           resultado.categorias,
           resultado.prioridades,
         ].every(Array.isArray);
@@ -92,7 +90,6 @@ export default function Reportar() {
           setForm(anterior => ({
             ...anterior,
             id_sala: sala ? String(sala.id_sala) : '',
-            id_equipo: '',
           }));
 
           if (!sala) {
@@ -125,7 +122,6 @@ export default function Reportar() {
     setForm(anterior => ({
       ...anterior,
       [name]: value,
-      ...(name === 'id_sala' ? { id_equipo: '' } : {}),
     }));
 
     if (name === 'id_sala') setAvisoSala('');
@@ -150,7 +146,7 @@ export default function Reportar() {
         titulo: form.titulo.trim(),
         descripcion: form.descripcion.trim(),
         id_sala: Number(form.id_sala),
-        id_equipo: form.id_equipo ? Number(form.id_equipo) : null,
+        id_equipo: null,
         id_categoria: Number(form.id_categoria),
         id_prioridad: Number(form.id_prioridad),
       });
@@ -190,11 +186,6 @@ export default function Reportar() {
       </main>
     );
   }
-
-  const equiposDisponibles =
-    catalogos?.equipos.filter(
-      equipo => Number(equipo.id_sala) === Number(form.id_sala)
-    ) || [];
 
   const ayudaPrioridad = obtenerAyudaPrioridad(
     catalogos?.prioridades || [],
@@ -266,29 +257,6 @@ export default function Reportar() {
             </select>
 
             {avisoSala && <p role="alert">{avisoSala}</p>}
-
-            <label htmlFor="id_equipo">
-              Equipo <span className="report-opcional">— opcional</span>
-            </label>
-
-            <select
-              id="id_equipo"
-              name="id_equipo"
-              value={form.id_equipo}
-              onChange={cambiar}
-              disabled={!form.id_sala || enviando}
-            >
-              <option value="">Sin equipo asociado</option>
-
-              {equiposDisponibles.map(equipo => (
-                <option key={equipo.id_equipo} value={equipo.id_equipo}>
-                  {equipo.nombre}
-                  {equipo.codigo_inventario
-                    ? ` (${equipo.codigo_inventario})`
-                    : ''}
-                </option>
-              ))}
-            </select>
 
             <label htmlFor="id_categoria">Categoría</label>
             <select

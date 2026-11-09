@@ -9,6 +9,7 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 
 const { createAuth } = require('./auth.cjs');
+const { createTurnos, finalizarTurno } = require('./turnos.cjs');
 const { createIncidencias } = require('./incidencias.cjs');
 const { permitirRoles } = require('./permisos.cjs');
 const { createAdministracion } = require('./administracion.cjs');
@@ -34,7 +35,8 @@ const pool = mysql.createPool({
   charset: 'utf8mb4',
 });
 
-const auth = createAuth(pool);
+const auth = createAuth(pool, { alCerrarTurno: id => finalizarTurno(pool, id) });
+app.use('/api/turno', createTurnos(pool, auth.requireAuth));
 app.get('/api/filtros-incidencias', auth.requireAuth, permitirRoles('Profesor', 'Técnico', 'Administrador'), async (_req, res, next) => {
   res.set('Cache-Control', 'no-store');
   try { res.json(await catalogosFiltros(pool)); } catch (error) { next(error); }

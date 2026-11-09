@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cerrarSesion, obtenerUsuario } from '../data/sesion';
 import { destinoActivo, navegacionRol } from './navegacion';
 import './MarcoAplicacion.css';
+import TurnoTecnico from './TurnoTecnico';
 
 export default function MarcoAplicacion({ children }) {
   const usuario = obtenerUsuario();
@@ -35,9 +36,10 @@ export default function MarcoAplicacion({ children }) {
       <header className="sigi-cabecera">
         <div className="sigi-titulo"><small>{usuario?.rol === 'Técnico' ? 'CETECOM / TÉCNICO' : usuario?.rol}</small><strong>{activo?.nombre || 'Mi espacio'}</strong></div>
         <div className="sigi-cuenta"><span className="sigi-avatar" aria-hidden="true">{usuario?.nombre?.charAt(0) || 'U'}</span><div><strong>{nombre}</strong><small>{usuario?.rol}</small></div></div>
-        <button className="sigi-salir" type="button" disabled={cerrando} onClick={salir}>{cerrando ? 'Cerrando sesión…' : 'Cerrar sesión'}</button>
+        <button className="sigi-salir" type="button" disabled={cerrando} onClick={salir}>{cerrando ? 'Cerrando sesión…' : usuario?.rol === 'Técnico' ? 'Finalizar turno y cerrar sesión' : 'Cerrar sesión'}</button>
       </header>
       {error && <p className="sigi-error" role="alert">{error}</p>}
+      {usuario?.rol === 'Técnico' && <TurnoTecnico />}
       <div id="sigi-contenido" className="sigi-contenido" tabIndex={-1}>{children}</div>
     </div>
   </div>;

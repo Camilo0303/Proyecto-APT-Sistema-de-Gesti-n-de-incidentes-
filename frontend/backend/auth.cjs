@@ -68,7 +68,7 @@ function publicUser(row) {
   };
 }
 
-function createAuth(pool) {
+function createAuth(pool, { alCerrarTurno } = {}) {
   const router = express.Router();
   const sessions = new Map();
   const attempts = new Map();
@@ -87,13 +87,14 @@ function createAuth(pool) {
 
   cleanup.unref();
 
-  function newSession(req, res, id) {
+  function newSession(req, res, id, rol) {
     sessions.delete(tokenFrom(req));
 
     const token = randomBytes(32).toString('hex');
 
     sessions.set(token, {
       id,
+      rol,
       expires: Date.now() + DURATION,
     });
 
@@ -317,7 +318,7 @@ function createAuth(pool) {
       await connection.commit();
       transaccionActiva = false;
 
-      newSession(req, res, result.insertId);
+      newSession(req, res, result.insertId, rows[0].rol);
 
       return res.status(201).json({
         mensaje: 'Cuenta creada correctamente.',
@@ -416,7 +417,7 @@ function createAuth(pool) {
         });
       }
 
-      newSession(req, res, account.id_usuario);
+      newSession(req, res, account.id_usuario, users[0].rol);
 
       res.json({
         usuario: publicUser(users[0]),
@@ -434,13 +435,14 @@ function createAuth(pool) {
   });
 
   // CERRAR SESIÓN
-  router.post('/logout', (req, res) => {
-    sessions.delete(tokenFrom(req));
-    res.clearCookie(COOKIE, cookieOptions);
-
-    res.json({
-      mensaje: 'Sesión cerrada.',
-    });
+  router.post('/logout', async (req, res, next) => {
+    try {
+      const session = sessions.get(tokenFrom(req));
+      if (session?.rol === 'Técnico' && alCerrarTurno) await alCerrarTurno(session.id);
+      sessions.delete(tokenFrom(req));
+      res.clearCookie(COOKIE, cookieOptions);
+      res.json({ mensaje: 'Sesión cerrada.' });
+    } catch (error) { next(error); }
   });
 
   return {

@@ -168,21 +168,13 @@ function createIncidencias(pool, requireAuth) {
     const categoria = leerId(body.id_categoria);
     const prioridad = leerId(body.id_prioridad);
 
-    const sinEquipo =
-      body.id_equipo === null ||
-      body.id_equipo === undefined ||
-      body.id_equipo === '';
-
-    const equipo = sinEquipo ? null : leerId(body.id_equipo);
-
     if (
       !titulo ||
       titulo.length > 150 ||
       descripcion.length > 2000 ||
       !sala ||
       !categoria ||
-      !prioridad ||
-      (!sinEquipo && !equipo)
+      !prioridad
     ) {
       return res.status(400).json({
         mensaje:
@@ -208,7 +200,7 @@ function createIncidencias(pool, requireAuth) {
           id_responsable
         )
         SELECT
-          ?, ?, ?, ?,
+          ?, ?, ?, NULL,
           s.id_sala,
           c.id_categoria,
           p.id_prioridad,
@@ -220,34 +212,22 @@ function createIncidencias(pool, requireAuth) {
         JOIN estados_incidencia e ON e.nombre = 'Pendiente'
         WHERE s.id_sala = ?
           AND s.activo = 1
-          AND (
-            ? IS NULL
-            OR EXISTS (
-              SELECT 1
-              FROM equipos q
-              WHERE q.id_equipo = ?
-                AND q.id_sala = s.id_sala
-            )
-          )
         `,
         [
           titulo,
           descripcion || null,
           req.usuario.id_usuario,
-          equipo,
           categoria,
           prioridad,
           sala,
-          equipo,
-          equipo,
         ]
       );
 
       if (result.affectedRows !== 1) {
         return res.status(400).json({
           mensaje:
-            'Revisa la sala, categoría, prioridad y equipo. ' +
-            'El equipo debe pertenecer a la sala y debe existir el estado Pendiente.',
+            'Revisa la sala, categoría y prioridad. ' +
+            'La sala debe estar activa y debe existir el estado Pendiente.',
         });
       }
 
