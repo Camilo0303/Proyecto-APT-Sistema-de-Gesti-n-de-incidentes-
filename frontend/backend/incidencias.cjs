@@ -1,4 +1,5 @@
 const express = require('express');
+const { asignarResponsable } = require('./asignacion.cjs');
 const { filtrarIncidencias, ordenFecha, leerPagina } = require('./filtros-incidencias.cjs');
 
 function createIncidencias(pool, requireAuth) {
@@ -183,10 +184,14 @@ function createIncidencias(pool, requireAuth) {
       });
     }
 
+    let conexion;
     try {
+      conexion = await pool.getConnection();
+      await conexion.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+      await conexion.beginTransaction();
       // Valida las referencias y guarda en una sola operación.
       // El creador viene de la sesión, no del navegador.
-      const [result] = await pool.execute(
+      const [result] = await conexion.execute(
         `
         INSERT INTO incidencias (
           titulo,
@@ -224,6 +229,7 @@ function createIncidencias(pool, requireAuth) {
       );
 
       if (result.affectedRows !== 1) {
+        await conexion.rollback();
         return res.status(400).json({
           mensaje:
             'Revisa la sala, categoría y prioridad. ' +
@@ -231,13 +237,20 @@ function createIncidencias(pool, requireAuth) {
         });
       }
 
-      // El trigger de MySQL ya registra la creación en el historial.
+      const responsable = await asignarResponsable(conexion, result.insertId, req.usuario.id_usuario);
+      await conexion.commit();
+      // El trigger de MySQL registra la creación; la asignación tiene su propio movimiento.
       res.status(201).json({
         mensaje: 'Incidencia registrada correctamente.',
         id_incidencia: result.insertId,
+        responsable,
+        estado: responsable ? 'Asignada' : 'Pendiente',
       });
     } catch (error) {
+      if (conexion) await conexion.rollback().catch(() => {});
       next(error);
+    } finally {
+      conexion?.release();
     }
   });
 

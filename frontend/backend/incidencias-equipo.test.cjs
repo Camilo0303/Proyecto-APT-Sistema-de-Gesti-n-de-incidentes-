@@ -7,9 +7,10 @@ test('Nuevas incidencias: equipo nulo incluso desde clientes anteriores y creado
   const consultas = [];
   const app = express();
   app.use(express.json());
-  app.use('/incidencias', createIncidencias({ execute: async (sql, params) => {
-    consultas.push({ sql, params }); return [{ affectedRows: 1, insertId: 56 }];
-  } }, (req, res, next) => { req.usuario = { rol: 'Profesor', id_usuario: 52 }; next(); }));
+  const conexion = { query: async()=>{}, beginTransaction:async()=>{},commit:async()=>{},rollback:async()=>{},release:()=>{},execute:async(sql,params)=>{
+    consultas.push({sql,params}); return sql.includes('INSERT INTO incidencias') ? [{affectedRows:1,insertId:56}] : [[]];
+  }};
+  app.use('/incidencias', createIncidencias({getConnection:async()=>conexion}, (req, res, next) => { req.usuario = { rol: 'Profesor', id_usuario: 52 }; next(); }));
   const server = app.listen(0, '127.0.0.1');
   await new Promise(r => server.once('listening', r));
   try {
@@ -19,7 +20,7 @@ test('Nuevas incidencias: equipo nulo incluso desde clientes anteriores y creado
         body: JSON.stringify({ titulo: 'Proyector sin imagen', id_sala: 9, id_categoria: 1, id_prioridad: 2, id_equipo: equipo, id_usuario_creador: 999 }),
       });
       assert.equal(respuesta.status, 201);
-      const q = consultas.at(-1);
+      const q = consultas.findLast(q => q.sql.includes('INSERT INTO incidencias'));
       assert.match(q.sql, /SELECT\s+\?, \?, \?, NULL,/);
       assert.deepEqual(q.params, ['Proyector sin imagen', null, 52, 1, 2, 9]);
     }

@@ -156,7 +156,8 @@ export default function Reportar() {
         state: {
           mensaje:
             `Incidencia INC-${String(resultado.id_incidencia)
-              .padStart(4, '0')} registrada correctamente.`,
+              .padStart(4, '0')} registrada correctamente. ` +
+            (resultado.responsable ? `Asignada a ${resultado.responsable.nombre}.` : 'Pendiente de asignación: no hay técnicos disponibles en turno.'),
         },
       });
     } catch (err) {
