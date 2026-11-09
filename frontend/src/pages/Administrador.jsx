@@ -5,9 +5,11 @@ import CorreosAutorizados from './CorreosAutorizados';
 import SalasQR from './SalasQR';
 import HistorialAdministracion from './HistorialAdministracion';
 import DashboardAdministracion from './DashboardAdministracion';
+import TecnicosEnTurno from './TecnicosEnTurno';
 import './Administrador.css';
 
 const opciones = [
+  { id: 'turnos', icono: '◷', titulo: 'Técnicos en turno', descripcion: 'Consulta quién está disponible y cuándo termina su turno.', color: 'verde' },
   { id: 'dashboard', icono: '▥', titulo: 'Dashboard', descripcion: 'Analiza las incidencias y exporta datos para Power BI.', color: 'azul' },
   {
     id: 'usuarios',
@@ -418,6 +420,7 @@ export default function Administrador() {
         ) : (
           <div className="ad-seccion">
             {seccion === 'usuarios' && <UsuariosAdministracion />}
+            {seccion === 'turnos' && <TecnicosEnTurno />}
             {seccion === 'dashboard' && <DashboardAdministracion />}
             {seccion === 'correos' && <CorreosAutorizados />}
             {seccion === 'historial' && <HistorialAdministracion />}

@@ -22,6 +22,21 @@ function createAdministracion(pool, requireAuth) {
     catch (error) { next(error); }
   });
 
+  router.get('/tecnicos-en-turno', async (_req, res, next) => {
+    try {
+      const [tecnicos] = await pool.execute(`SELECT u.id_usuario,u.nombre,u.apellido,u.correo,
+        DATE_FORMAT(t.fecha_inicio,'%d/%m/%Y %H:%i:%s') AS inicio,
+        DATE_FORMAT(t.vence,'%d/%m/%Y %H:%i:%s') AS vence
+        FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol
+        JOIN turnos_tecnicos t ON t.id_turno=(SELECT MAX(actual.id_turno)
+          FROM turnos_tecnicos actual WHERE actual.id_usuario=u.id_usuario
+          AND actual.fecha_fin IS NULL AND actual.vence>NOW())
+        WHERE u.activo=1 AND r.nombre='Técnico'
+        ORDER BY t.fecha_inicio,u.id_usuario`);
+      res.json({ tecnicos });
+    } catch (error) { next(error); }
+  });
+
   router.get('/usuarios', async (_req, res, next) => {
     try {
       const [usuarios] = await pool.execute(`

@@ -7,6 +7,7 @@ const administrador = [
   ['Mi panel', '/administrador', '⌂'],
   ['Dashboard', '/administrador?seccion=dashboard', '▥'],
   ['Usuarios registrados', '/administrador?seccion=usuarios', '◎'],
+  ['Técnicos en turno', '/administrador?seccion=turnos', '◷'],
   ['Correos autorizados', '/administrador?seccion=correos', '@'],
   ['Historial de incidencias', '/administrador?seccion=historial', '☷'],
   ['Salas y códigos QR', '/administrador?seccion=salas', '▦'],
