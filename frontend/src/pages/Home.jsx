@@ -120,27 +120,18 @@ export default function Home() {
             </p>
           </div>
 
-          <Link to="/reportar" className="pd-boton pd-boton-blanco">
+          <Link to="/escanear" className="pd-boton pd-boton-blanco">
             <span aria-hidden="true">＋</span>
             Nueva incidencia
           </Link>
         </section>
 
         <section className="pd-accesos" aria-label="Accesos rápidos">
-          <Link to="/reportar" className="pd-acceso">
-            <span className="pd-acceso-icono pd-azul" aria-hidden="true">＋</span>
-            <div>
-              <h2>Reportar un problema</h2>
-              <p>Describe lo ocurrido e indica su ubicación.</p>
-            </div>
-            <span className="pd-flecha" aria-hidden="true">→</span>
-          </Link>
-
           <Link to="/escanear" className="pd-acceso">
             <span className="pd-acceso-icono pd-violeta" aria-hidden="true">▦</span>
             <div>
               <h2>Escanear código QR</h2>
-              <p>Abre la cámara para leer un código.</p>
+              <p>Escanea el QR o selecciona la sala manualmente para reportar.</p>
             </div>
             <span className="pd-flecha" aria-hidden="true">→</span>
           </Link>
@@ -216,7 +207,7 @@ export default function Home() {
               <span className="pd-vacio-icono" aria-hidden="true">☷</span>
               <h3>Todavía no tienes incidencias</h3>
               <p>Cuando registres un problema, podrás seguir su avance aquí.</p>
-              <Link to="/reportar" className="pd-boton pd-boton-primario">
+              <Link to="/escanear" className="pd-boton pd-boton-primario">
                 Crear mi primer reporte
               </Link>
             </div>

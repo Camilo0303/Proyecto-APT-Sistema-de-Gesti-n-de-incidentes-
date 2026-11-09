@@ -531,3 +531,10 @@ body:has(.qr-page) {
     min-height: 180px;
   }
 }
+.qr-page .qr-manual { margin: 24px 0; padding: 18px; background: #f0f6ff; border: 1px solid #c8daf7; border-radius: 14px; text-align: left; }
+.qr-page .qr-manual summary { cursor: pointer; font-weight: 700; color: #1d4ed8; }
+.qr-page .qr-manual summary:focus-visible { outline: 3px solid #2563eb; outline-offset: 4px; }
+.qr-page .qr-manual form { display: grid; gap: 12px; }
+.qr-page .qr-manual label { font-weight: 600; }
+.qr-page .qr-manual select { min-width: 0; width: 100%; padding: 12px; font: inherit; color: #203654; background: white; border: 1px solid #bdcde3; border-radius: 10px; }
+.qr-page .qr-manual select:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }

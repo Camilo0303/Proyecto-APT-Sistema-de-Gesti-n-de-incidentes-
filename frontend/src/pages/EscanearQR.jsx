@@ -13,6 +13,11 @@ export default function EscanearQR() {
   const [trabajando, setTrabajando] = useState(false);
   const [validando, setValidando] = useState(false);
   const [error, setError] = useState('');
+  const [manualAbierto, setManualAbierto] = useState(false);
+  const [salas, setSalas] = useState(null);
+  const [salaManual, setSalaManual] = useState('');
+  const [errorSalas, setErrorSalas] = useState('');
+  const [intentoSalas, setIntentoSalas] = useState(0);
   const [mensaje, setMensaje] = useState(
     'Activa la cámara o selecciona una imagen del código QR.'
   );
@@ -27,6 +32,38 @@ export default function EscanearQR() {
   // Serializa las operaciones de la cámara para evitar
   // iniciar y detener el lector al mismo tiempo.
   const cola = useRef(Promise.resolve());
+
+  useEffect(() => {
+    if (!manualAbierto || emergencia) return;
+    let vigente = true;
+    api('/incidencias/catalogos').then(datos => {
+      if (!Array.isArray(datos.salas)) throw new Error('No se pudieron obtener las salas.');
+      if (vigente) setSalas(datos.salas);
+    }).catch(e => { if (vigente) setErrorSalas(e.message); });
+    return () => { vigente = false; };
+  }, [manualAbierto, emergencia, intentoSalas]);
+
+  async function continuarManual(evento) {
+    evento.preventDefault();
+    if (operacionEnCurso.current || validacionEnCurso.current || emergencia) return;
+    if (!salas?.some(s => String(s.id_sala) === salaManual)) {
+      setErrorSalas('Selecciona una sala de la lista.'); return;
+    }
+    operacionEnCurso.current = true; setTrabajando(true); setErrorSalas('');
+    try {
+      await ejecutarEnOrden(async () => {
+        const lector = lectorRef.current;
+        if (lector?.isScanning) await lector.stop();
+        lector?.clear();
+      });
+      if (montado.current) navigate(`/reportar?sala=${encodeURIComponent(salaManual)}`);
+    } catch {
+      if (montado.current) setErrorSalas('No se pudo cerrar el lector. Detén la cámara y vuelve a intentar.');
+    } finally {
+      operacionEnCurso.current = false;
+      if (montado.current) { setTrabajando(false); setCamaraActiva(Boolean(lectorRef.current?.isScanning)); }
+    }
+  }
 
   function ejecutarEnOrden(accion) {
     const siguiente = cola.current.then(accion);
@@ -369,6 +406,22 @@ export default function EscanearQR() {
         </p>
 
         {error && <p role="alert">{error}</p>}
+
+        {!emergencia && <details className="qr-manual" onToggle={e => { const abierto = e.currentTarget.open; setManualAbierto(abierto); if (abierto) { setErrorSalas(''); setSalas(null); } }}>
+          <summary>No puedo escanear el QR: seleccionar sala manualmente</summary>
+          <p>Si la cámara no abre o el código no se reconoce, selecciona la sala donde ocurre el problema.</p>
+          {errorSalas && <p role="alert">{errorSalas}</p>}
+          {!salas ? errorSalas ? <button type="button" onClick={() => { setErrorSalas(''); setIntentoSalas(n => n + 1); }}>Reintentar carga de salas</button> : <p role="status">Cargando salas…</p>
+            : salas.length === 0 ? <p>No hay salas activas disponibles. Contacta al administrador.</p>
+              : <form onSubmit={continuarManual}>
+                <label htmlFor="qr-sala-manual">Sala del problema</label>
+                <select id="qr-sala-manual" value={salaManual} onChange={e => setSalaManual(e.target.value)} required disabled={bloqueado}>
+                  <option value="">Selecciona una sala</option>
+                  {salas.map(s => <option key={s.id_sala} value={s.id_sala}>{s.nombre}</option>)}
+                </select>
+                <button type="submit" disabled={bloqueado || !salaManual}>Continuar con esta sala</button>
+              </form>}
+        </details>}
 
         <p>
           Mantén el código completo dentro del recuadro y procura que haya
