@@ -12,11 +12,12 @@ test('Turnos: permisos, id de sesión, inicio idempotente y fin sin desactivar c
     consultas.push({sql,args});
     if (sql.startsWith('SELECT u.id_usuario')) return [[{id_usuario:4}]];
     if (sql.startsWith('SELECT id_turno')) return [enTurno ? [{id_turno:1,inicio:'2026-11-09 09:00:00',vence:'2026-11-09 17:00:00'}] : []];
+    if (sql.includes('SELECT i.id_incidencia')) return [[]];
     if (sql.startsWith('INSERT')) { altas++; enTurno=true; }
     if (sql.includes('fecha_fin=NOW()')) enTurno=false;
     return [{affectedRows:1}];
   };
-  const c={execute:ejecutar,beginTransaction:async()=>{},commit:async()=>{},rollback:async()=>{},release:()=>{}};
+  const c={execute:ejecutar,query:async()=>{},beginTransaction:async()=>{},commit:async()=>{},rollback:async()=>{},release:()=>{}};
   const app=express(); app.use(express.json());
   app.use('/turno',createTurnos({execute:ejecutar,getConnection:async()=>c},(req,res,next)=>{
     if (!req.get('Test-Role')) return res.status(401).end();
@@ -34,7 +35,7 @@ test('Turnos: permisos, id de sesión, inicio idempotente y fin sin desactivar c
     assert.equal((await post({en_turno:true})).status,200);assert.equal(altas,1);
     const actual=await (await fetch(base,{headers:{'Test-Role':'Técnico'}})).json();assert.equal(actual.en_turno,true);
     assert.equal((await post({en_turno:false})).status,200);assert.equal(enTurno,false);
-    for(const q of consultas) assert.equal(q.args[0],4);
+    for(const q of consultas.filter(q=>q.args)) assert.equal(q.args[0],4);
     assert.ok(consultas.some(q=>q.sql.includes('FOR UPDATE')));
     assert.ok(!consultas.some(q=>q.sql.startsWith('UPDATE usuarios')));
   } finally {await new Promise(r=>server.close(r));}

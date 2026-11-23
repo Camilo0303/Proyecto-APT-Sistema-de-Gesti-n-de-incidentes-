@@ -121,6 +121,11 @@ function PanelCetecom({ seccion, estadoInicial, tituloSeccion }) {
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
   const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    const actualizarAsignaciones = () => setRevision(valor => valor + 1);
+    window.addEventListener('sigi-incidencias-actualizadas', actualizarAsignaciones);
+    return () => window.removeEventListener('sigi-incidencias-actualizadas', actualizarAsignaciones);
+  }, []);
 
   const [seleccion, setSeleccion] = useState(null);
   const [comentario, setComentario] = useState('');

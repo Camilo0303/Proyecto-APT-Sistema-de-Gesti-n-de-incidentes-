@@ -1,9 +1,13 @@
-async function asignarResponsable(conexion, idIncidencia, creador) {
+async function bloquearTecnicos(conexion) {
   // Los turnos y las asignaciones bloquean primero las mismas filas de usuario.
   // READ COMMITTED permite contar lo confirmado por el envío anterior al obtener el bloqueo.
   await conexion.execute(`SELECT u.id_usuario FROM usuarios u
     WHERE u.activo=1 AND u.id_rol IN (SELECT id_rol FROM roles WHERE nombre='Técnico')
     ORDER BY u.id_usuario FOR UPDATE`);
+}
+
+async function asignarResponsable(conexion, idIncidencia, creador) {
+  await bloquearTecnicos(conexion);
   const [[tecnico]] = await conexion.execute(`SELECT u.id_usuario,
     CONCAT(u.nombre,' ',u.apellido) AS nombre,
     (SELECT COUNT(*) FROM incidencias i JOIN estados_incidencia e ON e.id_estado=i.id_estado
@@ -25,4 +29,25 @@ async function asignarResponsable(conexion, idIncidencia, creador) {
     `Asignación automática al técnico en turno con menor carga (${Number(tecnico.abiertas)} incidencias abiertas antes de asignar).`]);
   return {id_usuario:tecnico.id_usuario,nombre:tecnico.nombre};
 }
-module.exports={asignarResponsable};
+async function asignarPendientes(conexion, actor) {
+  const [pendientes] = await conexion.execute(`SELECT i.id_incidencia
+    FROM incidencias i JOIN estados_incidencia e ON e.id_estado=i.id_estado
+    WHERE i.id_responsable IS NULL AND e.nombre='Pendiente'
+    ORDER BY i.fecha_creacion, i.id_incidencia`);
+  let asignadas = 0;
+  for (const pendiente of pendientes) {
+    // Revisa de nuevo bajo bloqueo por si otro técnico tomó el reporte.
+    const [[actual]] = await conexion.execute(`SELECT i.id_incidencia
+      FROM incidencias i
+      WHERE i.id_incidencia=? AND i.id_responsable IS NULL
+        AND i.id_estado IN (SELECT id_estado FROM estados_incidencia WHERE nombre='Pendiente')
+      FOR UPDATE`, [pendiente.id_incidencia]);
+    if (!actual) continue;
+    const responsable = await asignarResponsable(conexion, actual.id_incidencia, actor);
+    if (!responsable) break;
+    asignadas++;
+  }
+  return asignadas;
+}
+
+module.exports={asignarResponsable,bloquearTecnicos,asignarPendientes};

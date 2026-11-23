@@ -1,5 +1,6 @@
 const express = require('express');
 const { permitirRoles } = require('./permisos.cjs');
+const { bloquearTecnicos, asignarPendientes } = require('./asignacion.cjs');
 
 async function finalizarTurno(pool, id) {
   const c = await pool.getConnection();
@@ -31,7 +32,11 @@ function createTurnos(pool, requireAuth) {
     if (typeof req.body?.en_turno !== 'boolean') return res.status(400).json({mensaje:'Selecciona un estado de turno válido.'});
     let c;
     try {
-      c=await pool.getConnection(); await c.beginTransaction();
+      c=await pool.getConnection();
+      await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+      await c.beginTransaction();
+      // Mantiene el mismo orden de bloqueo que el registro de incidencias.
+      if (req.body.en_turno) await bloquearTecnicos(c);
       const [[usuario]]=await c.execute(`SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id_rol=u.id_rol
         WHERE u.id_usuario=? AND u.activo=1 AND r.nombre='Técnico' FOR UPDATE`,[req.usuario.id_usuario]);
       if (!usuario) { await c.rollback(); return res.status(403).json({mensaje:'La cuenta técnica no está habilitada.'}); }
@@ -39,8 +44,9 @@ function createTurnos(pool, requireAuth) {
       const [[actual]]=await c.execute('SELECT id_turno FROM turnos_tecnicos WHERE id_usuario=? AND fecha_fin IS NULL AND vence>NOW() LIMIT 1',[usuario.id_usuario]);
       if (req.body.en_turno && !actual) await c.execute('INSERT INTO turnos_tecnicos(id_usuario,vence) VALUES(?,DATE_ADD(NOW(),INTERVAL 8 HOUR))',[usuario.id_usuario]);
       if (!req.body.en_turno) await c.execute('UPDATE turnos_tecnicos SET fecha_fin=NOW() WHERE id_usuario=? AND fecha_fin IS NULL',[usuario.id_usuario]);
+      const asignadas = req.body.en_turno ? await asignarPendientes(c, usuario.id_usuario) : 0;
       await c.commit();
-      res.json({en_turno:req.body.en_turno,mensaje:req.body.en_turno?'Turno iniciado.':'Turno finalizado.'});
+      res.json({en_turno:req.body.en_turno,asignadas,mensaje:req.body.en_turno?'Turno iniciado.':'Turno finalizado.'});
     } catch (error) { if(c)await c.rollback().catch(()=>{}); next(error); }
     finally { c?.release(); }
   });

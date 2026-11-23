@@ -25,7 +25,11 @@ export default function TurnoTecnico() {
   async function cambiar() {
     if (bloqueo.current || !datos) return;
     bloqueo.current = true; setOcupado(true); setError('');
-    try { await api('/turno', { en_turno: !datos.en_turno }); setDatos(null); }
+    try {
+      const resultado = await api('/turno', { en_turno: !datos.en_turno });
+      if (resultado.asignadas > 0) window.dispatchEvent(new Event('sigi-incidencias-actualizadas'));
+      setDatos(null);
+    }
     catch (e) { setDatos(null); setError(`${e.message} Actualiza para comprobar el estado del turno.`); }
     finally { bloqueo.current = false; setOcupado(false); setRevision(n => n + 1); }
   }

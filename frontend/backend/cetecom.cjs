@@ -1,6 +1,7 @@
 const express = require('express');
 const { permitirRoles } = require('./permisos.cjs');
 const { filtrarIncidencias } = require('./filtros-incidencias.cjs');
+const { bloquearTecnicos } = require('./asignacion.cjs');
 
 function createCetecom(pool, requireAuth) {
   const router = express.Router();
@@ -278,6 +279,7 @@ function createCetecom(pool, requireAuth) {
       conexion = await pool.getConnection();
       await conexion.beginTransaction();
 
+      await bloquearTecnicos(conexion);
       // Bloquea la fila para evitar que dos técnicos
       // tomen o cambien la misma incidencia simultáneamente.
       const [[incidencia]] = await conexion.execute(

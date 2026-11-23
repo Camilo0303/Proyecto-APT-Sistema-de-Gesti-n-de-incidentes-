@@ -21,19 +21,21 @@ export default function useSonidoAlertas(alertas) {
     const contexto = audio.current;
     if (!habilitado.current || contexto?.state !== 'running') return;
     detener();
-    // Tres tonos breves con volumen moderado y sin archivos externos.
-    [0, 0.3, 0.6].forEach((retraso, indice) => {
+    // Alarma de dos tonos alternados con entrada y salida suaves.
+    [0, 0.4, 0.8, 1.2, 1.6, 2].forEach((retraso, indice) => {
       const tono = contexto.createOscillator();
       const volumen = contexto.createGain();
       const inicio = contexto.currentTime + retraso;
-      tono.type = 'sine'; tono.frequency.value = indice === 1 ? 1046 : 880;
+      tono.type = 'triangle';
+      tono.frequency.value = indice % 2 === 0 ? 660 : 990;
       volumen.gain.setValueAtTime(0, inicio);
-      volumen.gain.linearRampToValueAtTime(0.12, inicio + 0.015);
-      volumen.gain.linearRampToValueAtTime(0, inicio + 0.2);
+      volumen.gain.linearRampToValueAtTime(0.25, inicio + 0.02);
+      volumen.gain.setValueAtTime(0.25, inicio + 0.3);
+      volumen.gain.linearRampToValueAtTime(0, inicio + 0.36);
       tono.connect(volumen); volumen.connect(contexto.destination);
       nodos.current.add(tono);
       tono.onended = () => { nodos.current.delete(tono); tono.disconnect(); volumen.disconnect(); };
-      tono.start(inicio); tono.stop(inicio + 0.21);
+      tono.start(inicio); tono.stop(inicio + 0.37);
     });
   }
 
