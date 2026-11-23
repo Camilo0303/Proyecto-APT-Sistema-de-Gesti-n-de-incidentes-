@@ -13,9 +13,9 @@ Después de modificar el backend, detener su instancia anterior con Ctrl+C y vol
 - Los POST requieren JSON y la cabecera X-SIGI-Request: 1.
 - Contraseñas nuevas: scrypt con sal aleatoria. Las contraseñas en texto plano del SQL inicial se convierten después del primer login correcto. No se cambia su valor de acceso.
 - Sesiones en memoria del servidor por 8 horas, con cookie HttpOnly y SameSite=Strict. Reiniciar el backend cierra todas las sesiones; el usuario debe volver a iniciar sesión.
-- El dashboard requiere sesión y muestra el resumen general del establecimiento. No se han definido aún permisos diferenciados por rol para ese resumen.
+- El dashboard del profesor consulta sus propios reportes. Administración dispone de indicadores generales y exportación CSV con filtros.
 - Este servidor se mantiene en localhost. Antes de desplegar se necesitan HTTPS y almacenamiento compartido/persistente de sesiones.
-- Los formularios de incidencias y emergencias todavía no guardan en MySQL.
+- Los formularios de incidencias y emergencias guardan en MySQL. Las operaciones que afectan varios registros utilizan transacciones e historial.
 
 ## Comprobar un registro en Workbench
 
@@ -38,7 +38,7 @@ WHERE c.activo = 1 AND u.id_usuario IS NULL;
 
 ## Verificaciones
 
-`npm.cmd run check` valida sintaxis. `npm.cmd test` comprueba hashes sin tocar la BD.
+`npm.cmd run check` valida sintaxis. `npm.cmd test` ejecuta las pruebas de autenticación. Para ejecutar todas las pruebas del backend, usar `node --test *.test.cjs`.
 Para integración real, en PowerShell:
 
 ```powershell

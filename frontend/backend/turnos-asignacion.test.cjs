@@ -70,7 +70,7 @@ async function conServidor(escena, comprobar) {
     req.usuario = { id_usuario: 5, rol: 'Técnico' };
     next();
   }));
-  app.use((error, req, res, next) => res.status(500).json({ mensaje: error.message }));
+  app.use((error, req, res, _next) => res.status(500).json({ mensaje: error.message }));
   const server = app.listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   const iniciar = () => fetch(`http://127.0.0.1:${server.address().port}/turno`, {
